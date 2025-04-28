@@ -622,50 +622,53 @@ class EasyImage(EasyWidgetBase):
             if not hide:
                 self.rerender_itself()
 
-class CreateToolTip(object):
+class CreateToolTip:
     """
     Create a tooltip on hover for a given widget.
     """
-    def __init__(self, widget, text="widget info"):
-        self.waittime = 300
-        self.wraplength = 240
+    def __init__(self, widget, text="widget info", waittime=300, wraplength=240, x_offset=25, y_offset=25,):
         self.widget = widget
         self.text = text
+        self.waittime = waittime
+        self.wraplength = wraplength
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+
         self.widget.bind("<Enter>", self.enter)
         self.widget.bind("<Leave>", self.leave)
         self.widget.bind("<ButtonPress>", self.leave)
         self.id = None
-        self.tw = None
+        self.tooltip_window = None
 
     def enter(self, event=None):
         self.schedule()
 
     def leave(self, event=None):
         self.unschedule()
-        self.hidetip()
+        self.hide_tip()
 
     def schedule(self):
         self.unschedule()
-        self.id = self.widget.after(self.waittime, self.showtip)
+        self.id = self.widget.after(self.waittime, self.show_tip_wrapper)
 
     def unschedule(self):
-        id = self.id
+        if self.id:
+            self.widget.after_cancel(self.id)
         self.id = None
-        if id:
-            self.widget.after_cancel(id)
 
-    def showtip(self, event=None):
-        x = y = 0
+    def show_tip_wrapper(self, event=None):
+        return self.show_tip(self.x_offset, self.y_offset, event)
+
+    def show_tip(self, x_offset, y_offset, event=None):
         x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
+        x += self.widget.winfo_rootx() + x_offset
+        y += self.widget.winfo_rooty() + y_offset
 
-        self.tw = tk.Toplevel(self.widget)
-
-        self.tw.wm_overrideredirect(True)
-        self.tw.wm_geometry("+%d+%d" % (x, y))
+        self.tooltip_window = tk.Toplevel(self.widget)
+        self.tooltip_window.wm_overrideredirect(True)
+        self.tooltip_window.wm_geometry(f"+{x}+{y}")
         label = tk.Label(
-            self.tw,
+            self.tooltip_window,
             text=self.text,
             justify="left",
             foreground="#000",
@@ -676,11 +679,10 @@ class CreateToolTip(object):
         )
         label.pack(ipadx=1)
 
-    def hidetip(self):
-        tw = self.tw
-        self.tw = None
-        if tw:
-            tw.destroy()
+    def hide_tip(self):
+        if self.tooltip_window:
+            self.tooltip_window.destroy()
+        self.tooltip_window = None
 
 
 def read_txt(filename):
