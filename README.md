@@ -12,12 +12,12 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
   1. Find a directory on your device for the software and clone the repository from the terminal.
       ```sh
-      git clone https://github.com/EpiEvoSoftware/original_pipeline
+      git clone https://github.com/EpiEvoSoftware/e3SIM
       ```
   
   2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`. This step took 2.5 minutes on a M2 pro macbook. 
       ```sh
-      cd original_pipeline
+      cd e3SIM
       conda env create --name e3SIM --file ${ENV_YML}
       ```
       <!-- If environment creation fails or you encounter errors about importing packages in testing (step 4), do `conda deactivate` to deactivate the environment and delete it by `conda remove --name e3SIM --all`, then repeat this step by using the no-builds options of the yml file (`mac_env_wo_builds.yml` for MacOS or `linux_env_wo_builds.yml` for Linux). -->
@@ -27,8 +27,9 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
       conda activate e3SIM
       ```
   
-  4. Install R and R packages (ONLY Required for MacOS). Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
-      Download and install R from here: https://cran.r-project.org/. After successful installation of R, run the following command one by one to install required R packages.
+  4. Install R and R packages. Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
+      Download and install R from here: https://cran.r-project.org/. After successful installation of R, run the following command one by one to install required R packages.\
+     **For MacOS users:** 
         ```sh
         R
         install.packages("phylobase")
@@ -41,9 +42,19 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
             install.packages("BiocManager")
         BiocManager::install("ggtree")
         BiocManager::install("Biostrings")
+
+        q()
+        ```
+        
+      **For Linux users:**
+        ```sh
+        R
+        install.packages("ade4")
+
+        q()
         ```
 
-  5. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
+  6. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
       ```sh
       cd e3SIM
       e3SIM=${PWD}
@@ -74,13 +85,13 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     
         Command line tools for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator, GeneticEffectGenerator, and SeedHostMatcher. Please refer to the manual chapter 2 for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter 3.2. The following commands copy the template to your designated working directory.
         ```sh
-        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation.config
+        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation_config.json
         ```
-        Then manually change the configuration in `${WKDIR}/simulation.config`.
+        Then manually change the configuration in `${WKDIR}/simulation_config.json`.
 
 3. Run the simulation
     ```sh
-    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation.config
+    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation_config.json
     ```
 
 4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
@@ -91,6 +102,10 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     ```sh
     python ${e3SIM}/enivol.py -config ${WKDIR}/simulation.config
     ```
+
+5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.
+
+
 
 ## Liscence
 

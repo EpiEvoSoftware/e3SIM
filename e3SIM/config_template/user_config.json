@@ -1,36 +1,36 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "",
-    "n_replicates": 1,
+    "cwdir": "/Users/px54/Documents/TB_software/test_gui",
+    "n_replicates": 3,
     "random_number_seed": null
   },
   "EvolutionModel": {
-    "n_generation": 0,
-    "subst_model_parameterization": "",
+    "n_generation": 1000,
+    "subst_model_parameterization": "mutation rate matrix",
     "mut_rate": 0.0,
     "mut_rate_matrix": [
       [
         0.0,
+        1e-08,
+        1e-08,
+        1e-08
+      ],
+      [
+        1e-08,
         0.0,
+        1e-08,
+        1e-08
+      ],
+      [
+        1e-08,
+        1e-08,
         0.0,
         0.0
       ],
       [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      [
-        0.0,
-        0.0,
-        0.0,
+        1e-08,
+        1e-08,
+        1e-08,
         0.0
       ]
     ],
@@ -39,15 +39,15 @@
     "cap_withinhost": 1
   },
   "NetworkModelParameters": {
-    "method": "",
-    "host_size": 0,
+    "method": "randomly_generate",
+    "host_size": 10000,
     "user_input": {
       "path_network": ""
     },
     "randomly_generate": {
-      "network_model": "",
+      "network_model": "ER",
       "ER": {
-        "p_ER": 0
+        "p_ER": 0.0005
       },
       "RP": {
         "rp_size": [
@@ -66,41 +66,41 @@
     }
   },
   "SeedsConfiguration": {
-    "seed_size": 1,
+    "seed_size": 10,
     "use_reference": false,
-    "method": "",
+    "method": "SLiM_burnin_WF",
     "user_input": {
       "path_seeds_vcf": "",
       "path_seeds_phylogeny": ""
     },
     "SLiM_burnin_WF": {
-      "burn_in_Ne": 0,
-      "burn_in_generations": 0,
-      "subst_model_parameterization": "",
+      "burn_in_Ne": 1000,
+      "burn_in_generations": 4000,
+      "subst_model_parameterization": "mutation rate matrix",
       "burn_in_mutrate": 0.0,
       "burn_in_mutrate_matrix": [
         [
           0.0,
+          1e-08,
+          1e-08,
+          1e-08
+        ],
+        [
+          1e-08,
           0.0,
+          1e-08,
+          1e-08
+        ],
+        [
+          1e-08,
+          1e-08,
           0.0,
           0.0
         ],
         [
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        ],
-        [
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        ],
-        [
-          0.0,
-          0.0,
-          0.0,
+          1e-08,
+          1e-08,
+          1e-08,
           0.0
         ]
       ]
@@ -136,34 +136,46 @@
         ]
       ],
       "seeded_host_id": [],
-      "S_IE_prob": 0,
-      "E_I_prob": 0,
-      "E_R_prob": 0,
-      "latency_prob": 0,
-      "I_R_prob": 0,
-      "I_E_prob": 0,
-      "R_S_prob": 0
+      "S_IE_prob": 0.0,
+      "E_I_prob": 0.0,
+      "E_R_prob": 0.0,
+      "latency_prob": 0.0,
+      "I_R_prob": 0.0,
+      "I_E_prob": 0.0,
+      "R_S_prob": 0.0
     }
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "",
+    "ref_path": "/Users/px54/Documents/TB_software/test_gui/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
     "traits_num": {
-      "transmissibility": 0,
-      "drug_resistance": 0
+      "transmissibility": 2,
+      "drug_resistance": 1
     },
     "effect_size": {
-      "method": "",
+      "method": "randomly_generate",
       "user_input": {
         "path_effsize_table": ""
       },
       "randomly_generate": {
-        "gff": "",
-        "genes_num": [],
-        "effsize_min": [],
-        "effsize_max": [],
-        "normalize": false,
-        "final_trait": 1
+        "gff": "/Users/px54/Documents/TB_software/test_gui/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+        "genes_num": [
+          5,
+          10,
+          5
+        ],
+        "effsize_min": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "effsize_max": [
+          10.0,
+          5.0,
+          5.0
+        ],
+        "normalize": true,
+        "final_trait": 1.0
       }
     }
   },

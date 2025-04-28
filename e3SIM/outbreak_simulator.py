@@ -311,7 +311,7 @@ def create_slim_config(all_config):
 			raise CustomizedError("Ticks to do massive sampling (\"massive_sample_generation\") should be a list of length of the number of massive sampling events")
 		if any([i > slim_pars["n_generation"] or i < 1 for i in slim_pars["massive_sample_generation"]]):
 			raise CustomizedError(f"Ticks to do massive sampling (\"massive_sample_generation\") has to be a tick that is valid (1..{slim_pars["n_generation"]})")
-		out_config.write(f"massive_sample_generation: {",".join([str(x) for x in slim_pars["massive_sample_generation"]])}\n")
+		out_config.write(f"massive_sample_generation:{",".join([str(x) for x in slim_pars["massive_sample_generation"]])}\n")
 
 		slim_pars["massive_sample_prob"] = all_config["EpidemiologyModel"]["massive_sampling"]["sampling_prob"]
 		slim_pars["massive_sample_recover_prob"] = all_config["EpidemiologyModel"]["massive_sampling"]["recovery_prob_after_sampling"]
@@ -320,7 +320,7 @@ def create_slim_config(all_config):
 				raise CustomizedError(f"(\"{param}\") has to be a list []")
 			if any([type(i) not in [float, int] or i >1 or i < 0 for i in slim_pars[param]]):
 				raise CustomizedError(f"(\"{param}\") has to be a list of probability, thus between 0 and 1")
-			out_config.write(f"{param}: {",".join([str(x) for x in slim_pars[param]])}\n")
+			out_config.write(f"{param}:{",".join([str(x) for x in slim_pars[param]])}\n")
 	
 	slim_pars["super_infection"] = all_config["EpidemiologyModel"]["super_infection"]
 	_check_boolean(slim_pars["super_infection"], "Whether to enable super infection")
