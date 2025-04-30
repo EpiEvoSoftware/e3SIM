@@ -13,13 +13,13 @@ jobs:
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v2.2.0
       with:
-        activate-environment: trans_slim
+        activate-environment: e3SIM_linux
         environment-file: e3SIM_linux.yml
         auto-activate-base: false
 
     - name: Run Pytest
       shell: bash -l {0}
       run: |
-        conda activate trans_slim
+        conda activate e3SIM_linux
         cd test
         pytest
