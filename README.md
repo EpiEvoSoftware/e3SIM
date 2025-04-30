@@ -3,9 +3,9 @@
 $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an innovative outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
 
 ## Useful Links
-1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1).
-2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.11715269](https://doi.org/10.5281/zenodo.11715269).
-3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf).
+1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1){:target="_blank"}.
+2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.11715269](https://doi.org/10.5281/zenodo.11715269){:target="_blank"}.
+3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf){:target="_blank"}.
 
 
 ## Installation
