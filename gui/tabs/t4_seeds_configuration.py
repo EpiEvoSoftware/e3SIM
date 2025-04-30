@@ -3,7 +3,8 @@ from tkinter import messagebox
 import json
 from utils import (load_config_as_dict, no_validate_update_val, no_validate_update,
                    TabBase, GroupControls, EasyPathSelector, EasyTitle, EasyCombobox, 
-                   EasyRadioButton, EasyButton, EasyEntry, EasyRateMatrix, EasyImage)
+                   EasyRadioButton, EasyButton, EasyEntry, EasyRateMatrix, EasyImage,
+                   CreateToolTip)
 from seed_generator import run_seed_generation
 
 class SeedsConfiguration(TabBase):
@@ -162,6 +163,9 @@ class SeedsConfiguration(TabBase):
             "integer",
             hide,
             columnspan,
+            False,
+            'w',
+            "Number of seeding sequences (= number of initial patients)"
         )
         self.visible_components.add(component)
         return component
@@ -178,6 +182,8 @@ class SeedsConfiguration(TabBase):
             hide,
             frow,
             columnspan,
+            None,
+            "Path to a VCF file that specifies the existing mutations of the seeding sequences."
             )
         self.visible_components.add(component)
         return component
@@ -194,6 +200,8 @@ class SeedsConfiguration(TabBase):
             hide,
             frow,
             columnspan,
+            None,
+            "Phylogeny of the user-imported seeding sequences. They will be used in generating the final pathogen genealogy."
         )
         self.visible_components.add(component)
         return component
@@ -387,6 +395,9 @@ class SeedsConfiguration(TabBase):
             hide,
             width,
             columnspan,
+            None,
+            False,
+            "Substitution parameterization for the burn-in process, using the same format as the formal simulation, but you can specify different rate values / model as needed."
         )
         self.visible_components.add(component)
         return component
@@ -518,7 +529,10 @@ class SeedsConfiguration(TabBase):
             comboboxselected,
             hide,
             width,
-            column_span
+            column_span,
+            None,
+            False,
+            "Substitution parameterization for the burn-in process, using the same format as the formal simulation, but you can specify different rate values / model as needed."
         )
         self.visible_components.add(component)
         return component
@@ -599,7 +613,10 @@ class SeedsConfiguration(TabBase):
             frow,
             "list integer",
             hide,
-            columnspan=1,
+            1,
+            False,
+            "w",
+            "Patient 0's IDs, following the ID in the host population network",
         )
         self.visible_components.add(component)
         return component
@@ -618,6 +635,9 @@ class SeedsConfiguration(TabBase):
             "numerical",
             hide,
             1,
+            False,
+            "w",
+            "Probability of transmission (S->E/I) for each connected S-I host pair per tick."
         )
         self.visible_components.add(component)
         return component
@@ -636,6 +656,9 @@ class SeedsConfiguration(TabBase):
             "numerical",
             hide,
             1,
+            False,
+            "w",
+            "Probability of recovery (E->R) for each exposed host per tick."
         )
         self.visible_components.add(component)
         return component
@@ -654,6 +677,9 @@ class SeedsConfiguration(TabBase):
             "numerical",
             hide,
             1,
+            False,
+            "w",
+            "Probability of being in the exposed state once succcessfully infected by another host."
         )
         self.visible_components.add(component)
         return component
@@ -672,6 +698,9 @@ class SeedsConfiguration(TabBase):
             "numerical",
             hide,
             1,
+            False,
+            "w",
+            "Probability of activation (E->I) for each exposed host per tick."
         )
         self.visible_components.add(component)
         return component
@@ -689,7 +718,10 @@ class SeedsConfiguration(TabBase):
             frow,
             "numerical",
             hide,
-            columnspan=1,
+            1,
+            False,
+            "w",
+            "Probability of deactivation (I->E) for each infected host per tick."
         )
         self.visible_components.add(component)
         return component
@@ -707,7 +739,10 @@ class SeedsConfiguration(TabBase):
             frow,
             "numerical",
             hide,
-            columnspan=1,
+            1,
+            False,
+            "w",
+            "Probability of immunity loss (R->S) for each recovered host per tick."
         )
         self.visible_components.add(component)
         return component
@@ -725,7 +760,10 @@ class SeedsConfiguration(TabBase):
             frow,
             "numerical",
             hide,
-            columnspan=1,
+            1,
+            False,
+            "w",
+            "Probability of recovery (I->R) for each infected host per tick."
         )
         self.visible_components.add(component)
         return component

@@ -259,10 +259,12 @@ class EasyTitle(EasyWidgetBase):
 
 class EasyLabel(EasyWidgetBase):
     def __init__(
-        self, render_text, control_frame, column, frow, hide, columnspan=1, sticky="w"):
+        self, render_text, control_frame, column, frow, hide, columnspan=1, sticky="w", labtext=""):
         super().__init__()
         self.render_text = render_text
         self.label = ttk.Label(control_frame, text=self.render_text, style="Bold.TLabel")
+        if labtext != "":
+            CreateToolTip(self.label, labtext)
         if frow is None or column is None:
             self.label.grid()
         else:
@@ -298,7 +300,7 @@ class EasyEntry(EasyWidgetBase):
 
     def __init__(
         self, keys_path, config_path, render_text, render_text_short, control_frame, column, frow,
-        validate_for, hide, columnspan, disabled=False, sticky='w'):
+        validate_for, hide, columnspan, disabled=False, sticky='w', labtext=''):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -310,6 +312,8 @@ class EasyEntry(EasyWidgetBase):
             dict_var = ""
         label = ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
         self.label = label
+        if labtext != "":
+            CreateToolTip(self.label, labtext)
         self.entry = ttk.Entry(control_frame, foreground="black")
         self.entry.insert(0, str(dict_var))
 
@@ -442,7 +446,7 @@ class EasyRadioButton(EasyWidgetBase):
     def __init__(
         self, keys_path, config_path, render_text, render_text_short, control_frame,
         column, frow, hide, to_rerender, to_derender, columnspan, radiobuttonselected,
-        disabled=False, text=None):
+        disabled=False, text=None, labtext=""):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -458,6 +462,8 @@ class EasyRadioButton(EasyWidgetBase):
             self.var = tk.BooleanVar(value=True)
         label = ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
         self.label = label
+        if labtext != "":
+            CreateToolTip(self.label, labtext)
         self.rb_true = ttk.Radiobutton(
             control_frame,
             text="Yes" if not text else text[0],
@@ -505,7 +511,7 @@ class EasyCombobox(EasyWidgetBase):
     def __init__(
         self, keys_path, config_path, render_text, control_frame,
         column, frow, combobox_values, to_rerender, to_derender, comboboxselected, hide, width,
-        columnnspan, val_to_ui_mapping=None, keys_path_none=False):
+        columnnspan, val_to_ui_mapping=None, keys_path_none=False, labtext=""):
         super().__init__()
         self.keys_path = keys_path
         self.config_path = config_path
@@ -542,6 +548,8 @@ class EasyCombobox(EasyWidgetBase):
                 row=frow, column=column, columnspan=columnnspan, sticky="w", pady=5)
             self.combobox.grid(
                 row=frow + 1, column=column, columnspan=columnnspan, sticky="w", pady=5)
+        if labtext != "":
+            CreateToolTip(self.label, labtext)
 
         self.local_components = {self.label, self.combobox}
         self.derender_itself()
@@ -555,7 +563,7 @@ class EasyCombobox(EasyWidgetBase):
 class EasyPathSelector(EasyWidgetBase):
     def __init__(
         self, keys_path, config_path, render_text, control_frame,
-        column, hide, frow, columnspan, filetype=None):
+        column, hide, frow, columnspan, filetype=None, labtext=""):
         super().__init__()
         self.filetype = filetype
         self.keys_path = keys_path
@@ -563,6 +571,8 @@ class EasyPathSelector(EasyWidgetBase):
 
         dict_var = get_nested_dict_val(load_config_as_dict(config_path), keys_path)
         label = ttk.Label(control_frame, text=render_text, style="Bold.TLabel")
+        if labtext != "":
+            CreateToolTip(label, labtext)
         if dict_var == "":
             self.value_label = ttk.Label(
                 control_frame, text="None selected", foreground="black")

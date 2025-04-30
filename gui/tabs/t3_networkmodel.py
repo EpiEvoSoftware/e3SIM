@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from utils import load_config_as_dict, save_config
+from utils import load_config_as_dict, save_config, CreateToolTip
 import json
 import networkx as nx
 import os
@@ -56,6 +56,8 @@ class NetworkModel:
             0, str(load_config_as_dict(self.config_path)["NetworkModelParameters"]["host_size"]))
         self.update_config_entries["host_size"] = host_size_entry
 
+        CreateToolTip(host_size_label, 
+                      "Number of hosts in the population.")
         host_size_label.pack()
         host_size_entry.pack(pady=(0, 10))
 
@@ -91,6 +93,8 @@ class NetworkModel:
             value="randomly_generate",
             command=update)
 
+        CreateToolTip(network_method_label, 
+                      "Which random network model to use to generate a host contact network. Options: Erdos-Renyi (ER), Barabasi-Albert (BA), Random partition (RP)")
         network_method_label.pack()
         network_method_rb_user.pack()
         network_method_rb_random.pack(pady=(0, 10))

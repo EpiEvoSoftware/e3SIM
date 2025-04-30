@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "",
+    "cwdir": "/Users/px54/Documents/TB_software/test_gui",
     "n_replicates": 1,
     "random_number_seed": null
   },
@@ -213,7 +213,7 @@
     "do_postprocess": true,
     "tree_plotting": {
       "branch_color_trait": 1,
-      "heatmap": "none"
+      "heatmap": "transmissibility"
     },
     "sequence_output": {
       "vcf": true,

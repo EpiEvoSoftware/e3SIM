@@ -2,7 +2,7 @@ from tkinter import messagebox
 import json
 from utils import (load_config_as_dict, save_config, no_validate_update_val, no_validate_update,
                    TabBase, GroupControls, EasyPathSelector, EasyTitle, EasyCombobox,
-                   EasyRadioButton, EasyButton, EasyEntry, EasyLabel)
+                   EasyRadioButton, EasyButton, EasyEntry, EasyLabel, CreateToolTip)
 from genetic_effect_generator import run_effsize_generation
 
 class GenomeElement(TabBase):
@@ -101,12 +101,14 @@ class GenomeElement(TabBase):
             to_derender,
             columnspan,
             radiobuttonselected,
+            labtext="If you want to set trait values that are adjusted by the mutations on the genome, please select \"YES\"."
         )
         return component
 
     def render_number_of_traits_title(self, hide=True, column=None, frow=None):
-        text = "Number of traits (Integer):"
-        component = EasyLabel(text, self.control_frame, column, frow, hide)
+        text = "Number of traits where genetic architectures can be specified:"
+        component = EasyLabel(text, self.control_frame, column, frow, hide, 
+                              labtext="More than 1 trait can be specified for each trait type (transmissibility/drug-resistance).")
         return component
 
     def render_transmissibility(self, hide=True, column=None, frow=None):
@@ -123,6 +125,7 @@ class GenomeElement(TabBase):
             "integer",
             hide,
             columnspan=1,
+            labtext="Number of transmissibility traits you want to specify. In each epoch, only 1 transmissibility trait will be enabled, such that transmissibility is determined by its genetic architecture.",
         )
         self.visible_components.add(component)
         return component
@@ -141,6 +144,7 @@ class GenomeElement(TabBase):
             "integer",
             hide,
             columnspan=1,
+            labtext="Number of drug-resistance traits you want to specify. In each epoch, only 1 drug-resistance trait will be enabled, such that drug-resistance is determined by its genetic architecture.",
         )
         self.visible_components.add(component)
         return component
@@ -210,6 +214,7 @@ class GenomeElement(TabBase):
             hide,
             frow,
             columnspan,
+            labtext="The file has to have at least 5 columns, with the 4th and 5th column showing the starting and ending positions of one genetic element."
         )
         return component
 

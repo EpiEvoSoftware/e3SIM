@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from utils import render_next_button, load_config_as_dict, save_config
+from utils import render_next_button, load_config_as_dict, save_config, CreateToolTip
 from base_func import check_ref_format
 
 class Configuration:
@@ -63,6 +63,9 @@ class Configuration:
             style="Bold.TLabel")
         ref_path_label.grid(row=4, column=0, sticky="w", pady=5)
 
+        CreateToolTip(ref_path_label, 
+                      "Path to the reference genome of the pathogen (FASTA format).")
+
         if self.ref_path == "":
             self.ref_path_label = ttk.Label(
                 self.control_frame, text="None selected", foreground="black", width=50)
@@ -87,12 +90,16 @@ class Configuration:
             self.user_working_directory_label = ttk.Label(
                 self.control_frame, text=self.cwd, foreground="black", width=50)
 
+        CreateToolTip(self.working_directory_label, 
+                      "Path of the working directory of the current workflow, all files will be stored there.")
         self.user_working_directory_label.grid(row=1, column=0, pady=5, sticky="w")
 
         self.n_replicates_label = ttk.Label(
             self.control_frame, text="Number of Simulation Replicates (Integer)", 
             style="Bold.TLabel")
 
+        CreateToolTip(self.n_replicates_label, 
+                      "The number of simulation replicates to run with the current configuration.")
         self.n_replicates_label.grid(row=7, column=0, sticky="w", pady=5)
         self.n_replicates_entry = ttk.Entry(self.control_frame, foreground="black", width=20)
         self.n_replicates_entry.grid(row=8, column=0, sticky="w", pady=5)
@@ -101,6 +108,8 @@ class Configuration:
     def render_random_seed(self):
         random_seed_label = ttk.Label(
             self.control_frame, text="Random Seed (Integer)", style="Bold.TLabel")
+        CreateToolTip(random_seed_label, 
+                      "Random seed used for the preprocessing steps.")
         random_seed_label.grid(row=9, column=0, sticky="w", pady=5)
         self.random_seed_entry = ttk.Entry(self.control_frame, foreground="black", width=20)
         self.random_seed_entry.grid(row=10, column=0, sticky="w", pady=5)

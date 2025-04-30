@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from utils import render_next_button, load_config_as_dict, save_config
+from utils import render_next_button, load_config_as_dict, save_config, CreateToolTip
 
 class EvolutionaryModel:
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide = False):
@@ -35,6 +35,8 @@ class EvolutionaryModel:
         self.n_generation_label = ttk.Label(
             self.control_frame, text="Number of Generations (Integer)", 
             style="Bold.TLabel", width = 50)
+        CreateToolTip(self.n_generation_label, 
+                      "Number of generations (ticks) to run in the simulation.")
         self.n_generation_label.grid(row = 1, column = 0, sticky = 'w', pady = 5, padx = 10)
         self.n_generation_entry = ttk.Entry(self.control_frame, foreground="black")
         self.n_generation_entry.insert(0, self.initial_evolution_config['n_generation'])  
@@ -69,6 +71,9 @@ class EvolutionaryModel:
         self.model_parameterization_combobox.bind("<<ComboboxSelected>>", update)
         self.model_parameterization_combobox.grid(
             row = 4, column = 0, columnspan = 2, sticky = 'w', pady = 5, padx=10)
+        
+        CreateToolTip(self.model_parameterization_label, 
+                      "Which nucleotide substitution model to use in the simulation.")
 
         self.render_mut_rate()
         self.render_mut_rate_matrix()
@@ -85,6 +90,9 @@ class EvolutionaryModel:
             text="Mutation Rate Per Site Per Generation (Numerical)", 
             width = 50, 
             style = "Bold.TLabel")
+        
+        CreateToolTip(self.mut_rate_label, 
+                      "Probability of point mutation per site per tick (by default Jukes-Cantor model)")
         self.mut_rate_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
         self.mut_rate_entry = ttk.Entry(self.control_frame, foreground="black")
         self.mut_rate_entry.insert(0, self.initial_evolution_config['mut_rate'])
@@ -97,7 +105,8 @@ class EvolutionaryModel:
             width = 50,
             style = "Bold.TLabel")
         self.mut_rate_matrix_label.grid(row = 5, column = 0, sticky = 'w', pady = 5, padx=10)
-
+        CreateToolTip(self.mut_rate_matrix_label, 
+                      "Probability of point mutation per site per tick (The off-diagnal values represents the probability of nucleotide(row)->nucleotide(column) mutations, in the order of A,C,G,T)")
         self.mut_rate_matrix_container = ttk.Frame(self.control_frame)
         self.mut_rate_matrix_container.grid(row = 6, column = 0, stick='w', padx = 10)
 
@@ -141,6 +150,8 @@ class EvolutionaryModel:
             value=False,
             command=update)
 
+        CreateToolTip(self.within_host_reproduction_label, 
+                      "Whether to activate within-host reproduction (Pathogen can go through replications within hosts).")
         self.within_host_reproduction_label.grid(
             row = 15, column = 0, sticky = 'w', pady = 5, padx=10)
         self.rb_true.grid(row = 16, column = 0, sticky = 'w', pady = 5, padx=10)
@@ -155,6 +166,9 @@ class EvolutionaryModel:
             self.control_frame, foreground="black")
         self.within_host_reproduction_rate_entry.insert(
             0, self.initial_evolution_config['within_host_reproduction_rate'])
+        
+        CreateToolTip(self.within_host_reproduction_rate_label, 
+                      "Probability of within-host reproduction per pathogen per tick.")
         
         self.within_host_reproduction_rate_label.grid(
             row = 15, column = 1, sticky = 'w', pady = 5, padx=0)
@@ -174,6 +188,9 @@ class EvolutionaryModel:
             self.control_frame, 
             text="Maximum Number of Pathogens within Host (Integer)", 
             style = "Bold.TLabel")
+        
+        CreateToolTip(self.cap_withinhost_label, 
+                      "Maximum number of pathogens that is permitted within one host, the effective within-host reproduction rate will be 0 if this number is reached in one host.")
         self.cap_withinhost_label.grid(row = 18, column = 0, sticky = 'w', pady = 5, padx = 10)
         self.cap_withinhost_entry = ttk.Entry(self.control_frame, foreground="black")
         self.cap_withinhost_entry.insert(0, self.initial_evolution_config['cap_withinhost'])  

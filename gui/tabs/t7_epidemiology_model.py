@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import platform
 from utils import (no_validate_update, TabBase, EasyPathSelector, EasyTitle,
-                   EasyCombobox, EasyRadioButton, EasyEntry, EasyImage)
+                   EasyCombobox, EasyRadioButton, EasyEntry, EasyImage, CreateToolTip)
 
 class EpidemiologyModel(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):
@@ -143,7 +143,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel', 'slim_replicate_seed_file_path']
         component = EasyPathSelector(
             keys_path,self.config_path, text,
-            self.scrollable_frame, column, hide, frow, columnspan
+            self.scrollable_frame, column, hide, frow, columnspan,
+            labtext="You can upload a text file with each row being one seed number, and the number of rows matching the number of simulation replicates specified in tab1, such that each specified random seed is used in each replicate."
         )
         self.visible_components.add(component)
         return component
@@ -153,7 +154,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','epoch_changing','n_epoch']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Number of Epochs',
-            self.scrollable_frame, column, frow, 'integer', hide, columnspan
+            self.scrollable_frame, column, frow, 'integer', hide, columnspan,
+            labtext="In each epoch, one set of parameters can be used."
         )
         self.visible_components.add(component)
         return component
@@ -163,7 +165,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','epoch_changing','epoch_changing_generation']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Epoch-Changing Generation(s)',
-            self.scrollable_frame, column, frow, 'list integer', hide, columnspan
+            self.scrollable_frame, column, frow, 'list integer', hide, columnspan,
+            labtext="Once the epoch is changed, all the parameters are shifted to the next set as specified in the list."
         )
         self.visible_components.add(component)
         return component
@@ -183,7 +186,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','genetic_architecture','transmissibility']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Which Transmissibility Trait',
-            self.scrollable_frame, column, frow, 'list integer', hide, columnspan
+            self.scrollable_frame, column, frow, 'list integer', hide, columnspan,
+            labtext="Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order). Each entry has to be an integer within the range specified in the \"genome element\" tab. Specifying \"0\" would mean no genetic effect for transmissibility in this epoch."
         )
         self.visible_components.add(component)
         return component
@@ -203,7 +207,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','genetic_architecture','drug_resistance']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Which Drug-resistance Trait',
-            self.scrollable_frame, column, frow, 'list integer', hide, columnspan
+            self.scrollable_frame, column, frow, 'list integer', hide, columnspan,
+            labtext="Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order). Each entry has to be an integer within the range specified in the \"genome element\" tab. Specifying \"0\" would mean no genetic effect for drug-resistance in this epoch."
         )
         self.visible_components.add(component)
         return component
@@ -227,7 +232,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','S_IE_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Transmission Prob. β',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of transmission (S->E/I) for each connected S-I host pair per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component
@@ -237,7 +243,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','I_R_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Active Recovery Prob. γ', 
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of recovery (I->R) for each infected host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component
@@ -247,7 +254,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','R_S_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Immunity Loss Prob. ω',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of immunity loss (R->S) for each recovered host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component
@@ -257,7 +265,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','latency_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Latency Probability ζ',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of being in the exposed state once succcessfully infected by another host. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         self.SEIR_only_entries.add(component.entry)
@@ -268,7 +277,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','E_I_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Activation Prob. v',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of activation (E->I) for each recovered host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         self.SEIR_only_entries.add(component.entry)
@@ -279,7 +289,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','I_E_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'De-activation Prob. φ',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of de-activation (I->E) for each recovered host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         self.SEIR_only_entries.add(component.entry)
@@ -290,7 +301,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','E_R_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Latent Recovery Prob. τ',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of recovery (E->R) for each exposed host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         self.SEIR_only_entries.add(component.entry)
@@ -301,7 +313,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','sample_prob']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Sample Prob. ε',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of being sampled for each infected host per tick. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component
@@ -311,7 +324,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','transition_prob','recovery_prob_after_sampling']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Post-sampling Recovery Prob. δ',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Probability of instant recovery for each sampled host. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component
@@ -334,7 +348,8 @@ class EpidemiologyModel(TabBase):
         keys_path = ['EpidemiologyModel','massive_sampling','event_num']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Num Massive Sampling Events',
-            self.scrollable_frame, column, frow, 'integer', hide, columnspan
+            self.scrollable_frame, column, frow, 'integer', hide, columnspan,
+            labtext="Simultaneous sampling at specific ticks."
             )
         self.visible_components.add(component)
         return component   
@@ -383,7 +398,8 @@ class EpidemiologyModel(TabBase):
             keys_path, self.config_path, text, "Enable Super-infection", 
             self.scrollable_frame, column, frow, hide, 
             to_rerender, to_derender,
-            columnspan, radiobuttonselected
+            columnspan, radiobuttonselected,
+            labtext="By choosing \"YES\", you will allow exposed/infected to be infected again, provided that the capacity of within-host population size hasn't been reached."
             )
         self.visible_components.add(component)
         return component
