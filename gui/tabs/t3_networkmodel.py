@@ -94,7 +94,7 @@ class NetworkModel:
             command=update)
 
         CreateToolTip(network_method_label, 
-                      "Which random network model to use to generate a host contact network. Options: Erdos-Renyi (ER), Barabasi-Albert (BA), Random partition (RP)")
+                      "Which random network model to use to generate a host contact network. You can import your own contact network by selecting \"user_input\" or randomly generate one from our provided models by selecting \"randomly_generate\".")
         network_method_label.pack()
         network_method_rb_user.pack()
         network_method_rb_random.pack(pady=(0, 10))
@@ -172,6 +172,8 @@ class NetworkModel:
         model = config["NetworkModelParameters"]["randomly_generate"]["network_model"]
         network_model_var = tk.StringVar(value=model)
         network_model_label = tk.ttk.Label(self.control_frame, text="Network Model", style="Bold.TLabel")
+        CreateToolTip(network_model_label, 
+                      "Options: Erdos-Renyi (ER), Barabasi-Albert (BA), Random partition (RP)")
         network_model_combobox = ttk.Combobox(
             self.control_frame,
             textvariable=network_model_var,

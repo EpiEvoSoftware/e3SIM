@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/test_gui",
+    "cwdir": "",
     "n_replicates": 1,
     "random_number_seed": null
   },
@@ -39,7 +39,7 @@
     "cap_withinhost": 1
   },
   "NetworkModelParameters": {
-    "method": "",
+    "method": "user_input",
     "host_size": 0,
     "user_input": {
       "path_network": ""
@@ -213,7 +213,7 @@
     "do_postprocess": true,
     "tree_plotting": {
       "branch_color_trait": 1,
-      "heatmap": "transmissibility"
+      "heatmap": "none"
     },
     "sequence_output": {
       "vcf": true,
