@@ -22,4 +22,8 @@ jobs:
       run: |
         conda activate e3SIM_linux
         cd test
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
