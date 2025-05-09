@@ -1,5 +1,6 @@
 name: Python Tests
 
+
 on: [push, pull_request]
 
 jobs:
@@ -18,9 +19,9 @@ jobs:
         auto-activate-base: false
 
     - name: Run Pytest
-      shell: bash -l -c
+      shell: bash -l {0}
       run: |
         conda activate e3SIM_linux
         cd test
-	pytest
+
 
