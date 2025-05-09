@@ -22,6 +22,7 @@ jobs:
       run: |
         conda activate e3SIM_linux
         cd test
+	pytest
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:

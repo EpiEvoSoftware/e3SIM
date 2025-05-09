@@ -149,6 +149,10 @@ dependencies:
   - python-dateutil=2.9.0post0
   - python-tzdata=2024.1
   - python_abi=3.12
+  - pytest==7.2.2
+  - pytest-cov==4.0.0
+  - ruff==v0.0.260
+  - coverage-badge~=1.1.0
   - pytz=2024.1
   - pyyaml=6.0.1
   - qt=5.15.8
