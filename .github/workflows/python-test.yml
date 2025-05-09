@@ -23,5 +23,5 @@ jobs:
       run: |
         conda activate e3SIM_linux
         cd test
-
+        pytest
 
