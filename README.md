@@ -1,8 +1,8 @@
 ## $\textbf{e3SIM}$
 
-$\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an innovative outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
+$\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
 
-## Useful Links
+## Useful Links (Linux/MacOS)
 1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1).
 2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.11715269](https://doi.org/10.5281/zenodo.11715269).
 3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf).
@@ -120,24 +120,3 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 [GNU General Public License](\url{http://www.gnu.org/licenses/}) for more details.
-<!-- ================================
-
-Run ```conda env update --name myenvname --file environment.yml --prune`` to be updated w/ dependencies for backend
-or
-Run ```conda env create -f environment.yml``` to initialize conda env
-
-https://akrabat.com/creating-virtual-environments-with-pyenv/
-https://stackoverflow.com/questions/42352841/how-to-update-an-existing-conda-environment-with-a-yml-file
-
-
-deployment: https://github.com/TomSchimansky/CustomTkinter/issues/2322
-
-
-distributing for macos:
-pip install pyinstaller
-pyinstaller --onefile --windowed --icon=__icon__.ico __script__.py
-
-https://www.pythonguis.com/tutorials/packaging-tkinter-applications-windows-pyinstaller/ -->
-
-<!-- ## Additional from Manuscript
-Templates for all necessary input files are available in our GitHub repository. It is recommended to run the relevant pre-simulation modules with the $\texttt{-method user_input}$ flag to enable $\text{e3SIM}$ to validate the format of the user-provided files.  -->
