@@ -4,7 +4,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
 ## Useful Links (Linux/MacOS)
 1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1).
-2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.11715269](https://doi.org/10.5281/zenodo.11715269).
+2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.12597700](https://doi.org/10.5281/zenodo.12597700).
 3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf).
 
 
