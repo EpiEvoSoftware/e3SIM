@@ -8,7 +8,7 @@ workdir
 **/__pycache__/
 .vscode/*
 gui/__pycache__/*
-codes/__pycache__/*
+e3SIM_codes/__pycache__/*
 __pycache__/
 *.pyc
 *.pyo

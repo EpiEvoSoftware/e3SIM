@@ -585,10 +585,9 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 		os.remove(os.path.join(slim_pars["cwdir"], "output_trajectories"))
 
 	os.makedirs(os.path.join(slim_pars["cwdir"], "output_trajectories"))
-	for fign in ["all_SEIR_trajectory.png", "all_strains_trajectory.png"]
-	if os.path.exists(os.path.join(slim_pars["cwdir"], fign)):
-		os.rename(os.path.join(slim_pars["cwdir"], fign), 
-			os.path.join(slim_pars["cwdir"], "output_trajectories", fign))
+	for fign in ["all_SEIR_trajectory.png", "all_strains_trajectory.png"]:
+		if os.path.exists(os.path.join(slim_pars["cwdir"], fign)):
+			os.rename(os.path.join(slim_pars["cwdir"], fign), os.path.join(slim_pars["cwdir"], "output_trajectories", fign))
 
 
 	print("******************************************************************** \n" + 

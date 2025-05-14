@@ -1,5 +1,5 @@
 // Initial random seed:
-4461126639995851039
+5024096631126549479
 
 // RunInitializeCallbacks():
 initializeSLiMModelType(modelType = 'nonWF');
