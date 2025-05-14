@@ -41,3 +41,12 @@ Thumbs.db
 #########################
 .RData
 .Rhistory
+
+
+
+# Ignore the coverage files
+.coverage
+
+
+
+
