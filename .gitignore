@@ -9,6 +9,7 @@ workdir
 .vscode/*
 gui/__pycache__/*
 e3SIM_codes/__pycache__/*
+unit_test/__pycache__/*
 __pycache__/
 *.pyc
 *.pyo
