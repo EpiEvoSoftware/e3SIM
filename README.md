@@ -55,7 +55,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 
   6. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
       ```sh
-      cd e3SIM
+      cd e3SIM_codes
       e3SIM=${PWD}
       cd ../test/test_installation
       python update_config.py # To update the test_config.json with user's directory
@@ -74,7 +74,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 2. Generate a configuration file and all pre-requisite files for one simulation.
     * GUI
     
-        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. To access the GUI, please run the following command under your `original_pipeline` directory.
+        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. To access the GUI, please run the following command under the `e3SIM` directory.
         ```sh
         python gui
         ```

@@ -6,3 +6,6 @@ workdir
 **/__pycache__/
 
 .vscode/*
+__pycache__/
+./tabs/__pycache__/
+.DS_Store

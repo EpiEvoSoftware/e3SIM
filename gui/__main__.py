@@ -11,7 +11,7 @@ from tkinter import ttk
 import tkinter.font as tkFont
 import sys
 
-e3SIM_dir = os.path.join(os.path.dirname(__file__), '../e3SIM')
+e3SIM_dir = os.path.join(os.path.dirname(__file__), '../e3SIM_codes')
 if e3SIM_dir not in sys.path:
     sys.path.insert(0, e3SIM_dir)
 
@@ -29,8 +29,8 @@ def launch_gui(user_config_path, hide=False):
     """
     Launches the gui application
     """
-    default_config_path = "e3SIM/config_template/default_config.json"
-    if user_config_path == "e3SIM/config_template/user_config.json":
+    default_config_path = "e3SIM_codes/config_template/default_config.json"
+    if user_config_path == "e3SIM_codes/config_template/user_config.json":
         shutil.copy(default_config_path, user_config_path)
     config_path = user_config_path
 
@@ -79,7 +79,7 @@ def execute():
     # Parse arguments
     parser = argparse.ArgumentParser(prog='cluster', description='Application to view GUI')
     parser.add_argument(
-        '--config_path', type=str,default="e3SIM/config_template/user_config.json", 
+        '--config_path', type=str,default="e3SIM_codes/config_template/user_config.json", 
         help='path to the configuration JSON file')
     parser.add_argument(
         '--hide', action='store_true', 

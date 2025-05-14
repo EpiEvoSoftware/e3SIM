@@ -179,7 +179,7 @@
   },
   "EpidemiologyModel": {
     "slim_replicate_seed_file_path": "",
-    "model": "SEIR",
+    "model": "",
     "epoch_changing": {
       "n_epoch": 1,
       "epoch_changing_generation": []

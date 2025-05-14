@@ -581,6 +581,16 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 	print(f"Plotting the aggregated strain distribution trajectory...", flush = True)
 	plot_all_strain_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
 
+	if os.path.exists(os.path.join(slim_pars["cwdir"], "output_trajectories")):
+		os.remove(os.path.join(slim_pars["cwdir"], "output_trajectories"))
+
+	os.makedirs(os.path.join(slim_pars["cwdir"], "output_trajectories"))
+	for fign in ["all_SEIR_trajectory.png", "all_strains_trajectory.png"]
+	if os.path.exists(os.path.join(slim_pars["cwdir"], fign)):
+		os.rename(os.path.join(slim_pars["cwdir"], fign), 
+			os.path.join(slim_pars["cwdir"], "output_trajectories", fign))
+
+
 	print("******************************************************************** \n" + 
 		  "                FINISHED. THANK YOU FOR USING.					    \n" + 
 		  "********************************************************************", flush = True)
