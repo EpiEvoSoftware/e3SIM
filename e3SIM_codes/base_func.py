@@ -44,9 +44,11 @@ def str2bool(v):
     """
     if isinstance(v, bool):
         return v
-    if v.lower().replace(" ", "") in ('yes', 'true', 't', 'y', '1'):
+    if isinstance(v, int):
+        return bool(v)
+    if v.lower().replace(" ", "") in ('yes', 'true', 't', 'y'):
         return True
-    elif v.lower().replace(" ", "") in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower().replace(" ", "") in ('no', 'false', 'f', 'n'):
         return False
     raise argparse.ArgumentTypeError('Boolean value expected.')
 
@@ -114,14 +116,15 @@ def check_ref_format(ref_path):
     seq_num = 0
     for fasta in ref_seq:
         seq_num = seq_num + 1
-        name, sequence = fasta.id, str(fasta.seq).upper()
+        print(str(fasta.seq))
+        name, sequence = fasta.id, str(fasta.seq)
     if seq_num>1:
         raise CustomizedError("The reference genome file provided contains more than 1 sequences!")
     else:
-        count_A = sequence.count("A")
-        count_C = sequence.count("C")
-        count_G = sequence.count("G")
-        count_T = sequence.count("T")
+        count_A = sequence.count("A") + sequence.count("a")
+        count_C = sequence.count("C") + sequence.count("c")
+        count_G = sequence.count("G") + sequence.count("g")
+        count_T = sequence.count("T") + sequence.count("t")
         seq_len = len(sequence)
         print([count_A, count_C, count_G, count_T])
         if sum([count_A, count_C, count_G, count_T]) != seq_len:
