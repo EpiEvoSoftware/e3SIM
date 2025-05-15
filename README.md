@@ -5,7 +5,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 ## Useful Links (Linux/MacOS)
 1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1).
 2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.12597700](https://doi.org/10.5281/zenodo.12597700).
-3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf).
+3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/e3SIM/blob/main/e3SIM_manual.pdf).
 
 
 ## Installation
@@ -61,7 +61,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
       python update_config.py # To update the test_config.json with user's directory
       python ${e3SIM}/outbreak_simulator.py -config test_config.json # To run the simulation
       ```
-      Standard output in the terminal should show progress of the simulator. After the simulation ends, output files(e.g., `all_SEIR_trajectory.png`) are expected in the directory (test_installation) if the installation is successful.
+      Standard output in the terminal should show progress of the simulator. After the simulation ends, output files are expected in the directory (`test_installation`) if the installation is successful, including time trajectories plots in the `output_trajectories` folder, outputs for each replicate in separate subfolders `1`, `2`, `3`, the generated slim script `simulation.slim` and the parameter lists `slim.params`.
 
 
 ### Usage
@@ -74,9 +74,9 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 2. Generate a configuration file and all pre-requisite files for one simulation.
     * GUI
     
-        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. To access the GUI, please run the following command under the `e3SIM` directory.
+        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. To access the GUI, please run the following command:
         ```sh
-        python gui
+        python ${e3SIM}/../gui
         ```
         A window will pop up and you will be asked to navigate to your working directory in the first tab. By going through all the tabs, a configuation file called `simulation_config.json` will be generated in the working directory according to the given inputs. Please refer to Chapter 7 in the manual for more details on the GUI application.
 
@@ -102,7 +102,7 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
     python ${e3SIM}/enivol.py -config ${WKDIR}/simulation.config
     ```
 
-5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/original_pipeline/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.
+5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/e3SIM/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.
 
 
 

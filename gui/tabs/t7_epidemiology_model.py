@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import platform
+import platform, os
 from utils import (no_validate_update, TabBase, EasyPathSelector, EasyTitle,
                    EasyCombobox, EasyRadioButton, EasyEntry, EasyImage, CreateToolTip)
 
@@ -105,7 +105,7 @@ class EpidemiologyModel(TabBase):
         self.render_R_S_prob(hide, 0, 1, frow())
         self.render_sample_prob(hide, 0, 1, frow())
         self.render_sampling_recovery_prob(hide, 0, 1, frow())
-        self.render_image(hide, "gui/assets/t7.png", 500, 300, 1, 1, 17)
+        self.render_image(hide, os.path.join(self.config_path, "../../../gui/assets/t7.png"), 500, 300, 1, 1, 17)
 
         self.render_title("Massive Sampling Events", hide, 0, 1, frow(),)
         self.render_massive_sampling(hide, 0, 1, frow(by=1))

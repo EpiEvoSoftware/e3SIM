@@ -29,8 +29,8 @@ def launch_gui(user_config_path, hide=False):
     """
     Launches the gui application
     """
-    default_config_path = "e3SIM_codes/config_template/default_config.json"
-    if user_config_path == "e3SIM_codes/config_template/user_config.json":
+    default_config_path = os.path.join(e3SIM_dir, "config_template/default_config.json")
+    if os.path.samefile(user_config_path, os.path.join(e3SIM_dir, "config_template/user_config.json")):
         shutil.copy(default_config_path, user_config_path)
     config_path = user_config_path
 
@@ -79,7 +79,7 @@ def execute():
     # Parse arguments
     parser = argparse.ArgumentParser(prog='cluster', description='Application to view GUI')
     parser.add_argument(
-        '--config_path', type=str,default="e3SIM_codes/config_template/user_config.json", 
+        '--config_path', type=str,default=os.path.join(e3SIM_dir, "config_template/user_config.json"), 
         help='path to the configuration JSON file')
     parser.add_argument(
         '--hide', action='store_true', 

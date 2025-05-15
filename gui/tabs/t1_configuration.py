@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 from tkinter import ttk, messagebox, filedialog
 from utils import render_next_button, load_config_as_dict, save_config, CreateToolTip
 from base_func import check_ref_format
@@ -27,9 +28,10 @@ class Configuration:
     
     def render_working_directory(self):
         def choose_directory():
-            dir_inp = filedialog.askdirectory(title="Select a Directory")
+            dir_inp = filedialog.askdirectory(title="Select a Directory", initialdir=os.getcwd())
             if dir_inp:
                 self.cwd = dir_inp
+                #print(self.cwd)
                 self.user_working_directory_label.config(text=f"{self.cwd}")
 
                 config = load_config_as_dict(self.config_path)

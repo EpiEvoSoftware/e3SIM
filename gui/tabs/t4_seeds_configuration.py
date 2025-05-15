@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-import json
+import json, os
 from utils import (load_config_as_dict, no_validate_update_val, no_validate_update,
                    TabBase, GroupControls, EasyPathSelector, EasyTitle, EasyCombobox, 
                    EasyRadioButton, EasyButton, EasyEntry, EasyRateMatrix, EasyImage,
@@ -130,9 +130,10 @@ class SeedsConfiguration(TabBase):
         epi_grpctrls.add(self.render_I_E_prob(hide, 0, 17))
         epi_grpctrls.add(self.render_R_S_prob(hide, 0, 19))
         epi_grpctrls.add(self.render_I_R_prob(hide, 0, 21))
+
         epi_grpctrls.add(
             self.render_image(
-                "gui/assets/t4.png", 550, 255, hide, self.control_frame,
+                os.path.join(self.config_path, "../../../gui/assets/t4.png"), 550, 255, hide, self.control_frame,
                 frow=18, column=1, columnspan=2, rowspan=10))
         return epi_grpctrls
 
