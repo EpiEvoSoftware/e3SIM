@@ -1,7 +1,7 @@
 import sys
 import os
 import numpy as np
-import pytest
+#import pytest
 
 curr_dir = os.path.dirname(__file__)
 e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
