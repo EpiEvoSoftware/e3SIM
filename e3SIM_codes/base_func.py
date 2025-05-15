@@ -114,7 +114,7 @@ def check_ref_format(ref_path):
     seq_num = 0
     for fasta in ref_seq:
         seq_num = seq_num + 1
-        name, sequence = fasta.id, str(fasta.seq)
+        name, sequence = fasta.id, str(fasta.seq).upper()
     if seq_num>1:
         raise CustomizedError("The reference genome file provided contains more than 1 sequences!")
     else:
