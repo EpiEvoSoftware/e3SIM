@@ -3,9 +3,12 @@ import os
 import numpy as np
 import pytest
 
-from base_func import *
+curr_dir = os.path.dirname(__file__)curr_dir = os.path.dirname(__file__)
+e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
+if e3SIM_dir not in sys.path:
+	sys.path.insert(0, e3SIM_dir)
 
-curr_dir = os.path.dirname(__file__)
+from base_func import *
 
 def test_str2bool():
 	assert(test_str2bool("YES")==True)
