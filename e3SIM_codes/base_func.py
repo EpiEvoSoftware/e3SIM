@@ -24,7 +24,7 @@ def read_params(path_config, default_config):
     config = open(path_config, "r")
     usr_param_dict = json.loads(config.read())
     # Update the template with user information
-    # default_param_dict.uapdate(usr_param_dict)
+    # default_param_dict.update(usr_param_dict)
     recursive_update(default_param_dict, usr_param_dict)
 
     return default_param_dict
@@ -44,9 +44,9 @@ def str2bool(v):
     """
     if isinstance(v, bool):
         return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+    if v.lower().replace(" ", "") in ('yes', 'true', 't', 'y', '1'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower().replace(" ", "") in ('no', 'false', 'f', 'n', '0'):
         return False
     raise argparse.ArgumentTypeError('Boolean value expected.')
 
@@ -123,6 +123,7 @@ def check_ref_format(ref_path):
         count_G = sequence.count("G")
         count_T = sequence.count("T")
         seq_len = len(sequence)
+        print([count_A, count_C, count_G, count_T])
         if sum([count_A, count_C, count_G, count_T]) != seq_len:
             raise CustomizedError("The reference genome file provided contains characters that are not A, C, G, T!")
         return([count_A/seq_len, count_C/seq_len, count_G/seq_len, count_T/seq_len])
