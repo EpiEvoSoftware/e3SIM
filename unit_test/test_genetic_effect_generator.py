@@ -19,9 +19,10 @@ def test_count_gff_genes():
 
 def test_read_effvals():
 	test_dir = os.path.join(curr_dir, '../test/manual_tests/test_drugresist')
-	eff_size_true = read_effvals(test_dir, os.path.join(test_dir, "causal_gene_info.csv"), [1,2], 5)
+	eff_size_true = read_effvals(test_dir, os.path.join(test_dir, "causal_gene_info.csv"), 
+		{"transmissibility": 1, "drug_resistance": 2}, 5)
 	print(eff_size_true)
 
 
-print(_count_gff_genes(os.path.join(curr_dir, '../test/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff')))
+
 
