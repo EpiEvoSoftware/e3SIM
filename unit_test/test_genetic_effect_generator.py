@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import pytest
+import math
 
 curr_dir = os.path.dirname(__file__)
 e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
@@ -18,10 +19,13 @@ def test_count_gff_genes():
 
 
 def test_read_effvals():
-	test_dir = os.path.join(curr_dir, '../test/manual_tests/test_drugresist')
+	test_dir = os.path.join(curr_dir, '../test/manual_tests/test_minimal_model')
+	
 	eff_size_true = read_effvals(test_dir, os.path.join(test_dir, "causal_gene_info.csv"), 
-		{"transmissibility": 1, "drug_resistance": 2}, 5)
-	print(eff_size_true)
+		{"transmissibility": 1, "drug_resistance": 0}, 5)
+	
+	assert([math.ceil(i) for i in eff_size_true[0]]==[2,3,2,2,2])
+
 
 
 

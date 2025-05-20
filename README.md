@@ -74,32 +74,32 @@ $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation f
 2. Generate a configuration file and all pre-requisite files for one simulation.
     * GUI
     
-        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. To access the GUI, please run the following command:
+        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. The GUI can be activated from any local directory by specifying its full path. To access the GUI, please run the following command:
         ```sh
         python ${e3SIM}/../gui
         ```
-        A window will pop up and you will be asked to navigate to your working directory in the first tab. By going through all the tabs, a configuation file called `simulation_config.json` will be generated in the working directory according to the given inputs. Please refer to Chapter 7 in the manual for more details on the GUI application.
+        A window will pop up and you will be asked to navigate to your working directory in the first tab, and it's initiated from your current directory by default. By going through all the tabs, a configuation file called `config_file.json` will be generated in the working directory according to the given inputs. Please refer to Chapter 7 in the manual for more details on the GUI application.
 
     * Command Line
     
-        Command line tools for the pre-simulatuion programs includes NetworkGenerator, SeedGenerator, GeneticEffectGenerator, and SeedHostMatcher. Please refer to the manual chapter 2 for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter 3.2. The following commands copy the template to your designated working directory.
+        Command line tools for the pre-simulatuion programs includes `NetworkGenerator`, `SeedGenerator`, `GeneticEffectGenerator`, and `SeedHostMatcher`. Please refer to the manual chapter 2 for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter 3.2. The following commands copy the template to your designated working directory.
         ```sh
-        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/simulation_config.json
+        cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/config_file.json
         ```
-        Then manually change the configuration in `${WKDIR}/simulation_config.json`.
+        Then manually change the configuration in `${WKDIR}/config_file.json`.
 
 3. Run the simulation
     ```sh
-    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/simulation_config.json
+    python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/config_file.json
     ```
 
 4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
     ```sh
-    cp ${e3SIM}/config_template/base_params.json ${WKDIR}/simulation.config
+    cp ${e3SIM}/config_template/base_params.json ${WKDIR}/config_file.json
     ```
-    Then manually change the configuration in `${WKDIR}/simulation.config` and run
+    Then manually change the configuration in `${WKDIR}/config_file.json` and run
     ```sh
-    python ${e3SIM}/enivol.py -config ${WKDIR}/simulation.config
+    python ${e3SIM}/enivol.py -config ${WKDIR}/config_file.json
     ```
 
 5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/e3SIM/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.

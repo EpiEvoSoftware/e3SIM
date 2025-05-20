@@ -209,10 +209,11 @@ class EvolutionaryModel:
         config = load_config_as_dict(self.config_path) 
         if self.model_parameterization_var.get():
             parameterization = self.model_parameterization_var.get()
-            config['EvolutionModel']['subst_model_parameterization'] = parameterization
+            #config['EvolutionModel']['subst_model_parameterization'] = parameterization
 
             if parameterization == "mutation rate (single)":
                 try:
+                    config['EvolutionModel']['subst_model_parameterization'] = "mut_rate"
                     config['EvolutionModel']['mut_rate'] = float(self.mut_rate_entry.get())
                     self.mut_rate = config['EvolutionModel']['mut_rate']
                 except ValueError:
@@ -220,6 +221,7 @@ class EvolutionaryModel:
                         "Please enter a valid number for mutation rate (single).")
             elif parameterization == "mutation rate matrix":
                 try:
+                    config['EvolutionModel']['subst_model_parameterization'] = "mut_rate_matrix"
                     for i in range(4):
                         for j in range(4):
                             e = self.mut_rate_matrix_entries[i][j]

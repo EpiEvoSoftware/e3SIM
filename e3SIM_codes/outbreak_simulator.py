@@ -261,6 +261,11 @@ def create_slim_config(all_config):
 	slim_pars["sample_rate"] = all_config["EpidemiologyModel"]["transition_prob"]["sample_prob"]
 	slim_pars["recovery_prob_after_sampling"] = all_config["EpidemiologyModel"]["transition_prob"]["recovery_prob_after_sampling"]
 
+	seir_only_params = ["latency_prob", "E_I_rate", "I_E_rate", "E_R_rate"]
+	if slim_pars["epi_model"]=="SIR":
+		for param in seir_only_params:
+			slim_pars[param] = [0 for i in range(slim_pars["n_epoch"])]
+
 	for param in ["S_IE_rate", "I_R_rate", "R_S_rate", "latency_prob", "E_I_rate", "I_E_rate", "E_R_rate", "sample_rate", "recovery_prob_after_sampling"]:
 		if not isinstance(slim_pars[param], list):
 			raise CustomizedError(f"({param}) has to be a list []")
