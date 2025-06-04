@@ -84,7 +84,7 @@ def test_run_network_generation_success_BA():
     assert(g.number_of_edges() == 3*97)
     os.remove(file_location)
 
-def test_run_network_generation_success_BA():
+def test_run_network_generation_success_RP():
     g, err = run_network_generation(
         pop_size=100,
         wk_dir=curr_dir,
