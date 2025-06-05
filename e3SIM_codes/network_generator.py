@@ -82,7 +82,7 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
         p[k][k] = p_within[k]
 
     # Generate random partition graph
-    rp_graph = nx.stochastic_block_model(rp_size, p, see = np.random)
+    rp_graph = nx.stochastic_block_model(rp_size, p, seed = np.random)
     return rp_graph
 
 
