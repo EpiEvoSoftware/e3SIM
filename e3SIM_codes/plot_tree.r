@@ -348,6 +348,3 @@ main <- function(){
 
 # Execute the plotting
 main()
-
-
-

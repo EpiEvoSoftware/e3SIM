@@ -21,42 +21,42 @@ header = r"""
 
 
 def main():
-	parser = argparse.ArgumentParser(description='Run the whole simulation process by the configuration provided.')
-	parser.add_argument('-path_config', action='store',dest='path_config', required=True, help="Path to config file (json)")
+    parser = argparse.ArgumentParser(description='Run the whole simulation process by the configuration provided.')
+    parser.add_argument('-path_config', action='store',dest='path_config', required=True, help="Path to config file (json)")
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	config_path = args.path_config
+    config_path = args.path_config
 
-	## Read the parameters and store them into a dictionary
-	param_dict = read_params(config_path, "user_config.json")
+    ## Read the parameters and store them into a dictionary
+    param_dict = read_params(config_path, "user_config.json")
 
-	print(header, flush = True)
+    print(header, flush = True)
 
-	def _exit(error_m):
-		if error_m != None:
-			sys.exit("Simulation ends.")
+    def _exit(error_m):
+        if error_m != None:
+            sys.exit("Simulation ends.")
 
-	## Network generation
-	error = network_generation_byconfig(param_dict)
-	_exit(error)
+    ## Network generation
+    error = network_generation_byconfig(param_dict)
+    _exit(error)
 
-	## Seeds generation
-	error = seeds_generation_byconfig(param_dict)
-	_exit(error)
+    ## Seeds generation
+    error = seeds_generation_byconfig(param_dict)
+    _exit(error)
 
-	## Effect size generation
-	error = effsize_generation_byconfig(param_dict)
-	_exit(error)
+    ## Effect size generation
+    error = effsize_generation_byconfig(param_dict)
+    _exit(error)
 
-	## Seed-host match
-	error = read_config_and_match(param_dict) ######## UNIFINISHED
-	_exit(error)
+    ## Seed-host match
+    error = read_config_and_match(param_dict) ######## UNIFINISHED
+    _exit(error)
 
-	## Simulation
-	error = all_slim_simulation_by_config(param_dict)
-	_exit(error)
+    ## Simulation
+    error = all_slim_simulation_by_config(param_dict)
+    _exit(error)
 
 
 if __name__ == "__main__":
-	main()
+    main()
