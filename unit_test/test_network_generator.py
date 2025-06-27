@@ -65,7 +65,7 @@ def test_run_network_generation_success_ER():
     assert(nx.is_isomorphic(g, g_))
     assert(g.number_of_nodes() == 100)
     # Number of edges within 4 standard deviations
-    assert(g.number_of_edges() <= 495 + np.sqrt(4950 * 0.1 * 0.9)*4)
+    assert(g.number_of_edges() <= 495 + np.sqrt(4950 * 0.1 * 0.9)*4) # this is a rather generous upper bound for normal distribution
     os.remove(file_location)
 
 def test_run_network_generation_success_BA():
@@ -81,10 +81,10 @@ def test_run_network_generation_success_BA():
     g_ = nx.read_adjlist(file_location)
     assert(nx.is_isomorphic(g, g_))
     assert(g.number_of_nodes() == 100)
-    assert(g.number_of_edges() == 3*97)
+    assert(g.number_of_edges() == 3*97) # star graph 3 edges + 96 * 3
     os.remove(file_location)
 
-def test_run_network_generation_success_BA():
+def test_run_network_generation_success_RP():
     g, err = run_network_generation(
         pop_size=100,
         wk_dir=curr_dir,
@@ -100,5 +100,5 @@ def test_run_network_generation_success_BA():
     assert(nx.is_isomorphic(g, g_))
     assert(g.number_of_nodes() == 100)
     # within 4 standard deviations
-    assert(g.number_of_edges() <= (1225 * 0.3 + 2500 * 0.01) + 120)
+    assert(g.number_of_edges() <= (1225 * 0.3 + 2500 * 0.01) + 73) # independent binomial distributions
     os.remove(file_location)

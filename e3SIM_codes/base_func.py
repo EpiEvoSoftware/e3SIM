@@ -11,7 +11,7 @@ def recursive_update(default, user):
 
 def read_params(path_config, default_config):
     """
-    Reads configuration parameters from JSON files and merges with default parameters defined in he template dictionary.
+    Reads configuration parameters from JSON files and merges with default parameters defined in the template dictionary.
 
     Parameters:
         path_config (str): Full path to configuration file.
@@ -78,7 +78,7 @@ def format_subst_mtx(mu_matrix, diag_zero=True):
         mu_matrix = json.loads(mu_matrix)
     except json.decoder.JSONDecodeError:
         raise CustomizedError(f"The mutation matrix {mu_matrix} (-mu_matrix) is "
-    		   "not a valid json format")
+               "not a valid json format")
     alleles = ["A", "C", "G", "T"]
     from_allele = 0
     for allele in alleles:

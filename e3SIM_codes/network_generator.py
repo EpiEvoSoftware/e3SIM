@@ -2,7 +2,6 @@ import networkx as nx, numpy as np, os, argparse
 from base_func import *
 from error_handling import CustomizedError
 
-
 def write_network(ntwk_, wk_dir):
     """
     Writes a network to the working directory and returns the path to the network.
@@ -15,10 +14,8 @@ def write_network(ntwk_, wk_dir):
     Returns:
         ntwk_path (str): Path to the network.
     """
-    ntwk_path = os.path.join(wk_dir, "contact_network.adjlist")
-    nx.write_adjlist(ntwk_, os.path.join(wk_dir, "contact_network.adjlist"))
+    nx.write_adjlist(ntwk_, ntwk_path := os.path.join(wk_dir, "contact_network.adjlist"))
     return ntwk_path
-
 
 def ER_generate(pop_size, p_ER):
     """
@@ -29,8 +26,8 @@ def ER_generate(pop_size, p_ER):
         pop_size (int): Population size.
     """
     if not 0 < p_ER <= 1:
-        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph")
-    er_graph = nx.erdos_renyi_graph(pop_size, p_ER, seed=np.random)
+        raise CustomizedError("You need to specify a 0<p<=1 (-p_ER) in Erdos-Renyi graph")
+    er_graph = nx.erdos_renyi_graph(pop_size, p_ER, seed = np.random)
     return er_graph
 
 def fast_ER_generate(pop_size, p_ER):
@@ -42,7 +39,7 @@ def fast_ER_generate(pop_size, p_ER):
         pop_size (int): Population size.
     """
     if not 0 < p_ER <= 1:
-        raise CustomizedError("You need to specify a p>0 (-p_ER) in Erdos-Renyi graph")
+        raise CustomizedError("You need to specify a 0<p<=1 (-p_ER) in Erdos-Renyi graph")
     er_graph = nx.fast_gnp_random_graph(pop_size, p_ER, seed = np.random)
     return er_graph
 
@@ -85,7 +82,7 @@ def rp_generate(pop_size, rp_size, p_within, p_between):
         p[k][k] = p_within[k]
 
     # Generate random partition graph
-    rp_graph = nx.stochastic_block_model(rp_size, p, seed=np.random)
+    rp_graph = nx.stochastic_block_model(rp_size, p, seed = np.random)
     return rp_graph
 
 
@@ -97,7 +94,7 @@ def ba_generate(pop_size, m):
         pop_size (int): Population size.
         m (int): Number of edges to attach from a new node to existing nodes.
     """
-    ba_graph = nx.barabasi_albert_graph(pop_size, m, seed=np.random)
+    ba_graph = nx.barabasi_albert_graph(pop_size, m, seed = np.random)
     return ba_graph
 
 
@@ -117,7 +114,6 @@ def read_input_network(path_network, pop_size):
         raise FileNotFoundError(
             f"The provided network path ({path_network}) doesn't exist"
         )
-    # print("reading network")
     ntwk = nx.read_adjlist(path_network)
     if len(ntwk) != pop_size:
         raise CustomizedError(
@@ -283,7 +279,7 @@ def main():
         "--p_within",
         nargs="+",
         help="probability of edges for different groups \
-                        (descending order), take 2 elements rn",
+                        (descending order)",
         required=False,
         type=float,
         default=[],
