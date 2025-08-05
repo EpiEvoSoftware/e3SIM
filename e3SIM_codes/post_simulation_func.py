@@ -77,7 +77,7 @@ def nwk_output(tseq_smp, real_name, each_wk_dir_, seed_host_match_path):
 			nwk.write(tseq_smp.first().as_newick(root = root, node_labels = real_name) + "\n")
 
 
-def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
+def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
 	"""
 	Compute the trait values for all nodes given a TreeSequence object.
 
@@ -143,11 +143,21 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait):
 				# record the effect size caused by the new mutations given the parent node
 				node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
 			trait_val = {j: 0 for j in range(-1, node_size)}
+			# if sigmoid==True:
+			# 	for node_id in trvs_order:
+			# 		trait_val[node_id] = 1 / (1 + np.exp(np.negative(trait_val[tree_first.parent(node_id)] + node_plus[node_id])))
+			# else:
+			# 	for node_id in trvs_order:
+			# 		trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
 			for node_id in trvs_order:
-				trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
+		 		trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
 			trait_val.pop(-1)
 			real_traits_vals.append(trait_val)
 		# order of traversal
+		# if sigmoid==True:
+		# 	print(trait_val)
+		# 	print(type(real_traits_vals))
+		# 	real_traits_vals = 1 / (1 + np.exp(np.negative(np.array(real_traits_vals))))
 		return real_traits_vals, trvs_order
 
 def floats_to_colors_via_matplotlib(float_values):
@@ -166,7 +176,7 @@ def floats_to_colors_via_matplotlib(float_values):
 	return hex_colors
 
 
-def color_by_trait_normalized(trait_val, trvs_order):
+def color_by_trait_normalized(trait_val, trvs_order, sigmoid=False):
 	"""
 	Colorizes nodes based on normalized trait values.
 
@@ -362,7 +372,7 @@ def output_fasta(ref_path, wk_dir_):
 	get_full_fasta(ref_path, wk_dir_)
 
 
-def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_host_match_path, seq_out, color_trait=1):
+def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_host_match_path, seq_out, color_trait=1, sigmoid=False):
 	"""
 	Performs data processing tasks for a specific run.
 
@@ -396,7 +406,7 @@ def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_h
 
 	# CHECK W/ PERRY
 	if gen_model:
-		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
+		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait, sigmoid)
 		if color_trait > 0:
 			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
 		else:

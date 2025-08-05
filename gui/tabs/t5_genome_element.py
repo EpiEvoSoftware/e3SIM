@@ -15,7 +15,8 @@ class GenomeElement(TabBase):
 
     def load_page(self):
         self.render_simulation_settings_title(False, 0, 0, 1)
-        self.render_use_genetic_model(False, 0, 1, 1)
+        self.render_use_sigmoid_probs(False, 0, 1, 1)
+        self.render_use_genetic_model(False, 0, 4, 1)
 
         self.global_group_control = GroupControls()
         self.init_num_traits_group()
@@ -24,10 +25,10 @@ class GenomeElement(TabBase):
 
     def init_num_traits_group(self):
         hide = not self.initial_genome_config["use_genetic_model"]
-        number_of_traits_title = self.render_number_of_traits_title(hide, 0, 4)
-        transmissibility = self.render_transmissibility(hide, 0, 5)
-        drug_resistance = self.render_drug_resistance(hide, 1, 5)
-        generate_method = self.render_generate_method(0, 7, 2, hide, 30)
+        number_of_traits_title = self.render_number_of_traits_title(hide, 0, 7)
+        transmissibility = self.render_transmissibility(hide, 0, 8)
+        drug_resistance = self.render_drug_resistance(hide, 1, 8)
+        generate_method = self.render_generate_method(0, 10, 2, hide, 30) ###?
         self.generate_method = generate_method
 
         lst = [number_of_traits_title, transmissibility, drug_resistance, generate_method]
@@ -38,8 +39,8 @@ class GenomeElement(TabBase):
         hide = (not self.initial_genome_config["use_genetic_model"] 
                 or self.initial_genome_config["effect_size"]["method"] != "user_input")
         
-        file_input = self.render_path_eff_size_table(hide, 0, 11, 2)
-        run_button = self.render_run_button(hide, 0, 14, "user_input")
+        file_input = self.render_path_eff_size_table(hide, 0, 14, 2)
+        run_button = self.render_run_button(hide, 0, 17, "user_input")
 
         self.user_input_group_control = GroupControls()
         self.user_input_group_control.add(file_input)
@@ -51,14 +52,14 @@ class GenomeElement(TabBase):
         hide = (not self.initial_genome_config["use_genetic_model"] 
                 or self.initial_genome_config["effect_size"]["method"] != "randomly_generate")
 
-        gff = self.render_gff(hide, 0, 9, 1)
-        genes_num = self.render_genes_num(hide, 0, 12)
-        effsize_min = self.render_effsize_min(hide, 0, 14)
-        effsize_max = self.render_effsize_max(hide, 0, 16)
-        normalize = self.render_normalize(hide, 1, 9)
-        normalize_f_trait = self.render_normalize_f_trait(hide, 1, 12)
+        gff = self.render_gff(hide, 0, 12, 1)
+        genes_num = self.render_genes_num(hide, 0, 15)
+        effsize_min = self.render_effsize_min(hide, 0, 17)
+        effsize_max = self.render_effsize_max(hide, 0, 19)
+        normalize = self.render_normalize(hide, 1, 12)
+        normalize_f_trait = self.render_normalize_f_trait(hide, 1, 15)
         self.f_trait_control = normalize_f_trait
-        run_button = self.render_run_button(hide, 0, 31, "randomly_generate")
+        run_button = self.render_run_button(hide, 0, 34, "randomly_generate")
 
         lst = [gff, genes_num, effsize_min, effsize_max, normalize, normalize_f_trait, run_button]
         self.random_generate_group_control = GroupControls(lst)
@@ -103,6 +104,25 @@ class GenomeElement(TabBase):
             radiobuttonselected,
             labtext="If you want to set trait values that are adjusted by the mutations on the genome, please select \"YES\"."
         )
+        return component
+
+    def render_use_sigmoid_probs(self, hide=True, column=None, frow=None, columnspan=1):
+        def radiobuttonselected(var, to_rerender, to_derender):
+            no_validate_update(var, self.config_path, keys_path)
+        
+        keys_path = ["GenomeElement", "sigmoid_prob"]
+        text = "Do you want to use sigmoidal smoothing"
+        "for traits (transmissibility and drug-resistance)?"
+        to_rerender, to_derender = None, None
+        component = EasyRadioButton(
+            keys_path, self.config_path, text, "sigmoid_prob", 
+            self.control_frame, column, frow, hide, 
+            to_rerender, to_derender,
+            columnspan, radiobuttonselected,
+            labtext="If you want to use a sigmoidal function to smooth and constrain the probability of infection and recovery, please select \"YES\"."
+            )
+        self.visible_components.add(component)
+        
         return component
 
     def render_number_of_traits_title(self, hide=True, column=None, frow=None):

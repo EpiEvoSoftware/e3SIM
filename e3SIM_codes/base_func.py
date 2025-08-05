@@ -1,6 +1,6 @@
 import json, os, argparse
-from Bio import SeqIO
 from error_handling import CustomizedError
+from Bio import SeqIO
 
 def recursive_update(default, user):
     for k, v in user.items():

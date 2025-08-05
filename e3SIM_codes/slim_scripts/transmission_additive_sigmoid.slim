@@ -14,8 +14,7 @@ s1 reproduction()
 			infector_pathogen = sample(infector_subpop.individuals, 1);
 			muts = infector_pathogen.genome1.mutationsOfType(1);
 			transmissibility = 1 + additive_trait(muts, paste0("trans_", transmissibility_effsize[current_epoch]), cap_transmissibility[current_epoch]);
-
-			trans_event = rbinom(length(contact_ids), 1, min(1.0, S_IE_rate[current_epoch] * transmissibility));
+			trans_event = rbinom(length(contact_ids), 1, S_IE_rate[current_epoch] / (1 + exp(-transmissibility)));
 			contacts_states = Host_states[contact_ids];
 			
 			if (super_infection==T) 

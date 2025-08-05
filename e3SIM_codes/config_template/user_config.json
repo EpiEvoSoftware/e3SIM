@@ -1,13 +1,13 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/annonymous",
+    "cwdir": "",
     "n_replicates": 1,
     "random_number_seed": null
   },
   "EvolutionModel": {
-    "n_generation": 4000,
-    "subst_model_parameterization": "mut_rate",
-    "mut_rate": 1e-10,
+    "n_generation": 0,
+    "subst_model_parameterization": "",
+    "mut_rate": 0.0,
     "mut_rate_matrix": [
       [
         0.0,
@@ -39,10 +39,10 @@
     "cap_withinhost": 1
   },
   "NetworkModelParameters": {
-    "method": "user_input",
-    "host_size": 1000,
+    "method": "",
+    "host_size": 0,
     "user_input": {
-      "path_network": "/Users/px54/Documents/TB_software/annonymous/contact_network.adjlist"
+      "path_network": ""
     },
     "randomly_generate": {
       "network_model": "",
@@ -66,8 +66,8 @@
     }
   },
   "SeedsConfiguration": {
-    "seed_size": 3,
-    "use_reference": true,
+    "seed_size": 1,
+    "use_reference": false,
     "method": "",
     "user_input": {
       "path_seeds_vcf": "",
@@ -136,24 +136,24 @@
         ]
       ],
       "seeded_host_id": [],
-      "S_IE_prob": 0.0,
-      "E_I_prob": 0.0,
-      "E_R_prob": 0.0,
-      "latency_prob": 0.0,
-      "I_R_prob": 0.0,
-      "I_E_prob": 0.0,
-      "R_S_prob": 0.0
+      "S_IE_prob": 0,
+      "E_I_prob": 0,
+      "E_R_prob": 0,
+      "latency_prob": 0,
+      "I_R_prob": 0,
+      "I_E_prob": 0,
+      "R_S_prob": 0
     }
   },
   "GenomeElement": {
-    "use_genetic_model": false,
-    "ref_path": "/Users/px54/Documents/TB_software/annonymous/test/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "use_genetic_model": true,
+    "ref_path": "",
     "traits_num": {
       "transmissibility": 0,
       "drug_resistance": 0
     },
     "effect_size": {
-      "method": "",
+      "method": "randomly_generate",
       "user_input": {
         "path_effsize_table": ""
       },
@@ -165,7 +165,8 @@
         "normalize": false,
         "final_trait": 1.0
       }
-    }
+    },
+    "sigmoid_prob": true
   },
   "SeedHostMatching": {
     "method": "",
@@ -179,45 +180,27 @@
   },
   "EpidemiologyModel": {
     "slim_replicate_seed_file_path": "",
-    "model": "SIR",
+    "model": "",
     "epoch_changing": {
       "n_epoch": 1,
       "epoch_changing_generation": []
     },
     "genetic_architecture": {
-      "transmissibility": [
-        0
-      ],
-      "cap_transmissibility": [
-        0.0
-      ],
-      "drug_resistance": [
-        0
-      ],
-      "cap_drugresist": [
-        0.0
-      ]
+      "transmissibility": [],
+      "cap_transmissibility": [],
+      "drug_resistance": [],
+      "cap_drugresist": []
     },
     "transition_prob": {
-      "S_IE_prob": [
-        0.1
-      ],
-      "I_R_prob": [
-        0.2
-      ],
-      "R_S_prob": [
-        0.3
-      ],
+      "S_IE_prob": [],
+      "I_R_prob": [],
+      "R_S_prob": [],
       "latency_prob": [],
       "E_I_prob": [],
       "I_E_prob": [],
       "E_R_prob": [],
-      "sample_prob": [
-        0.05
-      ],
-      "recovery_prob_after_sampling": [
-        0.0
-      ]
+      "sample_prob": [],
+      "recovery_prob_after_sampling": []
     },
     "massive_sampling": {
       "event_num": 0,
@@ -230,12 +213,12 @@
   "Postprocessing_options": {
     "do_postprocess": true,
     "tree_plotting": {
-      "branch_color_trait": 0,
+      "branch_color_trait": 1,
       "heatmap": "none"
     },
     "sequence_output": {
       "vcf": true,
-      "fasta": false
+      "fasta": true
     }
   }
 }

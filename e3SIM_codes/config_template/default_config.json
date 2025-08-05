@@ -165,7 +165,8 @@
         "normalize": false,
         "final_trait": 1
       }
-    }
+    },
+    "sigmoid_prob": false
   },
   "SeedHostMatching": {
     "method": "",

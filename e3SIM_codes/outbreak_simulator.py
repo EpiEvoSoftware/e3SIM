@@ -2,9 +2,9 @@ import os, shutil, subprocess, argparse
 import pandas as pd
 import numpy as np
 # import tskit, pyslim
+from error_handling import CustomizedError
 from base_func import *
 from post_simulation_func import *
-from error_handling import CustomizedError
 
 
 def _writebinary(v):
@@ -210,6 +210,10 @@ def create_slim_config(all_config):
 													or any(not isinstance(i, int) for i in all_config["GenomeElement"]["traits_num"].values()):
 		raise CustomizedError("Number of traits (\"traits_num\") has to be a dictionary ({}) of length 2, containing integers, showing "
 						"number of effect size sets (traits) for transmissibility and drug-resistance")
+
+	slim_pars["sigmoid_prob"] = all_config["GenomeElement"]["sigmoid_prob"]
+	_check_boolean(slim_pars["use_genetic_model"], "Whether to use sigmoidal smoothing for the transmission and treatment failure probabilities.")
+	out_config.write(f"sigmoid_prob:{_writebinary(slim_pars["sigmoid_prob"])}\n")
 	print("\"GenomeElement\" Checked.", flush = True)
 
 	print("Checking \"NetworkModelParameters\"...... ", flush = True)
@@ -431,7 +435,10 @@ def create_slim_script(slim_pars):
 	if slim_pars["use_genetic_model"] == False:
 		append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
 	else:
-		append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
+		if slim_pars["sigmoid_prob"]==True:
+			append_files(os.path.join(code_path, "transmission_additive_sigmoid.slim"), mainslim_path)
+		else:
+			append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
 		# if slim_pars["trans_type"] == "additive":
 		# 	append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
 		# elif slim_pars["trans_type"] == "bialleleic":
@@ -455,7 +462,10 @@ def create_slim_script(slim_pars):
 
 	# State transition for infected hosts
 	if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
-		append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
+		if slim_pars["sigmoid_prob"]==True:
+			append_files(os.path.join(code_path, "Infected_process_additive_sigmoid.slim"), mainslim_path)
+		else:
+			append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 		# if slim_pars["trans_type"] == "additive":
 		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 		# elif slim_pars["trans_type"] == "bialleleic":
@@ -561,7 +571,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 				run_per_data_processing(
 					slim_pars["ref_path"], slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
 					slim_pars["seed_host_matching_path"], dataprocess_pars["sequence_output"],
-					dataprocess_pars["tree_plotting"]["branch_color_trait"])
+					dataprocess_pars["tree_plotting"]["branch_color_trait"], slim_pars["sigmoid_prob"])
 				if slim_pars["use_reference"]:
 					seed_phylo = ""
 				else:
@@ -587,7 +597,7 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 	plot_all_strain_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
 
 	if os.path.exists(os.path.join(slim_pars["cwdir"], "output_trajectories")):
-		os.remove(os.path.join(slim_pars["cwdir"], "output_trajectories"))
+		shutil.rmtree(os.path.join(slim_pars["cwdir"], "output_trajectories"))
 
 	os.makedirs(os.path.join(slim_pars["cwdir"], "output_trajectories"))
 	for fign in ["all_SEIR_trajectory.png", "all_strains_trajectory.png"]:
