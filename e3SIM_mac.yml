@@ -1,4 +1,4 @@
-name: eSIM_mac
+name: e3SIM_mac
 channels:
   - anaconda
   - etetoolkit

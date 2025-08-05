@@ -134,36 +134,36 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
         real_traits_vals = []
 
 
-		if len(which_m2) == 0:
+        if len(which_m2) == 0:
 			# for _ in range(num_trait):
-			trait_val_now = { i: 0 for i in range(node_size)}
-			print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
-			return [trait_val_now for _ in range(num_trait)], trvs_order
+            trait_val_now = { i: 0 for i in range(node_size)}
+            print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
+            return [trait_val_now for _ in range(num_trait)], trvs_order
 		
-		for trait_idx in range(num_trait):
-			node_plus = np.zeros(node_size)
-			for mut in which_m2:
+        for trait_idx in range(num_trait):
+            node_plus = np.zeros(node_size)
+            for mut in which_m2:
 				# nodes_ids[mut] are the nodes with that specific mutation
 				# intvs[mut] // 2 implies the gene that mutation belongs to
 				# record the effect size caused by the new mutations given the parent node
-				node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
-			trait_val = {j: 0 for j in range(-1, node_size)}
+                node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
+            trait_val = {j: 0 for j in range(-1, node_size)}
 			# if sigmoid==True:
 			# 	for node_id in trvs_order:
 			# 		trait_val[node_id] = 1 / (1 + np.exp(np.negative(trait_val[tree_first.parent(node_id)] + node_plus[node_id])))
 			# else:
 			# 	for node_id in trvs_order:
 			# 		trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
-			for node_id in trvs_order:
-		 		trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
-			trait_val.pop(-1)
-			real_traits_vals.append(trait_val)
+            for node_id in trvs_order:
+                trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
+            trait_val.pop(-1)
+            real_traits_vals.append(trait_val)
 		# order of traversal
 		# if sigmoid==True:
 		# 	print(trait_val)
 		# 	print(type(real_traits_vals))
 		# 	real_traits_vals = 1 / (1 + np.exp(np.negative(np.array(real_traits_vals))))
-		return real_traits_vals, trvs_order
+        return real_traits_vals, trvs_order
 
         if len(which_m2) == 0:
             # for _ in range(num_trait):
@@ -436,22 +436,22 @@ def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_h
 
 
 	# CHECK W/ PERRY
-	if gen_model:
-		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait, sigmoid)
-		if color_trait > 0:
-			trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
-		else:
-			trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+    if gen_model:
+        traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait, sigmoid)
+        if color_trait > 0:
+            trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+        else:
+            trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
 		# if color_trait > 0:
 		# 	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
 		# else:
 		# 	trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
-	else:
-		traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, {})
-		trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
-		color_trait = 0
-	mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
-	write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+    else:
+        traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, {})
+        trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+        color_trait = 0
+    mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+    write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
 
     # CHECK W/ PERRY
     if gen_model:

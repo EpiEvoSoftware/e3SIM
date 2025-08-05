@@ -207,15 +207,15 @@ def create_slim_config(all_config):
     out_config.write(f"use_genetic_model:{_writebinary(slim_pars["use_genetic_model"])}\n")
 
 
-	if (not isinstance(all_config["GenomeElement"]["traits_num"], dict)) or len(all_config["GenomeElement"]["traits_num"].keys()) != 2 \
+    if (not isinstance(all_config["GenomeElement"]["traits_num"], dict)) or len(all_config["GenomeElement"]["traits_num"].keys()) != 2 \
 													or any(not isinstance(i, int) for i in all_config["GenomeElement"]["traits_num"].values()):
-		raise CustomizedError("Number of traits (\"traits_num\") has to be a dictionary ({}) of length 2, containing integers, showing "
+        raise CustomizedError("Number of traits (\"traits_num\") has to be a dictionary ({}) of length 2, containing integers, showing "
 						"number of effect size sets (traits) for transmissibility and drug-resistance")
 
-	slim_pars["sigmoid_prob"] = all_config["GenomeElement"]["sigmoid_prob"]
-	_check_boolean(slim_pars["use_genetic_model"], "Whether to use sigmoidal smoothing for the transmission and treatment failure probabilities.")
-	out_config.write(f"sigmoid_prob:{_writebinary(slim_pars["sigmoid_prob"])}\n")
-	print("\"GenomeElement\" Checked.", flush = True)
+    slim_pars["sigmoid_prob"] = all_config["GenomeElement"]["sigmoid_prob"]
+    _check_boolean(slim_pars["use_genetic_model"], "Whether to use sigmoidal smoothing for the transmission and treatment failure probabilities.")
+    out_config.write(f"sigmoid_prob:{_writebinary(slim_pars["sigmoid_prob"])}\n")
+    print("\"GenomeElement\" Checked.", flush = True)
 
     if (not isinstance(all_config["GenomeElement"]["traits_num"], dict)) or len(all_config["GenomeElement"]["traits_num"].keys()) != 2 \
                                                     or any(not isinstance(i, int) for i in all_config["GenomeElement"]["traits_num"].values()):
@@ -440,19 +440,19 @@ def create_slim_script(slim_pars):
     append_files(os.path.join(code_path, "self_reproduce.slim"), mainslim_path)
 
 	# Transmission reproduction
-	if slim_pars["use_genetic_model"] == False:
-		append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
-	else:
-		if slim_pars["sigmoid_prob"]==True:
-			append_files(os.path.join(code_path, "transmission_additive_sigmoid.slim"), mainslim_path)
-		else:
-			append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
+    if slim_pars["use_genetic_model"] == False:
+        append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
+    else:
+        if slim_pars["sigmoid_prob"]==True:
+            append_files(os.path.join(code_path, "transmission_additive_sigmoid.slim"), mainslim_path)
+        else:
+            append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
 		# if slim_pars["trans_type"] == "additive":
 		# 	append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
 		# elif slim_pars["trans_type"] == "bialleleic":
 		# 	append_files(os.path.join(code_path, "transmission_bialleleic.slim"), mainslim_path)
-		if any(idx == 0 for idx in slim_pars["transmissibility_effsize"]):
-			append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
+        if any(idx == 0 for idx in slim_pars["transmissibility_effsize"]):
+            append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
 
     # Transmission reproduction
     if slim_pars["use_genetic_model"] == False:
@@ -483,17 +483,17 @@ def create_slim_script(slim_pars):
 
 
 	# State transition for infected hosts
-	if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
-		if slim_pars["sigmoid_prob"]==True:
-			append_files(os.path.join(code_path, "Infected_process_additive_sigmoid.slim"), mainslim_path)
-		else:
-			append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
+    if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
+        if slim_pars["sigmoid_prob"]==True:
+            append_files(os.path.join(code_path, "Infected_process_additive_sigmoid.slim"), mainslim_path)
+        else:
+            append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 		# if slim_pars["trans_type"] == "additive":
 		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 		# elif slim_pars["trans_type"] == "bialleleic":
 		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
-	if any(idx == 0 for idx in slim_pars["drugresistance_effsize"]):
-		append_files(os.path.join(code_path, "Infected_process_nogenetic.slim"), mainslim_path)
+    if any(idx == 0 for idx in slim_pars["drugresistance_effsize"]):
+        append_files(os.path.join(code_path, "Infected_process_nogenetic.slim"), mainslim_path)
 
     # State transition for infected hosts
     if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
@@ -596,42 +596,42 @@ def run_all_slim_simulation(slim_config_path = "", slim_pars = {}, dataprocess_p
 
 		# Extract the seed number for the current
 		# Check if sampled genomes exits
-		sampled_genomes_path = os.path.join(slim_pars["cwdir"], str(runid), "sample.csv.gz")
-		if os.path.exists(sampled_genomes_path):
-			if dataprocess_pars["do_postprocess"]:
-				each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
-				print(f"Processing replication {runid} treesequence file...", flush = True)
+        sampled_genomes_path = os.path.join(slim_pars["cwdir"], str(runid), "sample.csv.gz")
+        if os.path.exists(sampled_genomes_path):
+            if dataprocess_pars["do_postprocess"]:
+                each_wkdir = os.path.join(slim_pars["cwdir"], str(runid))
+                print(f"Processing replication {runid} treesequence file...", flush = True)
 				# Run data processing for each replicate
-				run_per_data_processing(
-					slim_pars["ref_path"], slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
-					slim_pars["seed_host_matching_path"], dataprocess_pars["sequence_output"],
-					dataprocess_pars["tree_plotting"]["branch_color_trait"], slim_pars["sigmoid_prob"])
-				if slim_pars["use_reference"]:
-					seed_phylo = ""
-				else:
-					seed_phylo = os.path.join(slim_pars["cwdir"], "seeds.nwk")
+                run_per_data_processing(
+                    slim_pars["ref_path"], slim_pars["cwdir"], slim_pars["use_genetic_model"], runid, dataprocess_pars["n_trait"], 
+                    slim_pars["seed_host_matching_path"], dataprocess_pars["sequence_output"],
+                    dataprocess_pars["tree_plotting"]["branch_color_trait"], slim_pars["sigmoid_prob"])
+                if slim_pars["use_reference"]:
+                    seed_phylo = ""
+                else:
+                    seed_phylo = os.path.join(slim_pars["cwdir"], "seeds.nwk")
 				# Plot transmission tree, strain distribution trajectory, and SEIR trajectory
-				print(f"Plotting transmission tree for replication {runid}...", flush = True)
-				plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], \
-					seed_phylo, dataprocess_pars["tree_plotting"]["heatmap"])
-				print(f"Plotting strain distribution trajectory for replication {runid}...", flush = True)
-				plot_strain_distribution_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["n_generation"])
-				print(f"Plotting SEIR trajectory for replication {runid}...", flush = True)
-				if os.path.exists(os.path.join(each_wkdir, "SEIR_trajectory.csv.gz")):
-					plot_SEIR_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"])
-					run_success.append(runid)
-		else:
-			print(f"There's no sampled genome in replicate {runid}. Either the simulation failed or the sampling rate is too low. \
-		Please check your config file and confirm those are your desired simulation parameters.", flush = True)
-		print("\n", flush = True)
+                print(f"Plotting transmission tree for replication {runid}...", flush = True)
+                plot_per_transmission_tree(each_wkdir, slim_pars["seed_size"], slim_config_path, dataprocess_pars["n_trait"], \
+                    seed_phylo, dataprocess_pars["tree_plotting"]["heatmap"])
+                print(f"Plotting strain distribution trajectory for replication {runid}...", flush = True)
+                plot_strain_distribution_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["n_generation"])
+                print(f"Plotting SEIR trajectory for replication {runid}...", flush = True)
+                if os.path.exists(os.path.join(each_wkdir, "SEIR_trajectory.csv.gz")):
+                    plot_SEIR_trajectory(each_wkdir, slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"])
+                    run_success.append(runid)
+        else:
+            print(f"There's no sampled genome in replicate {runid}. Either the simulation failed or the sampling rate is too low. \
+        Please check your config file and confirm those are your desired simulation parameters.", flush = True)
+        print("\n", flush = True)
 	# Plot aggregated SEIR and strain distribution trajectories
-	print(f"Plotting the aggregated SEIR trajectory...", flush = True)
-	plot_all_SEIR_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
-	print(f"Plotting the aggregated strain distribution trajectory...", flush = True)
-	plot_all_strain_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
+    print(f"Plotting the aggregated SEIR trajectory...", flush = True)
+    plot_all_SEIR_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
+    print(f"Plotting the aggregated strain distribution trajectory...", flush = True)
+    plot_all_strain_trajectory(slim_pars["cwdir"], slim_pars["seed_size"], slim_pars["host_size"], slim_pars["n_generation"], run_success)
 
-	if os.path.exists(os.path.join(slim_pars["cwdir"], "output_trajectories")):
-		shutil.rmtree(os.path.join(slim_pars["cwdir"], "output_trajectories"))
+    if os.path.exists(os.path.join(slim_pars["cwdir"], "output_trajectories")):
+        shutil.rmtree(os.path.join(slim_pars["cwdir"], "output_trajectories"))
 
         # Extract the seed number for the current
         # Check if sampled genomes exits

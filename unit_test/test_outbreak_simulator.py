@@ -5,23 +5,24 @@ import networkx as nx
 import numpy as np
 import pytest
 import json
-from outbreak_simulator import *
+
 
 curr_dir = os.path.dirname(__file__)
 e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
 if e3SIM_dir not in sys.path:
-    sys.path.insert(0, e3SIM_dir)
-
+	sys.path.insert(0, e3SIM_dir)
+from outbreak_simulator import *
 
 
 def test_sigmoid():
-    shutil.copytree(os.path.join(curr_dir, '../test/manual_tests/test_minimal_model'),
-    	curr_dir)
-    os.remove(os.path.join(curr_dir, 'test_minimal_model/slim.params'))
+	if os.path.exists(os.path.join(curr_dir, 'test_minimal_model')):
+		shutil.rmtree(os.path.join(curr_dir, 'test_minimal_model'))
+	shutil.copytree(os.path.join(curr_dir, '../test/manual_tests/test_minimal_model'), os.path.join(curr_dir, 'test_minimal_model'))
+	os.remove(os.path.join(curr_dir, 'test_minimal_model/slim.params'))
 
 	config_test = {
 	  "BasicRunConfiguration": {
-	    "cwdir": curr_dir,
+	    "cwdir": os.path.join(curr_dir, 'test_minimal_model'),
 	    "n_replicates": 1
 	  },
 	  "EvolutionModel": {
@@ -92,14 +93,14 @@ def test_sigmoid():
 	  }
 	}
 
-    all_slim_simulation_by_config(config_test)
-    with open(os.path.join(curr_dir, 'test_minimal_model/slim.params'), 'r') as file:
-        for line in file:
-        	if line.startswith("sigmoid_prob"):
-        		assert(line == "sigmoid_prob:T\n")
-        		break
+	all_slim_simulation_by_config(config_test)
+	with open(os.path.join(curr_dir, 'test_minimal_model/slim.params'), 'r') as file:
+		for line in file:
+			if line.startswith("sigmoid_prob"):
+				assert(line == "sigmoid_prob:T\n")
+				break
 
-    shutil.rmtree(os.path.join(curr_dir, 'test_minimal_model'))
+	shutil.rmtree(os.path.join(curr_dir, 'test_minimal_model'))
 
 
 
