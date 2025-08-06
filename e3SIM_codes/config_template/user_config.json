@@ -163,10 +163,10 @@
         "effsize_min": [],
         "effsize_max": [],
         "normalize": false,
-        "final_trait": 1.0
+        "final_trait": 1
       }
     },
-    "sigmoid_prob": true
+    "sigmoid_prob": false
   },
   "SeedHostMatching": {
     "method": "",
