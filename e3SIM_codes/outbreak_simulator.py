@@ -454,18 +454,6 @@ def create_slim_script(slim_pars):
         if any(idx == 0 for idx in slim_pars["transmissibility_effsize"]):
             append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
 
-    # Transmission reproduction
-    if slim_pars["use_genetic_model"] == False:
-        append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
-    else:
-        append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
-        # if slim_pars["trans_type"] == "additive":
-        # 	append_files(os.path.join(code_path, "transmission_additive.slim"), mainslim_path)
-        # elif slim_pars["trans_type"] == "bialleleic":
-        # 	append_files(os.path.join(code_path, "transmission_bialleleic.slim"), mainslim_path)
-        if any(idx == 0 for idx in slim_pars["transmissibility_effsize"]):
-            append_files(os.path.join(code_path, "transmission_nogenetic.slim"), mainslim_path)
-
 
     # Within-host reproduction
     if slim_pars["within_host_reproduction"]:
@@ -492,16 +480,6 @@ def create_slim_script(slim_pars):
 		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
 		# elif slim_pars["trans_type"] == "bialleleic":
 		# 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
-    if any(idx == 0 for idx in slim_pars["drugresistance_effsize"]):
-        append_files(os.path.join(code_path, "Infected_process_nogenetic.slim"), mainslim_path)
-
-    # State transition for infected hosts
-    if any(idx != 0 for idx in slim_pars["drugresistance_effsize"]):
-        append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
-        # if slim_pars["trans_type"] == "additive":
-        # 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
-        # elif slim_pars["trans_type"] == "bialleleic":
-        # 	append_files(os.path.join(code_path, "Infected_process_additive.slim"), mainslim_path)
     if any(idx == 0 for idx in slim_pars["drugresistance_effsize"]):
         append_files(os.path.join(code_path, "Infected_process_nogenetic.slim"), mainslim_path)
 
