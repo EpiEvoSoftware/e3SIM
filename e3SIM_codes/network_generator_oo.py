@@ -198,15 +198,18 @@ def network_generation_byconfig(all_config):
 # ---------------- CLI ---------------- #
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate a contact network.")
+    parser = argparse.ArgumentParser(description="Generate a contact network\
+                                     population size specified and store it in \
+                                     the working directory as an adjacency list.")
     parser.add_argument("-popsize", type=int, required=True)
     parser.add_argument("-wkdir", type=str, required=True)
     parser.add_argument("-method", type=str, required=True, choices=["user_input", "randomly_generate"])
     parser.add_argument("-model", type=str, default="")
     parser.add_argument("-path_network", type=str, default="")
     parser.add_argument("-p_ER", type=float, default=0)
-    parser.add_argument("-rp_size", nargs="+", type=int, default=[])
-    parser.add_argument("-p_within", nargs="+", type=float, default=[])
+    parser.add_argument("-rp_size", nargs="+", help = "Size of random partition graph groups", type=int, default=[])
+    parser.add_argument("-p_within", nargs="+", help = "Probability of edges for different groups \
+                         (decending order)", type=float, default=[])
     parser.add_argument("-p_between", type=float, default=0)
     parser.add_argument("-m", type=int, default=0)
     parser.add_argument("-random_seed", type=int, default=None)

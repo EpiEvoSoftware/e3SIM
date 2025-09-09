@@ -5,6 +5,7 @@ import json
 import networkx as nx
 import os
 from network_generator import run_network_generation
+from network_generator_oo import NetworkManager
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
@@ -116,12 +117,18 @@ class NetworkModel:
                 config = load_config_as_dict(self.config_path)
                 wk_dir = config["BasicRunConfiguration"]["cwdir"]
                 pop_size = config["NetworkModelParameters"]["host_size"]
-                network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="user_input",
-                        path_network=chosen_file)
-                
+                # network, error = run_network_generation(
+                #         pop_size=pop_size,
+                #         wk_dir=wk_dir,
+                #         method="user_input",
+                #         path_network=chosen_file)
+                manager = NetworkManager(wk_dir)
+                network, error = manager.run(
+                    pop_size = pop_size,
+                    wk_dir = wk_dir,
+                    method = "user_input",
+                    path_network = chosen_file
+                )
                 if error:
                     messagebox.showerror("Error", error)
                     return
@@ -282,37 +289,63 @@ class NetworkModel:
 
                 if network_model == "ER":
                     p_ER = config["NetworkModelParameters"]["randomly_generate"]["ER"]["p_ER"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="ER",
-                        p_ER=p_ER,
-                        rand_seed=rand_seed)
+                    # network, error = run_network_generation(
+                    #     pop_size=pop_size,
+                    #     wk_dir=wk_dir,
+                    #     method="randomly_generate",
+                    #     model="ER",
+                    #     p_ER=p_ER,
+                    #     rand_seed=rand_seed)
+                    manager = NetworkManager(wk_dir)
+                    network, error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "ER",
+                        p_ER = p_ER,
+                        rand_seed = rand_seed)
                 elif network_model == "BA":
                     m = config["NetworkModelParameters"]["randomly_generate"]["BA"]["ba_m"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="BA",
-                        m=m,
-                        rand_seed=rand_seed)
+                    # network, error = run_network_generation(
+                    #     pop_size=pop_size,
+                    #     wk_dir=wk_dir,
+                    #     method="randomly_generate",
+                    #     model="BA",
+                    #     m=m,
+                    #     rand_seed=rand_seed)
+                    manager = NetworkManager(wk_dir)
+                    network, error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "BA",
+                        m = m,
+                        rand_seed = rand_seed)
                 elif network_model == "RP":
                     rp_size = config["NetworkModelParameters"]["randomly_generate"]["RP"]["rp_size"]
                     p_within = \
                         config["NetworkModelParameters"]["randomly_generate"]["RP"]["p_within"]
                     p_between = \
                         config["NetworkModelParameters"]["randomly_generate"]["RP"]["p_between"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="RP",
-                        rp_size=rp_size,
-                        p_within=p_within,
-                        p_between=p_between,
-                        rand_seed=rand_seed)
+                    # network, error = run_network_generation(
+                    #     pop_size=pop_size,
+                    #     wk_dir=wk_dir,
+                    #     method="randomly_generate",
+                    #     model="RP",
+                    #     rp_size=rp_size,
+                    #     p_within=p_within,
+                    #     p_between=p_between,
+                    #     rand_seed=rand_seed)
+                    manager = NetworkManager(wk_dir)
+                    network, error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "RP",
+                        rp_size = rp_size,
+                        p_within = p_within,
+                        p_between = p_between,
+                        rand_seed = rand_seed)
                 else:
                     raise ValueError("Unsupported model.")
 
