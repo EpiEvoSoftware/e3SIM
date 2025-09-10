@@ -6,6 +6,7 @@ from utils import (load_config_as_dict, no_validate_update_val, no_validate_upda
                    EasyRadioButton, EasyButton, EasyEntry, EasyRateMatrix, EasyImage,
                    CreateToolTip)
 from seed_generator import run_seed_generation
+from seed_generator_oo import SeedConfig, SeedGenerator
 
 class SeedsConfiguration(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):
@@ -814,7 +815,19 @@ class SeedsConfiguration(TabBase):
                     mu_matrix = WF_config["burn_in_mutrate_matrix"]
                     mu_matrix = json.dumps({"A": mu_matrix[0], "C": mu_matrix[1], 
                                             "G": mu_matrix[2], "T": mu_matrix[3]})
-                    error = run_seed_generation(
+                    # error = run_seed_generation(
+                    #     method=method,
+                    #     wk_dir=cwdir,
+                    #     seed_size=seed_size,
+                    #     Ne=Ne,
+                    #     mu=mu,
+                    #     n_gen=n_gen,
+                    #     ref_path=ref_path,
+                    #     rand_seed=rand_seed,
+                    #     use_subst_matrix=use_subst_matrix, 
+                    #     mu_matrix=mu_matrix
+                    # )
+                    config = SeedConfig(
                         method=method,
                         wk_dir=cwdir,
                         seed_size=seed_size,
@@ -826,6 +839,8 @@ class SeedsConfiguration(TabBase):
                         use_subst_matrix=use_subst_matrix, 
                         mu_matrix=mu_matrix
                     )
+                    generator = SeedGenerator(config)
+                    error = generator.run()
                 elif method == "SLiM_burnin_epi":
                     epi_config = seeds_config["SLiM_burnin_epi"]
                     seeded_host_id = epi_config["seeded_host_id"]
@@ -848,7 +863,27 @@ class SeedsConfiguration(TabBase):
                     I_E_prob = epi_config["I_E_prob"]
                     R_S_prob = epi_config["R_S_prob"]
                     host_size = config["NetworkModelParameters"]["host_size"]
-                    error = run_seed_generation(
+                    # error = run_seed_generation(
+                    #     method=method,
+                    #     wk_dir=cwdir,
+                    #     seed_size=seed_size,
+                    #     use_subst_matrix=use_subst_matrix, 
+                    #     mu=mu,
+                    #     mu_matrix=mu_matrix,
+                    #     n_gen=n_gen,
+                    #     seeded_host_id=seeded_host_id,
+                    #     S_IE_prob=S_IE_prob,
+                    #     E_I_prob=E_I_prob,
+                    #     E_R_prob=E_R_prob,
+                    #     latency_prob=latency_prob,
+                    #     I_R_prob=I_R_prob,
+                    #     I_E_prob=I_E_prob,
+                    #     R_S_prob=R_S_prob,
+                    #     host_size=host_size,
+                    #     ref_path=ref_path,
+                    #     rand_seed=rand_seed
+                    # )
+                    config = SeedConfig(
                         method=method,
                         wk_dir=cwdir,
                         seed_size=seed_size,
@@ -868,10 +903,20 @@ class SeedsConfiguration(TabBase):
                         ref_path=ref_path,
                         rand_seed=rand_seed
                     )
+                    generator = SeedGenerator(config)
+                    error = generator.run()
                 elif method == "user_input":
                     path_seeds_vcf = seeds_config["user_input"]["path_seeds_vcf"]
                     path_seeds_phylogeny = seeds_config["user_input"]["path_seeds_phylogeny"]
-                    error = run_seed_generation(
+                    # error = run_seed_generation(
+                    #     method=method,
+                    #     wk_dir=cwdir,
+                    #     seed_size=seed_size,
+                    #     seed_vcf=path_seeds_vcf,
+                    #     path_seeds_phylogeny=path_seeds_phylogeny,
+                    #     rand_seed=rand_seed
+                    # )
+                    config = SeedConfig(
                         method=method,
                         wk_dir=cwdir,
                         seed_size=seed_size,
@@ -879,6 +924,8 @@ class SeedsConfiguration(TabBase):
                         path_seeds_phylogeny=path_seeds_phylogeny,
                         rand_seed=rand_seed
                     )
+                    generator = SeedGenerator(config)
+                    error = generator.run()
 
                 if error is not None:
                     raise Exception(error)
