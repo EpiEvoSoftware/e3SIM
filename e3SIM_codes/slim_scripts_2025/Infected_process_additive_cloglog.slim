@@ -1,0 +1,50 @@
+s7 early(){
+	i_inds = which(current_hoststates==2);
+	hosts = sim.subpopulations;
+	draw_uniform = runif(length(i_inds));
+	state_transition = findInterval(draw_uniform, c(0, sample_rate[current_epoch] * recovery_prob_after_sampling[current_epoch], sample_rate[current_epoch], I_R_rate[current_epoch] + sample_rate[current_epoch], I_R_rate[current_epoch] + sample_rate[current_epoch] + I_E_rate[current_epoch]));
+	recover_from_i = i_inds[which((state_transition==0) | (state_transition==2))];
+	sampled_inds = i_inds[which(state_transition<=1)];
+	
+	if (length(sampled_inds)>0)
+	{
+		sampled_inds_genomes = c();
+		for (ind in sampled_inds)
+		{
+			sampled_pathogen = sample(hosts[ind].individuals, 1);
+			line1 = paste(community.tick, ind, sampled_pathogen.tag);
+			writeFile(paste0(cwdir, runid, "/sample.csv"), line1, append=T, compress=T);
+			sampled_inds_genomes = c(sampled_inds_genomes, sampled_pathogen);
+		}
+		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
+	}
+	
+	actually_recovered = c();
+	if (length(recover_from_i)>0)
+	{
+		for (ind in recover_from_i)
+		{
+			pathogens = hosts[ind].individuals;
+			for (pathogen in pathogens)
+			{
+				muts = pathogen.genome1.mutationsOfType(1);
+				survival_prob = exp(- kappa[current_epoch] * exp(- alpha_drug * additive_trait(muts, paste0("drug_resistance_", drugresistance_effsize[current_epoch]))));
+
+				//the bigger the effect size for drug resistance mutation is, the less probable that the the pathogen dies
+				if (runif(1) > survival_prob)
+				{
+					line1 = paste(community.tick, ind);
+					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
+					actually_recovered = c(actually_recovered, pathogen);
+				}
+			}
+		}
+		if (length(actually_recovered) > 0)
+		{
+			sim.killIndividuals(actually_recovered);
+			Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3;
+		}
+	}
+}
+
+

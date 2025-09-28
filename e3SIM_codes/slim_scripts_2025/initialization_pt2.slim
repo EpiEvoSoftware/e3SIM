@@ -1,0 +1,25 @@
+	defineConstant("L", initializeAncestralNucleotides(ref_path));
+	initializeRecombinationRate(0);
+
+	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
+	initializeMutationTypeNuc(1, 1, "f", 0.0);  // Mutations contributing to traits
+	if (transition_matrix==T)
+	{
+		mm1 = readCSV(transition_matrix_path, colNames = T);
+		defineGlobal("mm", mm1.asMatrix());
+		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm);
+		initializeGenomicElementType(1, 1, 1.0, mutationMatrix = mm);
+	}
+	else
+	{
+		initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mut_rate / 3));
+		initializeGenomicElementType(1, 1, 1.0, mmJukesCantor(mut_rate / 3));
+	}
+
+	// Print the mutation transition rate matrix!
+	print(g1.mutationMatrix);
+	
+
+
+
+	

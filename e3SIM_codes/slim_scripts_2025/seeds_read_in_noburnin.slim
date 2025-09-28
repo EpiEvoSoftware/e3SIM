@@ -1,0 +1,36 @@
+1 early() {
+	seeds_structure = readCSV(seed_host_matching_path, colNames=T);
+	// Add N($sample_size) subpopulations (representing N humans in the population) with 0 or 1 elements (Susceptible or Infected)
+	labels = c();
+	seed_count = 0;
+
+	for (i in 1:host_size)
+	{
+		if (i == seeds_structure.subset(seed_count, 1) + 1)
+		{
+			sim.addSubpop(i - 1, 1, haploid=T); // Infected hosts
+			current_subpop = sim.subpopulations[i - 1];
+			labels = c(labels, 2);
+			current_subpop.individuals.tag = seeds_structure.subset(seed_count, 0); // id of seed
+			sim.treeSeqRememberIndividuals(current_subpop.individuals);
+
+			if (seed_count < seed_size - 1)
+			{
+				seed_count = seed_count + 1;
+			}
+		}
+		else
+		{
+			sim.addSubpop(i - 1, 0, haploid=T); // Susceptible
+			current_subpop = sim.subpopulations[i - 1];
+			labels = c(labels, 0);
+		}
+		current_subpop.tag = i - 1;
+		current_subpop.setValue("Contacts", c());
+	}
+
+	defineGlobal("Host_states", labels);
+	defineGlobal("current_hoststates", Host_states);
+}
+
+

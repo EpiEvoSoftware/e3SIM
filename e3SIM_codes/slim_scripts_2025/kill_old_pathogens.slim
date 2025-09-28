@@ -1,0 +1,6 @@
+s6 early()
+{
+	inds = sim.subpopulations.individuals;
+	sim.killIndividuals(inds[inds.age > 0]);
+}
+

@@ -341,6 +341,7 @@ main <- function(){
   # Plot whole transmission tree if exists
   if (whole_phylo_output){
     write.tree(seed_phylo, file = file.path(wk_dir, "whole_transmission_tree.nwk"))
+    cat("Plotting whole transmission tree including descendants of all seeds.\n")
     plot_transmission_tree_helper(seed_phylo, meta_df, n_dr, n_trans, wk_dir, heatmap_trait)
   }
 }

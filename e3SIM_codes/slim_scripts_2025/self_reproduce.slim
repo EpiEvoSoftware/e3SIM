@@ -1,0 +1,12 @@
+s0 reproduction() {
+	subpops_inds = sim.subpopulations.individuals;
+	subpops = subpops_inds.subpopulation;
+	num_inds = length(subpops_inds);
+	for (pathogen in 1:num_inds)
+	{
+		this_pathogen = subpops_inds[pathogen - 1];
+		subpops[pathogen - 1].addRecombinant(this_pathogen.genome1, NULL, NULL, NULL, NULL, NULL).tag = this_pathogen.tag;
+	}
+	self.active = 0;
+}
+

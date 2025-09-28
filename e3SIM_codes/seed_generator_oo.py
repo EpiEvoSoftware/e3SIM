@@ -50,9 +50,9 @@ class SeedConfig:
         self.wk_dir = wk_dir
         self.seed_size = seed_size
         self.params = kwargs
-        self._validate()
+        # self._validate()
 
-    def _validate(self):
+    def validate(self):
         if not os.path.exists(self.wk_dir):
             raise CustomizedError(f"Working directory {self.wk_dir} does not exist.")
         if self.seed_size <= 0:
@@ -416,6 +416,7 @@ class SeedGenerator:
 
     def run(self):
         try:
+            self.config.validate()
             np.random.seed(self.config.params.get("rand_seed"))
             if self.config.method in ("SLiM_burnin_WF", "SLiM_burnin_epi"): # assuming SLiM burn-in (currently just WF and epi), checking violation of parameters for all SLiM burn-in
                 if self.config.params["Ne"] <= 0 and self.config.method == "SLiM_burnin_WF": 

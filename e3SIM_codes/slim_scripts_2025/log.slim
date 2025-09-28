@@ -1,0 +1,32 @@
+s4 late()
+{
+	// unique new mutations down to the ancestral state
+	// muts = sim.mutations; 
+	// new_muts = muts[muts.originTick == community.tick]; 
+	// back_muts = NULL; 
+	// for (mut in new_muts) 
+	// {
+	// 	pos = mut.position;
+	// 	if (mut.nucleotide == sim.chromosomes.ancestralNucleotides(pos, pos))
+	// 		back_muts = c(back_muts, mut);
+	// } 
+	// if (size(back_muts))
+	// {
+	// 	print("THERE ARE BACK MUTATIONS");
+	// 	sim.subpopulations.haplosomes.removeMutations(back_muts);
+	// }
+
+	writeFile(paste0(cwdir, runid, "/SEIR_trajectory.csv"), paste0(sum(Host_states == 0), ", ", sum(Host_states == 1), ", ", sum(Host_states == 2), ", ", sum(Host_states == 3)), append=T, compress=T);
+
+	all_pathogens = sim.subpopulations.individuals.tag;
+	line = asString(sum(all_pathogens == 0));
+	if (seed_size > 1)
+	{
+		for (seed in 2:seed_size)
+		{
+			line = paste0(line, ", ", sum(all_pathogens == seed - 1));
+		}
+	}
+	writeFile(paste0(cwdir, runid, "/strain_trajectory.csv"), line, append=T, compress=T);
+}
+
