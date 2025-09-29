@@ -1,336 +1,235 @@
-import networkx as nx, numpy as np, os, argparse
-from base_func import *
-from error_handling import CustomizedError
-
-def write_network(ntwk_, wk_dir):
-    """
-    Writes a network to the working directory and returns the path to the network.
-    The output file will be named contact_network.adjlist.
-
-    Parameters:
-        wk_dir (str): Working directory.
-        ntwk_ (nx.Graph): Contact network.
-
-    Returns:
-        ntwk_path (str): Path to the network.
-    """
-    nx.write_adjlist(ntwk_, ntwk_path := os.path.join(wk_dir, "contact_network.adjlist"))
-    return ntwk_path
-
-def ER_generate(pop_size, p_ER):
-    """
-    Returns an Erdos_renyi graph with specified parameters.
-
-    Parameters:
-        p_ER (str): The probability of existing edges between two nodes.
-        pop_size (int): Population size.
-    """
-    if not 0 < p_ER <= 1:
-        raise CustomizedError("You need to specify a 0<p<=1 (-p_ER) in Erdos-Renyi graph")
-    er_graph = nx.erdos_renyi_graph(pop_size, p_ER, seed = np.random)
-    return er_graph
-
-def fast_ER_generate(pop_size, p_ER):
-    """
-    Returns an Erdos_renyi graph faster than the vanilla implementation.
-
-    Parameters:
-        p_ER (str): The probability of existing edges between two nodes.
-        pop_size (int): Population size.
-    """
-    if not 0 < p_ER <= 1:
-        raise CustomizedError("You need to specify a 0<p<=1 (-p_ER) in Erdos-Renyi graph")
-    er_graph = nx.fast_gnp_random_graph(pop_size, p_ER, seed = np.random)
-    return er_graph
-
-def rp_generate(pop_size, rp_size, p_within, p_between):
-    """
-    Returns a random partition graph with n groups, each group having a probability of
-        within-group edge, and there is a global between-group edge probability.
-
-    Parameters:
-        rp_size (list[int]): The sizes of partitions.
-        pop_size (int): Population size.
-        p_within (list[float]): The probability of edges within each partition.
-        p_between (float): The probability of edges among partitions.
-    """
-    block_size = len(rp_size)
-    prob_size = len(p_within)
-
-    # Check for validity of inputs
-    if sum(rp_size) != pop_size:
-        raise CustomizedError(
-            f"Size of the partitions (-rp_size {rp_size}) has "
-            f"to add up to the whole population size (-popsize {pop_size})"
-        )
-    if prob_size != block_size:
-        raise CustomizedError(
-            f"The number of partitions ({block_size}) does "
-            "not match the number of given within partition connection "
-            f"probabilities ({prob_size})"
-        )
-    if p_between == 0:
-        print(
-            "WARNING: You didn't specify a between partition connection probability (-p_between) "
-            "or have set it to 0. This will lead to two completely isolated partitions.",
-            flush=True,
-        )
-
-    # Construct contact probability matrix
-    p = [[p_between for _ in range(block_size)] for _ in range(block_size)]
-    for k in range(block_size):
-        p[k][k] = p_within[k]
-
-    # Generate random partition graph
-    rp_graph = nx.stochastic_block_model(rp_size, p, seed = np.random)
-    return rp_graph
+import os
+import argparse
+import networkx as nx
+import numpy as np
+from e3SIM_codes.error_handling import CustomizedError
 
 
-def ba_generate(pop_size, m):
-    """
-    Returns a random graph using Barabasi-Albert preferential attachement.
+# ---------------- Base Class ---------------- #
 
-    Parameters:
-        pop_size (int): Population size.
-        m (int): Number of edges to attach from a new node to existing nodes.
-    """
-    ba_graph = nx.barabasi_albert_graph(pop_size, m, seed = np.random)
-    return ba_graph
+class BaseNetworkGenerator:
+    """Base class for network generators."""
 
+    def __init__(self, pop_size, rand_seed=None):
+        self.pop_size = pop_size
+        self.rand_seed = rand_seed
+        if rand_seed is not None:
+            np.random.seed(rand_seed)
 
-def read_input_network(path_network, pop_size):
-    """
-    Checks the format of the input network and return it.
-
-    Parameters:
-        path_network (str): Path to the network file.
-        pop_size (int): Population size.
-    """
-    if path_network == "":
-        raise CustomizedError(
-            f"You need to specify a path to the user-provided network (-path_network)"
-        )
-    elif not os.path.exists(path_network):
-        raise FileNotFoundError(
-            f"The provided network path ({path_network}) doesn't exist"
-        )
-    ntwk = nx.read_adjlist(path_network)
-    if len(ntwk) != pop_size:
-        raise CustomizedError(
-            "The provided network doesn't have the same number of nodes "
-            f"({len(ntwk)}) as the host population size ({pop_size}) specified."
-        )
-
-    return ntwk
+    def generate(self):
+        raise NotImplementedError("Subclasses must implement generate()")
 
 
-def run_network_generation(
-    pop_size,
-    wk_dir,
-    method,
-    model="",
-    path_network="",
-    p_ER=0,
-    rp_size=[],
-    p_within=[],
-    p_between=0,
-    m=0,
-    rand_seed=None,
-):
-    """
-    Generates the contact network given parameters.
+# ---------------- Concrete Implementations ---------------- #
 
-    Parameters:
-        wk_dir (str): Working directory.
-        path_network (str): Path to the network file.
-        pop_size (int): Population size.
-        method (str): Method to acquire the contact network.
-        model (str): The network model to construct contact network.
-        p_ER (float): param for ER graph.
-        rp_size (float): param for RP graph.
-        p_within (list[float]): param for RP graph.
-        p_between (float): param for RP graph.
-        m (int): param for BA graph.
+class ERGenerator(BaseNetworkGenerator):
+    def __init__(self, pop_size, p_ER, rand_seed=None):
+        super().__init__(pop_size, rand_seed)
+        if not 0 < p_ER <= 1:
+            raise CustomizedError("You need to specify a 0<p<=1 (-p_ER) in Erdos-Renyi graph")
+        self.p_ER = p_ER
 
-    Returns:
-        ntwk (nx.Graph): Generated network.
-        error_message (str): Error message.
-    """
-    if rand_seed != None:
-        np.random.seed(rand_seed)
-    ntwk = None
-    error_message = None
-    try:
+    def generate(self):
+        return nx.fast_gnp_random_graph(self.pop_size, self.p_ER, seed=np.random)
+
+
+class RPGenerator(BaseNetworkGenerator):
+    def __init__(self, pop_size, rp_size, p_within, p_between, rand_seed=None):
+        super().__init__(pop_size, rand_seed)
+        if sum(rp_size) != pop_size:
+            raise CustomizedError(f"Partition sizes {rp_size} must sum to population size {pop_size}")
+        if len(p_within) != len(rp_size):
+            raise CustomizedError("Number of partitions and within-group probabilities mismatch")
+        if p_between == 0:
+            print("WARNING: Between-group probability is 0. Partitions will be isolated.")
+        self.rp_size = rp_size
+        self.p_within = p_within
+        self.p_between = p_between
+
+    def generate(self): # Thought it is called random partition, but can be any number of groups
+        block_size = len(self.rp_size)
+        prob_matrix = [[self.p_between for _ in range(block_size)] for _ in range(block_size)]
+        for k in range(block_size):
+            prob_matrix[k][k] = self.p_within[k]
+        return nx.stochastic_block_model(self.rp_size, prob_matrix, seed=np.random)
+
+
+class BAGenerator(BaseNetworkGenerator):
+    def __init__(self, pop_size, m, rand_seed=None):
+        super().__init__(pop_size, rand_seed)
+        self.m = m
+
+    def generate(self):
+        return nx.barabasi_albert_graph(self.pop_size, self.m, seed=np.random)
+
+
+class UserInputGenerator(BaseNetworkGenerator):
+    def __init__(self, pop_size, path_network, rand_seed=None):
+        super().__init__(pop_size, rand_seed)
+        self.path_network = path_network
+
+    def generate(self):
+        if not self.path_network or not os.path.exists(self.path_network):
+            raise FileNotFoundError(f"Network path {self.path_network} not found")
+        ntwk = nx.read_adjlist(self.path_network)
+        if len(ntwk) != self.pop_size:
+            raise CustomizedError(f"Network nodes {len(ntwk)} do not match population size {self.pop_size}")
+        return ntwk
+
+
+# ---------------- Factory ---------------- #
+
+class NetworkFactory:
+    """Factory to instantiate network generators."""
+
+    @staticmethod
+    def create(method, model="", **kwargs):
+        """
+        Parameters:
+            wk_dir (str): Working directory.
+            path_network (str): Path to the network file.
+            pop_size (int): Population size.
+            method (str): Method to acquire the contact network.
+            model (str): The network model to construct contact network.
+            p_ER (float): param for ER graph.
+            rp_size (float): param for RP graph.
+            p_within (list[float]): param for RP graph.
+            p_between (float): param for RP graph.
+            m (int): param for BA graph.
+        """
         if method == "user_input":
-            # change function name
-            ntwk = read_input_network(path_network, pop_size)
+            return UserInputGenerator(kwargs["pop_size"], kwargs["path_network"], kwargs.get("rand_seed"))
 
         elif method == "randomly_generate":
-            if not model in ["ER", "RP", "BA"]:
-                raise CustomizedError(
-                    "Please specify a legit random graph model (-model) in random "
-                    "generate mode. (Supported model: ER/RP/BA)"
-                )
-
             if model == "ER":
-                ntwk = fast_ER_generate(pop_size, p_ER)
+                return ERGenerator(kwargs["pop_size"], kwargs["p_ER"], kwargs.get("rand_seed"))
             elif model == "RP":
-                ntwk = rp_generate(pop_size, rp_size, p_within, p_between)
+                return RPGenerator(kwargs["pop_size"], kwargs["rp_size"], kwargs["p_within"], kwargs["p_between"], kwargs.get("rand_seed"))
             elif model == "BA":
-                ntwk = ba_generate(pop_size, m)
+                return BAGenerator(kwargs["pop_size"], kwargs["m"], kwargs.get("rand_seed"))
+            else:
+                raise CustomizedError("Supported models: ER, RP, BA")
+
         else:
-            raise CustomizedError(
-                "Please provide a permitted method (user_input/randomly_generate)"
+            raise CustomizedError("Permitted methods: user_input / randomly_generate")
+
+
+# ---------------- Manager ---------------- #
+
+class NetworkManager:
+    """Handles generation, saving, and error management."""
+
+    def __init__(self, wk_dir):
+        self.wk_dir = wk_dir
+
+    def write_network(self, ntwk):
+        ntwk_path = os.path.join(self.wk_dir, "contact_network.adjlist")
+        nx.write_adjlist(ntwk, ntwk_path)
+        return ntwk_path
+
+    def run(self, method, model="", **kwargs):
+        try:
+            generator = NetworkFactory.create(method, model, **kwargs)
+            ntwk = generator.generate()
+            path = self.write_network(ntwk)
+            print(
+                "********************************************************************\n"
+                "                   CONTACT NETWORK GENERATED\n"
+                "********************************************************************",
+                flush=True,
             )
-        # No Error occur
-        ntwk_path = write_network(ntwk, wk_dir)
-        print(
-            "******************************************************************** \n"
-            + "                   CONTACT NETWORK GENERATED                         \n"
-            + "********************************************************************",
-            flush=True,
-        )
-        print("Contact network:", ntwk_path, flush=True)
-    except Exception as e:
-        print(f"Contact network generation - An error occured: {e}.", flush=True)
-        error_message = e
+            print("Contact network:", path, flush=True)
+            return ntwk, None
+        except Exception as e:
+            print(f"Error during network generation: {e}")
+            return None, e
 
-    return ntwk, error_message
 
+# ---------------- Config-based Interface ---------------- #
 
 def network_generation_byconfig(all_config):
+    """
+    Generate network based on config dict structure (same as old implementation).
+    """
     ntwk_config = all_config["NetworkModelParameters"]
     wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
-    # shared params
+
+    # Shared params
     ntwk_method = ntwk_config["method"]
     pop_size = ntwk_config["host_size"]
-    # user_input params
+
+    # User input params
     path_network = ntwk_config["user_input"]["path_network"]
-    # randomly generated network params
+
+    # Random generation params
     model = ntwk_config["randomly_generate"]["network_model"]
-    # ER param
+
+    # ER
     p_ER = ntwk_config["randomly_generate"]["ER"]["p_ER"]
-    # RP params
+
+    # RP
     rp_params = ntwk_config["randomly_generate"]["RP"]
     rp_size = rp_params["rp_size"]
     p_within = rp_params["p_within"]
     p_between = rp_params["p_between"]
-    # BA params
+
+    # BA
     ba_m = ntwk_config["randomly_generate"]["BA"]["ba_m"]
 
-    # Random Number generator
-    random_number_seed = all_config["BasicRunConfiguration"].get(
-        "random_number_seed", None
-    )
+    # RNG seed
+    random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
-    _, error = run_network_generation(
-        pop_size=pop_size,
-        wk_dir=wk_dir,
+    manager = NetworkManager(wk_dir)
+    _, error = manager.run(
         method=ntwk_method,
-        path_network=path_network,
         model=model,
+        pop_size=pop_size,
+        path_network=path_network,
         p_ER=p_ER,
+        rp_size=rp_size,
         p_within=p_within,
         p_between=p_between,
-        rp_size=rp_size,
         m=ba_m,
         rand_seed=random_number_seed,
     )
     return error
 
 
+# ---------------- CLI ---------------- #
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate a contact network for the population \
-                                     size specified and store it in the working directory as an adjacency list."
-    )
-    parser.add_argument(
-        "-popsize", action="store", dest="popsize", required=True, type=int
-    )
-    parser.add_argument("-wkdir", action="store", dest="wkdir", required=True, type=str)
-    parser.add_argument(
-        "-method", action="store", dest="method", required=True, type=str
-    )
-    parser.add_argument(
-        "-model", action="store", dest="model", required=False, type=str, default=""
-    )
-    parser.add_argument(
-        "-path_network",
-        action="store",
-        dest="path_network",
-        required=False,
-        type=str,
-        default="",
-    )
-    parser.add_argument(
-        "-p_ER", action="store", dest="p_ER", required=False, type=float, default=0
-    )
-    parser.add_argument(
-        "-rp_size",
-        "--rp_size",
-        nargs="+",
-        help="Size of random partition graph groups",
-        required=False,
-        type=int,
-        default=[],
-    )
-    parser.add_argument(
-        "-p_within",
-        "--p_within",
-        nargs="+",
-        help="probability of edges for different groups \
-                        (descending order)",
-        required=False,
-        type=float,
-        default=[],
-    )
-    parser.add_argument(
-        "-p_between",
-        action="store",
-        dest="p_between",
-        required=False,
-        type=float,
-        default=0,
-    )
-    parser.add_argument(
-        "-m", action="store", dest="m", required=False, type=int, default=0
-    )
-    parser.add_argument(
-        "-random_seed",
-        action="store",
-        dest="random_seed",
-        required=False,
-        type=int,
-        default=None,
-    )
+    parser = argparse.ArgumentParser(description="Generate a contact network\
+                                     population size specified and store it in \
+                                     the working directory as an adjacency list.")
+    parser.add_argument("-popsize", type=int, required=True)
+    parser.add_argument("-wkdir", type=str, required=True)
+    parser.add_argument("-method", type=str, required=True, choices=["user_input", "randomly_generate"])
+    parser.add_argument("-model", type=str, default="")
+    parser.add_argument("-path_network", type=str, default="")
+    parser.add_argument("-p_ER", type=float, default=0)
+    parser.add_argument("-rp_size", nargs="+", help = "Size of random partition graph groups", type=int, default=[])
+    parser.add_argument("-p_within", nargs="+", help = "Probability of edges for different groups \
+                         (decending order)", type=float, default=[])
+    parser.add_argument("-p_between", type=float, default=0)
+    parser.add_argument("-m", type=int, default=0)
+    parser.add_argument("-random_seed", type=int, default=None)
 
     args = parser.parse_args()
-    pop_size = args.popsize
-    wk_dir = args.wkdir
-    method = args.method
-    model = args.model
-    path_network = args.path_network
-    p_ER = args.p_ER
-    rp_size = args.rp_size
-    p_within = args.p_within
-    p_between = args.p_between
-    m = args.m
-    rand_seed = args.random_seed
 
-    run_network_generation(
-        pop_size=pop_size,
-        wk_dir=wk_dir,
-        method=method,
-        model=model,
-        path_network=path_network,
-        p_ER=p_ER,
-        rp_size=rp_size,
-        p_within=p_within,
-        p_between=p_between,
-        m=m,
-        rand_seed=rand_seed,
+    manager = NetworkManager(args.wkdir)
+    manager.run(
+        method=args.method,
+        model=args.model,
+        pop_size=args.popsize,
+        path_network=args.path_network,
+        p_ER=args.p_ER,
+        rp_size=args.rp_size,
+        p_within=args.p_within,
+        p_between=args.p_between,
+        m=args.m,
+        rand_seed=args.random_seed,
     )
+
 
 if __name__ == "__main__":
     main()
-

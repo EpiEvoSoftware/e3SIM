@@ -1,0 +1,6 @@
+name: o-builds
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+prefix: /home/sl984/miniconda3/envs/o-builds
