@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib
 
-NUM_META_COLS = 3
-POS_COL = 1
-TRANS_INDEX = 0
-DRUG_RES_INDEX = 1
+NUM_META_COLS = 1
+POS_COL = 0
+# TRANS_INDEX = 0
+# DRUG_RES_INDEX = 1
 
 def read_tseq(each_wk_dir_):
     """
@@ -107,16 +107,18 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
     else:
         eff_size = pd.read_csv(os.path.join(wk_dir_, "causal_gene_info.csv"))
         # Increment the end index so it is no longer inclusive
-        eff_size["end"] += 1
+        # eff_size["end"] += 1
         
 
         # if there are no traits to calculate, directly return empty list
         if num_trait==0:
             return [], trvs_order
 
-        search_intvls = np.array(np.ravel(eff_size[["start", "end"]]), dtype="float")
-        search_intvls[0::2] -= 0.1
-        search_intvls[1::2] += 0.1
+        # search_intvls = np.array(np.ravel(eff_size[["start", "end"]]), dtype="float")
+        # search_intvls[0::2] -= 0.1
+        # search_intvls[1::2] += 0.1
+
+        search_sites = np.array(eff_size[["Sites"]], dtype="float").flatten()
 
         # seem unncessary
         pos_values = [] # list of positions of mutations happened
@@ -125,28 +127,42 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
         for mut_idx in range(muts_size):
             mut = tseq_smp.mutation(mut_idx)
             pos_values.append(tseq_smp.site(mut.site).position + 1)
+            #pos_values.append(tseq_smp.site(mut.site).position)
             node_ids.append(mut.node)
-        
-        # Get the indices of each mutation position if inserted into the search intervals
-        intvs = np.searchsorted(search_intvls, pos_values)
 
-        which_m2 = np.where(intvs % 2 == 1)[0]
+        pos_values= np.array(pos_values)
+        matches = np.isin(pos_values, search_sites)
+        matched_pos_vals = pos_values[matches]
+        matched_site_idx = np.searchsorted(search_sites, matched_pos_vals)
+
+        if not np.any(matches):
+            print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
+            trait_val_now = { i: 0 for i in range(node_size)}
+            return [trait_val_now for _ in range(num_trait)], trvs_order
+        
+        which_m2 = np.where(matches)[0]
+
+        # Get the indices of each mutation position if inserted into the search intervals
+        # intvs = np.searchsorted(search_intvls, pos_values)
+
+        # which_m2 = np.where(intvs % 2 == 1)[0]
         real_traits_vals = []
 
 
-        if len(which_m2) == 0:
-			# for _ in range(num_trait):
-            trait_val_now = { i: 0 for i in range(node_size)}
-            print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
-            return [trait_val_now for _ in range(num_trait)], trvs_order
+        # if len(which_m2) == 0:
+		# 	# for _ in range(num_trait):
+        #     trait_val_now = { i: 0 for i in range(node_size)}
+        #     print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
+        #     return [trait_val_now for _ in range(num_trait)], trvs_order
 		
         for trait_idx in range(num_trait):
             node_plus = np.zeros(node_size)
-            for mut in which_m2:
+            for i, mut in enumerate(which_m2):
 				# nodes_ids[mut] are the nodes with that specific mutation
 				# intvs[mut] // 2 implies the gene that mutation belongs to
 				# record the effect size caused by the new mutations given the parent node
-                node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
+                # node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
+                node_plus[node_ids[mut]] += eff_size.iloc[matched_site_idx[i], trait_idx + NUM_META_COLS]
             trait_val = {j: 0 for j in range(-1, node_size)}
 			# if sigmoid==True:
 			# 	for node_id in trvs_order:
@@ -165,26 +181,26 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
 		# 	real_traits_vals = 1 / (1 + np.exp(np.negative(np.array(real_traits_vals))))
         return real_traits_vals, trvs_order
 
-        if len(which_m2) == 0:
-            # for _ in range(num_trait):
-            trait_val_now = { i: 0 for i in range(node_size)}
-            print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
-            return [trait_val_now for _ in range(num_trait)], trvs_order
+        # if len(which_m2) == 0:
+        #     # for _ in range(num_trait):
+        #     trait_val_now = { i: 0 for i in range(node_size)}
+        #     print("WARNING: There's no mutations related to any trait in samples from this replication.", flush = True)
+        #     return [trait_val_now for _ in range(num_trait)], trvs_order
         
-        for trait_idx in range(num_trait):
-            node_plus = np.zeros(node_size)
-            for mut in which_m2:
-                # nodes_ids[mut] are the nodes with that specific mutation
-                # intvs[mut] // 2 implies the gene that mutation belongs to
-                # record the effect size caused by the new mutations given the parent node
-                node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
-            trait_val = {j: 0 for j in range(-1, node_size)}
-            for node_id in trvs_order:
-                trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
-            trait_val.pop(-1)
-            real_traits_vals.append(trait_val)
-        # order of traversal
-        return real_traits_vals, trvs_order
+        # for trait_idx in range(num_trait):
+        #     node_plus = np.zeros(node_size)
+        #     for mut in which_m2:
+        #         # nodes_ids[mut] are the nodes with that specific mutation
+        #         # intvs[mut] // 2 implies the gene that mutation belongs to
+        #         # record the effect size caused by the new mutations given the parent node
+        #         node_plus[node_ids[mut]] += eff_size.iloc[intvs[mut] // 2, trait_idx + NUM_META_COLS]
+        #     trait_val = {j: 0 for j in range(-1, node_size)}
+        #     for node_id in trvs_order:
+        #         trait_val[node_id] = trait_val[tree_first.parent(node_id)] + node_plus[node_id]
+        #     trait_val.pop(-1)
+        #     real_traits_vals.append(trait_val)
+        # # order of traversal
+        # return real_traits_vals, trvs_order
 
 
 def floats_to_colors_via_matplotlib(float_values):
@@ -610,7 +626,7 @@ def plot_all_SEIR_trajectory(wk_dir_, seed_size, host_size, n_generation, run_su
 
     plt.tight_layout()
 
-    plt.savefig(os.path.join(wk_dir_, "all_SEIR_trajectory.png"))
+    plt.savefig(os.path.join(wk_dir_, "output_trajectories", "all_SEIR_trajectory.png"))
     plt.close()
 
 
@@ -657,5 +673,5 @@ def plot_all_strain_trajectory(wk_dir_, seed_size, host_size, n_generation, run_
 
     plt.tight_layout()
 
-    plt.savefig(os.path.join(wk_dir_, "all_strains_trajectory.png"))
+    plt.savefig(os.path.join(wk_dir_, "output_trajectories", "all_strains_trajectory.png"))
     plt.close()

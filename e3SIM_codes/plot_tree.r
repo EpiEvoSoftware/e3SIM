@@ -196,7 +196,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
     cat(paste0("No heatmap on the tree plot.\n"))
   }
   else if (heatmap_trait=="drug_resistance") {
-    cat(paste0("Plotting drug resistance traits as heatmap on the tree plot.\n"))
+    cat(paste0("     - Plotting drug resistance traits as heatmap on the tree plot.\n"))
     if (n_dr > 0) {
       for (i in 1:n_dr) { # Assign drug resistance values
         color_value_df <- assign_dr(meta_df, color_value_df, i, n_trans, g1)
@@ -209,11 +209,11 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
       plot_heatmap = TRUE
     }
     else {
-      cat(paste0("There's no drug_resistance values to plot.\n"))
+      cat(paste0("     - There's no drug_resistance values to plot.\n"))
     }
   }
   else if (heatmap_trait=="transmissibility") {
-    cat(paste0("Plotting transmissibility traits as heatmap on the tree plot.\n"))
+    cat(paste0("     - Plotting transmissibility traits as heatmap on the tree plot.\n"))
     if (n_trans > 0) {
       for (i in 1:n_trans) { # Assign transmissibility values
         color_value_df <- assign_trans(meta_df, color_value_df, i, g1)
@@ -226,7 +226,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
       plot_heatmap = TRUE
     }
     else {
-      cat(paste0("There's no drug_resistance values to plot.\n"))
+      cat(paste0("     - There's no transmissibility values to plot.\n"))
     }
   }
 
@@ -258,7 +258,7 @@ plot_transmission_tree_helper <- function(tree, meta_df, n_dr, n_trans, wk_dir, 
 # Plot tranmission tree of individual seed
 plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whole_phylo_output, seed_phylo, heatmap_trait){
 # Print message indicating the transmission tree being plotted
-  cat(paste0("Plotting seed ", seed_id - 1, "'s transmission tree...\n"))
+  cat(paste0("   - Plotting seed ", seed_id - 1, "'s transmission tree...\n"))
   # File path to the transmission tree
   trans_tree_file <- file.path(wk_dir, "transmission_tree", paste0(seed_id - 1, ".nwk"))
   # Read transmission tree file
@@ -271,13 +271,13 @@ plot_transmission_tree <- function(seed_id, wk_dir, meta_df, n_trans, n_dr, whol
 
     # Check if the tree has only on tip, not suitable for visualization
     if (length(tree$tip.label) == 1) {
-      cat("Sorry, we do NOT support visualizing single branch tree.\n")
+      cat("     - Sorry, we do NOT support visualizing single branch tree.\n")
     } else { # Convert the tree into phylo4 object
       plot_transmission_tree_helper(tree, meta_df, n_dr, n_trans, wk_dir, heatmap_trait, seed_id)
     }
     return(tree)
   } else { # If the seed has no progeny sampled
-    cat("No samples for this seed's progeny.\n")
+    cat("     - No samples for this seed's progeny.\n")
     return(NULL)
   }
 }
@@ -341,6 +341,7 @@ main <- function(){
   # Plot whole transmission tree if exists
   if (whole_phylo_output){
     write.tree(seed_phylo, file = file.path(wk_dir, "whole_transmission_tree.nwk"))
+    cat("   - Plotting whole transmission tree including descendants of all seeds.\n")
     plot_transmission_tree_helper(seed_phylo, meta_df, n_dr, n_trans, wk_dir, heatmap_trait)
   }
 }

@@ -12,7 +12,6 @@
 	{
 		if (i == seeds_structure.subset(seed_count, 1) + 1)
 		{
-			
 			sim.addSubpop(i - 1, 1, haploid=T); // Infected hosts
 			current_subpop = sim.subpopulations[i - 1];
 			labels = c(labels, 2);
@@ -44,11 +43,11 @@
 			if (any(mut.position == range_genes))
 			{
 				mut.setMutationType(1);
-				which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
-
+				which_site = asInteger(which(trait_locs == mut.position));
+				
 				for (t_num in 1:n_trans_traits)
 				{
-					mut.setValue(paste0("trans_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2)); 
+					mut.setValue(paste0("transmissibility_", t_num), effsize_pos.subset(which_site, t_num)); 
 				}
 			}
 		}
@@ -59,11 +58,11 @@
 			if (any(mut.position == range_genes))
 			{
 				mut.setMutationType(1);
-				which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+				which_site = asInteger(which(trait_locs == mut.position));
 
 				for (t_num in 1:n_dr_traits)
 				{
-					mut.setValue(paste0("dr_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2 + n_trans_traits)); 
+					mut.setValue(paste0("drug_resistance_", t_num), effsize_pos.subset(which_site, t_num + n_trans_traits)); 
 				}
 			}
 		}
@@ -72,6 +71,8 @@
 
 	defineGlobal("Host_states", labels);
 	defineGlobal("current_hoststates", Host_states);
+	print("HOW MANY INDS:");
+	print(length(sim.subpopulations.individuals));
 }
 
 

@@ -1,13 +1,13 @@
 mutation(m1) {
 
 	// Set mutational effects for new m2 mutation 
-	which_gene = asInteger((findInterval(mut.position, trait_locs) + 1) / 2);
+	which_site = asInteger(which(trait_locs == mut.position));
 
 	if (n_trans_traits>0)
 	{
 		for (t_num in 1:n_trans_traits)
 		{
-			mut.setValue(paste0("trans_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2)); 
+			mut.setValue(paste0("transmissibility_", t_num), effsize_pos.subset(which_site, t_num)); 
 		}
 	}
 	
@@ -15,7 +15,7 @@ mutation(m1) {
 	{
 		for (t_num in 1:n_dr_traits)
 		{
-			mut.setValue(paste0("dr_", t_num), effsize_pos.subset(which_gene - 1, t_num + 2 + n_trans_traits)); 
+			mut.setValue(paste0("drug_resistance_", t_num), effsize_pos.subset(which_site, t_num + n_trans_traits)); 
 		}
 	}
 	

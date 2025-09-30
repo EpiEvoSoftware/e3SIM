@@ -13,18 +13,33 @@
 	if (use_genetic_model)
 	{
 		not_genetic_gens = c();
-		not_genetic_epochs = which(transmissibility_effsize==0);
+		// not_genetic_epochs = which(transmissibility_effsize==0);
+		if (any(transmissibility_effsize==0))
+		{
+			not_genetic_epochs = which(transmissibility_effsize==0);
+		}
+		else
+		{
+			not_genetic_epochs = NULL;
+		}
 		for (epoch_indx in not_genetic_epochs)
 		{
 			if (epoch_indx == 0)
 			{
 				start_gen = 2;
-				end_gen = epoch_changing_generation[epoch_indx] - 1;
+				if (n_epoch==1)
+				{
+					end_gen = n_generation;
+				}
+				else
+				{
+					end_gen = epoch_changing_generation[epoch_indx] - 1;
+				}
 			}
 			else if (epoch_indx == n_epoch - 1)
 			{
 				start_gen = epoch_changing_generation[epoch_indx - 1];
-				end_gen = n_gen;
+				end_gen = n_generation;
 			}
 			else
 			{
@@ -36,7 +51,9 @@
 		if (length(not_genetic_epochs) > 0)
 		{
 			community.rescheduleScriptBlock(s13, ticks = not_genetic_gens);
-			community.rescheduleScriptBlock(s1, ticks = setDifference(all_gens_vector, not_genetic_gens));
+			if (length(setDifference(all_gens_vector, not_genetic_gens))>0){
+				community.rescheduleScriptBlock(s1, ticks = setDifference(all_gens_vector, not_genetic_gens));
+			}
 		}
 		else
 		{
@@ -65,7 +82,15 @@
 	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
 	// either s3 or s7 will be run each tick
 	not_dr_gens = c();
-	not_dr_epochs = which(drugresistance_effsize==0);
+	if (any(drugresistance_effsize==0))
+	{
+		not_dr_epochs = which(drugresistance_effsize==0);
+	}
+	else
+	{
+		not_dr_epochs = NULL;
+	}
+	
 
 
 	if (n_epoch==1)
@@ -99,9 +124,12 @@
 		}
 	}
 	
-	if (any(not_dr_gens > 1))
+	if (isNULL(not_dr_gens)==F)
 	{
-		community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
+		if (any(not_dr_gens > 1))
+		{
+			community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
+		}
 	}
 
 	if (length(not_dr_gens) < n_generation - 1)

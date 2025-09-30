@@ -1,13 +1,13 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "",
+    "cwdir": "/Users/px54/Documents/TB_software/annonymous/16756959 2/e3SIM-main/test_installation/run",
     "n_replicates": 1,
-    "random_number_seed": null
+    "random_number_seed": 12345
   },
   "EvolutionModel": {
-    "n_generation": 0,
-    "subst_model_parameterization": "",
-    "mut_rate": 0.0,
+    "n_generation": 1000,
+    "subst_model_parameterization": "mut_rate",
+    "mut_rate": 1e-07,
     "mut_rate_matrix": [
       [
         0.0,
@@ -34,15 +34,15 @@
         0.0
       ]
     ],
-    "within_host_reproduction": false,
-    "within_host_reproduction_rate": 0.0,
-    "cap_withinhost": 1
+    "within_host_reproduction": true,
+    "within_host_reproduction_rate": 0.01,
+    "cap_withinhost": 2
   },
   "NetworkModelParameters": {
-    "method": "",
-    "host_size": 0,
+    "method": "user_input",
+    "host_size": 10000,
     "user_input": {
-      "path_network": ""
+      "path_network": "/Users/px54/Documents/TB_software/annonymous/16756959 2/e3SIM-main/test_installation/run/contact_network.adjlist"
     },
     "randomly_generate": {
       "network_model": "",
@@ -66,8 +66,8 @@
     }
   },
   "SeedsConfiguration": {
-    "seed_size": 1,
-    "use_reference": false,
+    "seed_size": 3,
+    "use_reference": true,
     "method": "",
     "user_input": {
       "path_seeds_vcf": "",
@@ -136,21 +136,21 @@
         ]
       ],
       "seeded_host_id": [],
-      "S_IE_prob": 0,
-      "E_I_prob": 0,
-      "E_R_prob": 0,
-      "latency_prob": 0,
-      "I_R_prob": 0,
-      "I_E_prob": 0,
-      "R_S_prob": 0
+      "S_IE_prob": 0.0,
+      "E_I_prob": 0.0,
+      "E_R_prob": 0.0,
+      "latency_prob": 0.0,
+      "I_R_prob": 0.0,
+      "I_E_prob": 0.0,
+      "R_S_prob": 0.0
     }
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "",
+    "ref_path": "/Users/px54/Documents/TB_software/annonymous/16756959 2/e3SIM-main/test_installation/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
     "traits_num": {
-      "transmissibility": 0,
-      "drug_resistance": 0
+      "transmissibility": 1,
+      "drug_resistance": 1
     },
     "effect_size": {
       "method": "randomly_generate",
@@ -158,15 +158,24 @@
         "path_effsize_table": ""
       },
       "randomly_generate": {
-        "gff": "",
-        "genes_num": [],
-        "effsize_min": [],
-        "effsize_max": [],
+        "gff": "/Users/px54/Documents/TB_software/annonymous/16756959 2/e3SIM-main/test_installation/data/TB/GCF_000195955.2_ASM19595v2_genomic.overlap.gff",
+        "genes_num": [
+          3,
+          3
+        ],
+        "effsize_min": [
+          0.1,
+          0.1
+        ],
+        "effsize_max": [
+          0.2,
+          0.2
+        ],
         "normalize": false,
-        "final_trait": 1
+        "final_trait": 1.0
       }
     },
-    "sigmoid_prob": false
+    "sigmoid_prob": true
   },
   "SeedHostMatching": {
     "method": "",

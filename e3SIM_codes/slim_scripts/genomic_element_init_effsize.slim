@@ -2,30 +2,37 @@
 	defineGlobal("effsize_pos", readCSV(causal_gene_path, colNames = T));
 	n_causal_genes = effsize_pos.nrow;
 	ncol_idx = effsize_pos.ncol - 1;
-	trait_names = effsize_pos.colNames[3:ncol_idx];
+	trait_names = effsize_pos.colNames[1:ncol_idx];
 	n_trans_traits = sum(strcontains(trait_names, "transmissibility"));
-	n_dr_traits = sum(strcontains(trait_names, "dr"));
-	initializeGenomicElement(0, 0, effsize_pos.subset(0,1) - 2);
+	n_dr_traits = sum(strcontains(trait_names, "drug_resistance"));
+	initializeGenomicElement(0, 0, effsize_pos.subset(0,0) - 2);
 	nminus1 = n_causal_genes - 1;
-	trait_locs = c(0);
+	trait_locs = c();
 
 	for (i in 1:nminus1)
 	{
-		range_genes = c(range_genes, effsize_pos.subset(i-1,1):effsize_pos.subset(i-1,2) - 1);
-		trait_locs = c(trait_locs, effsize_pos.subset(i-1,1) - 1, effsize_pos.subset(i-1,2) - 1);
-		initializeGenomicElement(1, effsize_pos.subset(i-1,1) - 1, effsize_pos.subset(i-1,2) - 1);
-		initializeGenomicElement(0, effsize_pos.subset(i-1,2), effsize_pos.subset(i,1) - 2);
+		range_genes = c(range_genes, effsize_pos.subset(i-1,0) - 1);
+		trait_locs = c(trait_locs, effsize_pos.subset(i-1,0) - 1);
+		initializeGenomicElement(1, effsize_pos.subset(i-1,0) - 1, effsize_pos.subset(i-1,0) - 1);
+		if (effsize_pos.subset(i,0) - effsize_pos.subset(i-1,0) > 1) {
+			initializeGenomicElement(0, effsize_pos.subset(i-1,0), effsize_pos.subset(i,0) - 2);
+		}
 	}
 
- 
-	range_genes = c(range_genes, effsize_pos.subset(nminus1,1):effsize_pos.subset(nminus1,2) - 1);
-	trait_locs = c(trait_locs, effsize_pos.subset(nminus1,1) - 1, effsize_pos.subset(nminus1,2) - 1);
-	initializeGenomicElement(1, effsize_pos.subset(nminus1,1) - 1, effsize_pos.subset(nminus1,2) - 1);
-	initializeGenomicElement(0, effsize_pos.subset(nminus1,2), L-1);
+
+	range_genes = c(range_genes, effsize_pos.subset(nminus1,0) - 1);
+	trait_locs = c(trait_locs, effsize_pos.subset(nminus1,0) - 1);
+	initializeGenomicElement(1, effsize_pos.subset(nminus1,0) - 1, effsize_pos.subset(nminus1,0) - 1);
+	initializeGenomicElement(0, effsize_pos.subset(nminus1,0), L-1);
 
 	defineGlobal("n_causal_genes", n_causal_genes);
 	defineGlobal("n_trans_traits", n_trans_traits);
 	defineGlobal("n_dr_traits", n_dr_traits);
 	defineGlobal("trait_locs", trait_locs);
 	defineGlobal("range_genes", range_genes);
+
+	defineGlobal("logit_beta", log(S_IE_rate) - log(1 - S_IE_rate));
+	defineGlobal("logit_s", log(surviv_prob) - log(1 - surviv_prob));
+	defineGlobal("lambda", -log(1 - S_IE_rate));
+	defineGlobal("kappa", -log(surviv_prob));
 

@@ -14,11 +14,11 @@ s2 reproduction()
 			for (j in reproduce_event)
 			{
 				parent = all_individuals[j];
-				i.addRecombinant(parent.genome1, NULL, NULL, NULL, NULL, NULL).tag = parent.tag;
+				i.addRecombinant(parent.haploidGenome1, NULL, NULL, NULL, NULL, NULL).tag = parent.tag;
 			}
 		}
 	}
-	self.active=F;
+	self.active=0;
 }
 
 

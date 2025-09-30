@@ -1,114 +1,153 @@
 ## $\textbf{e3SIM}$
 
 $\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
+The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is composed of many SLiM code chunks which is difficult to test one-by-one, our unit tests are mainly focused on the pre-simulation modules. The SLiM simulation codes are tested manually which are not logged in the Codecov calculation.
 
-## Useful Links (Linux/MacOS)
-1. For an overview of our e3SIM, please refer to our manuscript: [e3SIM: Epidemiological-ecological-evolutionary simulation framework for genetic epidemiology](https://www.biorxiv.org/content/10.1101/2024.06.29.601123v1).
-2. For the codes and configuration files used in the manunscript, please refer to Zenodo at [doi:10.5281/zenodo.12597700](https://doi.org/10.5281/zenodo.12597700).
-3. For a detailed manual of e3SIM, please refer to: [Manual](https://github.com/EpiEvoSoftware/e3SIM/blob/main/e3SIM_manual.pdf).
+## Installation (Linux / macOS)
 
+1. **Extract the source archive** \
+    Download and unzip the source archive:
+    
+    ```sh
+    unzip e3SIM-main.zip
+    cd e3SIM-main
+    ```
+This creates the e3SIM-main/ directory.
+    
 
-## Installation
+2. **Create the conda environment** \
+Create a conda environment with the provided environment file.
 
-  1. Find a directory on your device for the software and clone the repository from the terminal.
-      ```sh
-      git clone https://github.com/EpiEvoSoftware/e3SIM
-      ```
+    - **macOS**
+        ```sh
+        conda env create --name e3SIM --file e3SIM_mac.yml
+        ```
+    
+    - **Linux**
+        ```sh
+        conda env create --name e3SIM --file e3SIM_linux.yml
+        ```
+
   
-  2. Create a conda environment with the provided environment file. For MacOS users, replace `${ENV_YML}` with `e3SIM_mac.yml`. For Linux users, replace `${ENV_YML}` with `e3SIM_linux.yml`. This step took 2.5 minutes on a M2 pro macbook. 
-      ```sh
-      cd e3SIM
-      conda env create --name e3SIM --file ${ENV_YML}
-      ```
+3. **Activate the environment**
+
+    ```sh
+    conda activate e3SIM
+    ```
   
-  3. Activate the conda environment.
-      ```sh
-      conda activate e3SIM
-      ```
-  
-  4. Install R and R packages. Note that R has to be directly callable without the full path (test by running `Rscript --help`)  \
-      Download and install R from here: https://cran.r-project.org/. After successful installation of R, run the following command one by one to install required R packages.\
-     **For MacOS users:** 
+4. **Install required R packages** \
+Make sure `Rscript` is in your `PATH` (test with `Rscript --help`).  
+
+    - **macOS**
         ```sh
         R
-        install.packages("phylobase")
-        install.packages("ape")
-        install.packages("ggplot2")
-        install.packages("R.utils")
-        install.packages("data.table")
+        
+        chooseCRANmirror(graphics = FALSE)
+        install.packages(c("phylobase", "ape", "ggplot2", "R.utils", "data.table"))
 
-        if (!require("BiocManager", quietly = TRUE))
+        if (!requireNamespace("BiocManager", quietly = TRUE))
             install.packages("BiocManager")
-        BiocManager::install("ggtree")
-        BiocManager::install("Biostrings")
+        BiocManager::install(c("ggtree", "Biostrings"))
 
         q()
         ```
-        
-      **For Linux users:**
+
+    - **Linux**
         ```sh
         R
+        
+        chooseCRANmirror(graphics = FALSE)
         install.packages("ade4")
 
         q()
         ```
 
-  6. Test whether $\text{e3SIM}$ is successfully installed by running a simple model. This testing took ~2 minutes on a M2 pro macbook. 
-      ```sh
-      cd e3SIM_codes
-      e3SIM=${PWD}
-      cd ../test/test_installation
-      python update_config.py # To update the test_config.json with user's directory
-      python ${e3SIM}/outbreak_simulator.py -config test_config.json # To run the simulation
-      ```
-      Standard output in the terminal should show progress of the simulator. After the simulation ends, output files are expected in the directory (`test_installation`) if the installation is successful, including time trajectories plots in the `output_trajectories` folder, outputs for each replicate in separate subfolders `1`, `2`, `3`, the generated slim script `simulation.slim` and the parameter lists `slim.params`.
+5. **Verify Installation** \
+Run a small simulation to confirm everything is set up correctly:
 
-
-### Usage
-
-1. Find a working directory (in most circumstances, create a new empty directory outside the github repo you cloned). This directory will be your "working directory" for one simulation --- the generated input files and simulated results will be saved here. Save the path to variable `WKDIR` by replacing `${YOUR_WORKING_DIRECTORY}` with your actual working directory.
     ```sh
-    WKDIR=${YOUR_WORKING_DIRECTORY}
+    cd e3SIM_codes
+    e3SIM=${PWD}
+    cd ../test_installation/run
+    
+    # Update test_config.json with user's directory
+    python update_config.py 
+    
+    # Run the test simulation
+    python ${e3SIM}/outbreak_simulator.py -config test_config.json  
+    ```
+        
+    - You should see progress messages in the console.
+    - Upon completion, check for output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
+
+
+
+### General Usage
+`${e3SIM}` should be set to the absolute path of the `e3SIM_codes` directory inside your e3SIM installation:
+
+```sh
+export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
+```
+
+
+1. **Set up your working directory** \
+    Create a new empty directory outside `e3SIM-main` directory. This directory will be your working directory for a single simulation; all generated input files and simulation results will be saved here. 
+
+    Set the path to this directory in the `WKDIR` by replacing `/path/to/working_dir` with your actual path:
+
+    ```sh
+    WKDIR="/path/to/working_dir"
     ```
 
-2. Generate a configuration file and all pre-requisite files for one simulation.
-    * GUI
-    
-        We provide an interactive graphical user interface (GUI) option for the pre-simulation data generation. The GUI can be activated from any local directory by specifying its full path. To access the GUI, please run the following command:
-        ```sh
-        python ${e3SIM}/../gui
-        ```
-        A window will pop up and you will be asked to navigate to your working directory in the first tab, and it's initiated from your current directory by default. By going through all the tabs, a configuation file called `config_file.json` will be generated in the working directory according to the given inputs. Please refer to Chapter 7 in the manual for more details on the GUI application.
+2. **Generate prerequisite files and a configuration file** \
+    You can prepare simulation input files using either the command-line tools or the Graphical User Interface (GUI). For explanations of configuration parameters, see ***Chapter 3.2*** of the manual.
 
-    * Command Line
+    - **Command Line** \
+        Run the following pre-simulation programs *in order*:
+        
+        - `NetworkGenerator`
+        - `SeedGenerator`
+        - `GeneticEffectGenerator`
+        - `SeedHostMatcher`
     
-        Command line tools for the pre-simulatuion programs includes `NetworkGenerator`, `SeedGenerator`, `GeneticEffectGenerator`, and `SeedHostMatcher`. Please refer to the manual chapter 2 for how to run them sequentially. After running these programs, you need to create a configuration file by modifying the config file template. For explanations on the configuration file, please refer to Manual chapter 3.2. The following commands copy the template to your designated working directory.
+        These must be run sequentially to generate all prerequisite files required for the simulation. For detailed instructions, see ***Chapter 2*** of the manual.
+
+        After generating these files, create a configuration file by copying and editing the provided template:
+        
         ```sh
         cp ${e3SIM}/config_template/slim_only_template.json ${WKDIR}/config_file.json
         ```
-        Then manually change the configuration in `${WKDIR}/config_file.json`.
+  
+        Then edit `${WKDIR}/config_file.json` to match your simulation settings.
 
-3. Run the simulation
+
+    - **GUI** \
+        An interactive GUI is available for pre-simulation data generation. The GUI can be launched from any local directory by specifying its full path: 
+    
+        ```sh
+        python ${e3SIM}/gui
+        ```
+        
+        The GUI will:
+        - Prompt you to select your working directory on the first tab (default: current directory).
+        - Guide you through each tab *in order* to generate prerequisite files.
+        - Create a `config_file.json` in your working directory based on your inputs.
+
+        For more details on the GUI, see ***Chapter 7*** of the manual. 
+    
+
+3. **Run the simulation** \
+    Execute the simulation using:
+
     ```sh
     python ${e3SIM}/outbreak_simulator.py -config ${WKDIR}/config_file.json
     ```
 
-4. (Alternative to 2 & 3) Run the pre-simulation programs and the simulation together in one command. You need to fill out a bigger configuration file.
-    ```sh
-    cp ${e3SIM}/config_template/base_params.json ${WKDIR}/config_file.json
-    ```
-    Then manually change the configuration in `${WKDIR}/config_file.json` and run
-    ```sh
-    python ${e3SIM}/enivol.py -config ${WKDIR}/config_file.json
-    ```
 
-5. Working examples: There are two working example runs of the simulation that are described in the [Manual](https://github.com/EpiEvoSoftware/e3SIM/blob/main/e3SIM_manual.pdf) Chapter 5 step-by-step. It is recommended to read Chapter 5 and try out the whole pipeline as instructed to understand the whole workflow since e3SIM contains a lot of information to be digest for a first-time-user.
-
+---
 
 
 ## Liscence
-
-Copyright &copy; 2024 Jaehee Kim. All rights reserved.\
 $\text{e3SIM}$ is a free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

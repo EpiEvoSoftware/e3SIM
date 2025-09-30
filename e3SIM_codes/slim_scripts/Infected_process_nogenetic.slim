@@ -20,20 +20,30 @@ s3 early(){
 		sim.treeSeqRememberIndividuals(sampled_inds_genomes);
 	}
 
+	actually_recovered = c();
 	if (length(recover_from_i)>0)
 	{
-		Host_states[recover_from_i]=3;
 		for (ind in recover_from_i)
 		{
-			line1 = paste(community.tick, ind);
-			writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
-		}
-		sim.killIndividuals(hosts[recover_from_i].individuals);
-	}
+			pathogens = hosts[ind].individuals;
+			for (pathogen in pathogens)
+			{
+				survival_prob = exp(- kappa[current_epoch]);
 
-	if (length(go_latent_inds)>0)
-	{
-		Host_states[go_latent_inds]=1;
+				//the bigger the effect size for drug resistance mutation is, the less probable that the the pathogen dies
+				if (runif(1) > survival_prob)
+				{
+					line1 = paste(community.tick, ind);
+					writeFile(paste0(cwdir, runid, "/recovery.csv"), line1, append=T, compress=T);
+					actually_recovered = c(actually_recovered, pathogen);
+				}
+			}
+		}
+		if (length(actually_recovered) > 0)
+		{
+			sim.killIndividuals(actually_recovered);
+			Host_states[recover_from_i[which(hosts[recover_from_i].individualCount==0)]] = 3;
+		}
 	}
 }
 

@@ -154,19 +154,46 @@
     },
     "effect_size": {
       "method": "",
-      "user_input": {
-        "path_effsize_table": ""
+      "filepath": {
+        "csv_path": "",
+        "gff_path": ""
       },
-      "randomly_generate": {
-        "gff": "",
-        "genes_num": [],
-        "effsize_min": [],
-        "effsize_max": [],
-        "normalize": false,
-        "final_trait": 1
+      "causalsites_params": {
+        "method": "p",
+        "Ks": [],
+        "pis": []
+      },
+      "effsize_params": {
+        "effsize_function":"normal",
+        "normal": {
+          "taus": []
+        },
+        "laplace": {
+          "bs": []
+        },
+        "studentst": {
+          "s": [],
+          "nv": 3
+        }
+      },
+      "calibration": {
+        "do_calibration": false,
+        "V_target": []
       }
     },
-    "sigmoid_prob": false
+    "trait_prob_link": {
+      "link": "logit",
+      "Rs": [],
+      "calibration": false,
+      "logit": {
+        "alpha_trans": [],
+        "alpha_drug": []
+      },
+      "cloglog": {
+        "alpha_trans": [],
+        "alpha_drug": []
+      }
+    }
   },
   "SeedHostMatching": {
     "method": "",
@@ -187,9 +214,7 @@
     },
     "genetic_architecture": {
       "transmissibility": [],
-      "cap_transmissibility": [],
-      "drug_resistance": [],
-      "cap_drugresist": []
+      "drug_resistance": []
     },
     "transition_prob": {
       "S_IE_prob": [],
@@ -200,7 +225,8 @@
       "I_E_prob": [],
       "E_R_prob": [],
       "sample_prob": [],
-      "recovery_prob_after_sampling": []
+      "recovery_prob_after_sampling": [],
+      "surviv_prob": []
     },
     "massive_sampling": {
       "event_num": 0,
