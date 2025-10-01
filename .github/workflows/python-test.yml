@@ -14,8 +14,8 @@ jobs:
     - name: Setup Miniconda
       uses: conda-incubator/setup-miniconda@v2.2.0
       with:
-        activate-environment: e3SIM_linux
-        environment-file: e3SIM_linux_092925.yml
+        activate-environment: e3SIM_exhaust
+        environment-file: e3SIM_linux_2025_manual_ete4.yml
         auto-activate-base: false
 
     - name: Run Pytest
