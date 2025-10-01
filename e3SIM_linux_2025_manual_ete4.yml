@@ -1,4 +1,4 @@
-name: e3SIM_exhaust
+name: e3SIM_linux
 channels:
   - conda-forge
   - bioconda
@@ -250,6 +250,7 @@ dependencies:
       - pyparsing==3.2.5
       - pyslim==1.1.0
       - pytest==8.4.2
+      - pytest-cov==7.0.0
       - python-dateutil==2.9.0.post0
       - pytz==2025.2
       - referencing==0.36.2
