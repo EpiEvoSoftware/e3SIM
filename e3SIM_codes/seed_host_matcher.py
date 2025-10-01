@@ -1,380 +1,428 @@
-import os, networkx as nx, json, pandas as pd, math, argparse, numpy as np
+import os
+import networkx as nx
+import json
+import pandas as pd
+import math
+import argparse
+import numpy as np
 from collections import defaultdict
 from pathlib import Path
-from error_handling import CustomizedError
-from base_func import *
+from typing import Dict, List, Tuple, Union, Optional, Any
+
+# Assuming these exist in your project
+from e3SIM_codes.error_handling import CustomizedError
+from e3SIM_codes.base_func import *
 
 # Magic numbers
 HUNDRED = 100
 ZERO = 0
 
-def _build_dict_edges_node(ntwk_):
-    """
-    Returns a dictionary with degrees as keys and a list of nodes 
-    of corresponding degrees as values (dict[int, list[int]]).
 
-    Parameters:
-        ntwk_ (nx.Graph): The contact network.
-    """
-    dict_edges_node = defaultdict(list)
-    [dict_edges_node[n_edges].append(node) for node, n_edges in ntwk_.degree]
-    return dict_edges_node
-
-def _sort_node_by_edge(dict_edges_node):
-    """
-    Returns a list of nodes reversely sorted by their degress (list[int])
-    and a list of their corresponding degrees (list[int]).
-
-    Parameters:
-        dict_edges_node (dict[int, list[int]]): A dictionary with degrees
-        as keys and a list of nodes of corresponding degrees as values
-    """
-    nodes_sorted = []
-    degree_sorted = []
-    for degree in sorted(dict_edges_node.keys(), reverse = True):
-        nodes = dict_edges_node[degree]
-        nodes_sorted.extend(nodes)
-        degree_sorted.extend([degree]*len(nodes))
-    # degree_sorted is not used anywhere in the pipeline for now; 
-    # we can delete it if we decide this is unnecessary
-    return nodes_sorted, degree_sorted
-
-def _save_dict_to_csv(dict_matching, file_path):
-    """
-    Writes a CSV that stores the matching dictionary with columns ['seed', 'host_id'].
-
-    Parameters:
-        dict_matching (dict[int, int]): A dictionary with seeds as keys and hosts as values
-        file_path (str): Full path to write the desired CSV
-    """
-    # changed the order of columns, it used to be ['host_id', 'seed']
-    df = pd.DataFrame(list(dict_matching.items()), columns = ['seed', 'host_id'])
-    df.to_csv(file_path, index = False)
- 
-def _read_user_matchingfile_info_json(file):
-    """
-    Returns a dictionary of the matching and checks the user input JSON for matching.
-
-    Parameters:
-        file (str): Full path to the JSON
-    """
-    ## TODO: to check whether the contents of JSON satisfies the matching requirement
-    return file
-
-def _read_user_matchingfile_info_csv(file):
-    """
-    Returns a dictionary of the matching and checks the user input CSV for matching.
-
-    Parameters:
-        file (str): Full path to the CSV
-    """
-    ## TODO: to check whether the contents of CSV satisfies the matching requirement
-    return file
-
-def _percentile_to_index(percentile, node_per_percent):
-    """
-    Returns the two indices (int, int) corresponding to the given percentile ranges.
-
-    Parameters: 
-        percentile (list[int, int]): percentile range for the node selection.
-        node_per_percent: The number of nodes equivalent to a percentile
-    """
-    if len(percentile) != 2:
-        raise CustomizedError(f"The percentile range {percentile} is not a list of two element")
-    l_per, h_per = percentile
-    # check if the percentiles are int
-    if type(l_per) != int or type(h_per) != int:
-        raise CustomizedError(f"The percentile range {percentile} is not a list of integers, please reset the range")
-    # check if the ends are out of bound
-    if min(l_per, h_per) < ZERO or max(l_per, h_per) > HUNDRED:
-        raise CustomizedError(f"The percentile range {percentile} is not within the closed 0-100 interval")
-    # check the relationship between the lower and higher ends
-    if h_per <= l_per:
-        raise CustomizedError(f"The percentile range {percentile} is not a valid interval")
-    # round the index to make sure those are integers
-    low_idx = math.ceil(node_per_percent * l_per)
-    high_idx = math.floor(node_per_percent * h_per)
-    return low_idx, high_idx
-
-def read_user_matchingfile(file_path):
-    """
-    Raises exceptions when user given file path is invalid/ format does not satisfy
-    the matching file requirements. Returns a dictionary of matching where seeds are 
-    keys and host_ids are values.
-
-    Parameters:
-        file path (str): Full path to the user matchingfile
-    """
-    file_path = Path(file_path)
-
-    # check if file exists
-    if not file_path.exists():
-        raise FileNotFoundError(f"Path to user defined matching file {file_path} not found")
-    # check if the json file is a valid matching file
-    if file_path.suffix.lower() == ".json":
-        try:
-            with open(file_path, 'r') as file:
-                matching = json.load(file)
-                return _read_user_matchingfile_info_json(matching)
-        except json.JSONDecodeError:
-            raise ValueError(f"Invalid JSON format in {file_path}")
-    # check if the csv file is a valid matching file
-    elif file_path.suffix.lower() == ".csv":
-        try:
-            matching = pd.read_csv(file_path)
-            return _read_user_matchingfile_info_csv(matching)
-        except pd.errors.ParserError:
-            raise ValueError(f"Invalid CSV format in {file_path}")
-    raise ValueError("Host-seed matching file is not CSV or JSON")
-
-def read_network(network_path):
-    """
-    Return a network (nx.Graph) written in the input path.
-
-    Parameters:
-        network_path (str): Full path to the network to read
-    """
-    network_path = Path(network_path)
-    if not network_path.exists():
-        raise FileNotFoundError(f"The provided networkX path '{network_path}' doesn't exist. "
-                            "Please run network_generation first before running this script "
-                              "and make sure the given working directory is correct.")
-    return nx.read_adjlist(network_path, nodetype=int)
-
-def match_random(nodes_sorted, taken_hosts, param = None):
-    """
-    Returns one random available host (int) to match one seed.
-
-    Parameters:
-        nodes_sorted (list[int]): Hosts sorted in reverse order by degrees.
-        taken_hosts (list[int]): Hosts already matched to a seed.
-    """
-    available_host = list(set(nodes_sorted).difference(set(taken_hosts)))
-    host = np.random.choice(available_host, 1)[0]
-    return host
-
-def match_ranking(nodes_sorted, taken_hosts, rank):
-    """
-    Returns one available host (int) of a specific rank (by degrees) to match one seed.
-
-    Parameters:
-        nodes_sorted (list[int]): Hosts sorted in reverse order by degrees.
-        taken_hosts (list[int]): Hosts already matched to a seed.
-    """
-    ntwk_size = len(nodes_sorted)
-    if type(rank) != int:
-        raise CustomizedError(f"The provided rank {rank} of of type {type(rank)}, please provide an interger")
-    if rank > ntwk_size:
-        raise CustomizedError(f"Your provided ranking {rank} exceed host size {ntwk_size}")
-    if rank < 1:
-        raise CustomizedError(f"Your provided ranking {rank} is smaller than 1, while the rank starts from 1 (the highest rank)")
-    host = nodes_sorted[rank - 1]
-    if host in taken_hosts: 
-        raise CustomizedError(f"Host of specified rank {rank} is already taken")
-    return host
-
-def match_percentile(nodes_sorted, taken_hosts, percentile):
-    """
-    Returns one available host (int) within the 
-    given percentile range (by degrees) to match one seed.
-
-    Parameters:
-        nodes_sorted (list[int]): Hosts sorted in reverse order by degrees.
-        taken_hosts (list[int]): Hosts already matched to a seed.
-        percentile (list[int]): Range for host selection, can only be of length two.
-    """
-    node_per_percent = len(nodes_sorted) / HUNDRED
-    low_idx, high_idx = _percentile_to_index(percentile, node_per_percent)
-    if high_idx > low_idx:
-        hosts_in_range = set(nodes_sorted[low_idx:high_idx])
-        taken_hosts_in_range = hosts_in_range.intersection(taken_hosts)
-        available_host = list(hosts_in_range.difference(taken_hosts_in_range))
-        if available_host == []: 
-            raise CustomizedError(f"There is no host left to match in the percentile {percentile}")
-        host = np.random.choice(available_host, 1)[0]
-        return host
-    raise CustomizedError(f"There is no host to match in the range {percentile}%")
+class NetworkPreprocessor:
+    """Handles network preprocessing operations with NumPy optimization."""
     
-def write_match(match_dict, wk_dir):
-    """
-    Writes the matching to a CSV file sorted in ascending 
-    order by host ids in the working directory.
+    def __init__(self, network: nx.Graph):
+        self.network = network
+        self._sorted_nodes = None
+        self._sorted_degrees = None
+    
+    def get_sorted_nodes(self) -> np.ndarray:
+        """Get nodes sorted by degree (descending) - lazy loaded for performance."""
+        if self._sorted_nodes is None:
+            self._compute_sorted_data()
+        return self._sorted_nodes
+    
+    def get_sorted_degrees(self) -> np.ndarray:
+        """Get degrees sorted (descending) - lazy loaded for performance."""
+        if self._sorted_degrees is None:
+            self._compute_sorted_data()
+        return self._sorted_degrees
+    
+    def _compute_sorted_data(self):
+        """Compute sorted nodes and degrees using NumPy for better performance."""
+        # Get all nodes and their degrees as NumPy arrays
+        nodes = np.array(list(self.network.nodes()))
+        degrees = np.array([self.network.degree[node] for node in nodes])
+        
+        # Sort by degrees in descending order (much faster than manual sorting)
+        sort_indices = np.argsort(-degrees)
+        
+        self._sorted_nodes = nodes[sort_indices]
+        self._sorted_degrees = degrees[sort_indices]
 
-    Parameters:
-        match_dict (dict[int, int]): A dictionary of matching with seeds as keys and hosts as values.
-        wk_dir (str): Full path to the working directory.
-    """
-    sorted_match = dict(sorted(match_dict.items(), key=lambda x:x[1]))
+
+class HostMatcher:
+    """Handles different host matching strategies."""
+    
+    def __init__(self, preprocessor: NetworkPreprocessor):
+        self.preprocessor = preprocessor
+        self.taken_hosts = set()
+    
+    def match_random(self, param = None) -> int:
+        """Match to a random available host."""
+        available_hosts = self._get_available_hosts(self.preprocessor.get_sorted_nodes())
+        if len(available_hosts) == 0:
+            raise CustomizedError("No available hosts for random matching")
+        
+        host = np.random.choice(available_hosts)
+        self.taken_hosts.add(host)
+        return host
+    
+    def match_ranking(self, rank: int) -> int:
+        """Match to host with specific degree rank."""
+        if not isinstance(rank, int):
+            raise CustomizedError(f"Rank must be integer, got {type(rank)}")
+        
+        sorted_nodes = self.preprocessor.get_sorted_nodes()
+        network_size = len(sorted_nodes)
+        
+        if rank > network_size:
+            raise CustomizedError(f"Rank {rank} exceeds network size {network_size}")
+        if rank < 1:
+            raise CustomizedError(f"Rank {rank} must be >= 1")
+        
+        host = sorted_nodes[rank - 1]
+        if host in self.taken_hosts:
+            raise CustomizedError(f"Host at rank {rank} is already taken")
+        
+        self.taken_hosts.add(host)
+        return host
+    
+    def match_percentile(self, percentile: List[int]) -> int:
+        """Match to host within percentile range."""
+        if not isinstance(percentile, list) or len(percentile) != 2:
+            raise CustomizedError("Percentile must be list of 2 integers")
+        
+        low_per, high_per = percentile
+        if not all(isinstance(p, int) for p in percentile):
+            raise CustomizedError("Percentile values must be integers")
+        
+        if min(percentile) < 0 or max(percentile) > 100:
+            raise CustomizedError("Percentile values must be between 0 and 100")
+        
+        if high_per <= low_per:
+            raise CustomizedError("Invalid percentile range")
+        
+        # Calculate indices using NumPy
+        sorted_nodes = self.preprocessor.get_sorted_nodes()
+        network_size = len(sorted_nodes)
+        node_per_percent = network_size / HUNDRED
+        
+        low_idx = math.ceil(node_per_percent * low_per)
+        high_idx = math.floor(node_per_percent * high_per)
+        
+        if high_idx <= low_idx:
+            raise CustomizedError(f"No hosts available in percentile range {percentile}")
+        
+        # Use NumPy slicing for efficiency
+        hosts_in_range = sorted_nodes[low_idx:high_idx]
+        available_hosts = self._get_available_hosts(hosts_in_range)
+        
+        if len(available_hosts) == 0:
+            raise CustomizedError(f"No available hosts in percentile range {percentile}")
+        
+        host = np.random.choice(available_hosts)
+        self.taken_hosts.add(host)
+        return host
+    
+    def _get_available_hosts(self, candidates: np.ndarray) -> np.ndarray:
+        """Get available hosts from candidates using NumPy operations."""
+        if len(self.taken_hosts) == 0:
+            return candidates
+        
+        # Convert to NumPy array for efficient set operations
+        taken_array = np.array(list(self.taken_hosts))
+        return np.setdiff1d(candidates, taken_array)
+
+
+class SeedHostMatcher:
+    """Main class for matching seeds to hosts."""
+    
+    def __init__(self, network: nx.Graph):
+        self.network = network
+        self.preprocessor = NetworkPreprocessor(network)
+        self.matcher = HostMatcher(self.preprocessor)
+    
+    def match_all_seeds(self, match_methods: Dict[str, str], 
+                       match_params: Dict[str, Any], 
+                       num_seeds: int) -> Dict[int, int]:
+        """
+        Match all seeds to hosts using specified methods and parameters.
+        
+        Args:
+            match_methods: Dict mapping seed_id (as string) to method name
+            match_params: Dict mapping seed_id (as string) to method parameters
+            num_seeds: Total number of seeds to match
+            
+        Returns:
+            Dictionary mapping seed_id to host_id
+        """
+        network_size = self.network.number_of_nodes()
+        if num_seeds > network_size:
+            raise CustomizedError(f"Cannot match {num_seeds} seeds to {network_size} hosts")
+        
+        # Group seeds by method for efficient processing
+        method_groups = self._group_seeds_by_method(match_methods, num_seeds)
+        
+        # Process in specific order: ranking, percentile, random
+        seed_to_host = {}
+        processing_order = ['ranking', 'percentile', 'random']
+        
+        for method in processing_order:
+            if method not in method_groups:
+                continue
+            
+            for seed_id in method_groups[method]:
+                param = match_params.get(str(seed_id))
+                host = self._match_single_seed(method, param)
+                seed_to_host[seed_id] = host
+        
+        return seed_to_host
+    
+    def _match_single_seed(self, method: str, param: Any) -> int:
+        """Match a single seed using the specified method."""
+        if method == 'random':
+            return self.matcher.match_random(param)
+        elif method == 'ranking':
+            return self.matcher.match_ranking(param)
+        elif method == 'percentile':
+            return self.matcher.match_percentile(param)
+        else:
+            available_methods = ['random', 'ranking', 'percentile']
+            raise CustomizedError(f"Unknown method '{method}'. Available: {available_methods}")
+    
+    def _group_seeds_by_method(self, match_methods: Dict[str, str], 
+                              num_seeds: int) -> Dict[str, List[int]]:
+        """Group seeds by their matching method."""
+        method_groups = defaultdict(list)
+        available_methods = ['random', 'ranking', 'percentile']
+        
+        for seed_id in range(num_seeds):
+            method = match_methods.get(str(seed_id), 'random')
+            
+            if method not in available_methods:
+                raise CustomizedError(f"Invalid method '{method}' for seed {seed_id}")
+            
+            method_groups[method].append(seed_id)
+        
+        return dict(method_groups)
+
+
+class FileManager:
+    """Handles file operations for matching data."""
+    
+    @staticmethod
+    def save_matching_csv(seed_to_host: Dict[int, int], file_path: str):
+        """Save matching to CSV file, sorted by host_id."""
+        sorted_items = sorted(seed_to_host.items(), key=lambda x: x[1])
+        df = pd.DataFrame(sorted_items, columns=['seed', 'host_id'])
+        df.to_csv(file_path, index=False)
+    
+    @staticmethod
+    def read_network(network_path: str) -> nx.Graph:
+        """Read network from file."""
+        network_path = Path(network_path)
+        if not network_path.exists():
+            raise FileNotFoundError(
+                f"Network file '{network_path}' not found. "
+                "Please run network generation first."
+            )
+        return nx.read_adjlist(network_path, nodetype=int)
+    
+    @staticmethod
+    def read_user_matching_file(file_path: str) -> Dict[int, int]:
+        """Read user-provided matching file (JSON or CSV)."""
+        file_path = Path(file_path)
+        
+        if not file_path.exists():
+            raise FileNotFoundError(f"Matching file {file_path} not found")
+        
+        if file_path.suffix.lower() == ".json":
+            try:
+                with open(file_path, 'r') as file:
+                    return json.load(file)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON in {file_path}: {e}")
+        
+        elif file_path.suffix.lower() == ".csv":
+            try:
+                df = pd.read_csv(file_path)
+                return dict(zip(df['seed'], df['host_id']))
+            except Exception as e:
+                raise ValueError(f"Invalid CSV in {file_path}: {e}")
+        
+        else:
+            raise ValueError("Matching file must be JSON or CSV")
+
+
+class MatchingOrchestrator:
+    """Main orchestrator for the matching process."""
+    
+    def __init__(self, working_dir: str, random_seed: Optional[int] = None):
+        self.working_dir = working_dir
+        np.random.seed(random_seed)
+    
+    def run_matching(self, method: str, num_seeds: int, 
+                    match_scheme: Union[str, Dict] = "", 
+                    match_scheme_param: Union[str, Dict] = "",
+                    path_matching: str = "") -> Tuple[Optional[Dict[int, int]], Optional[Exception]]:
+        """Run the complete matching process."""
+        try:
+            if method == "user_input":
+                return self._handle_user_input(path_matching)
+            elif method == "randomly_generate":
+                return self._handle_random_generation(num_seeds, match_scheme, match_scheme_param)
+            else:
+                raise CustomizedError(f"Invalid method '{method}'. Use 'user_input' or 'randomly_generate'")
+        
+        except Exception as e:
+            print(f"Matching error: {e}")
+            return None, e
+    
+    def _handle_user_input(self, path_matching: str) -> Tuple[Dict[int, int], None]:
+        """Handle user-provided matching file."""
+        if not path_matching:
+            raise CustomizedError("Path to matching file required for user_input method")
+        
+        matching = FileManager.read_user_matching_file(path_matching)
+        return matching, None
+    
+    def _handle_random_generation(self, num_seeds: int, 
+                                 match_scheme: Union[str, Dict], 
+                                 match_scheme_param: Union[str, Dict]) -> Tuple[Dict[int, int], None]:
+        """Handle random matching generation."""
+        # Parse parameters
+        match_methods = self._parse_match_scheme(match_scheme, num_seeds)
+        match_params = self._parse_match_params(match_scheme_param, match_methods, num_seeds)
+        
+        # Load network and perform matching
+        network_path = os.path.join(self.working_dir, "contact_network.adjlist")
+        network = FileManager.read_network(network_path)
+        
+        matcher = SeedHostMatcher(network)
+        seed_to_host = matcher.match_all_seeds(match_methods, match_params, num_seeds)
+        
+        # Save results
+        output_path = os.path.join(self.working_dir, "seed_host_match.csv")
+        FileManager.save_matching_csv(seed_to_host, output_path)
+        
+        print("********************************************************************")
+        print("                     SEEDS AND HOSTS MATCHED                       ")
+        print("********************************************************************")
+        print(f"Matching saved to: {output_path}")
+        
+        return seed_to_host, None
+    
+    def _parse_match_scheme(self, match_scheme: Union[str, Dict], num_seeds: int) -> Dict[str, str]:
+        """Parse match scheme from string or dict."""
+        if isinstance(match_scheme, dict):
+            return match_scheme
+        elif match_scheme == "":
+            return {str(i): "random" for i in range(num_seeds)}
+        else:
+            try:
+                return json.loads(match_scheme)
+            except json.JSONDecodeError:
+                raise CustomizedError("Invalid JSON format for match_scheme")
+    
+    def _parse_match_params(self, match_scheme_param: Union[str, Dict], 
+                           match_methods: Dict[str, str], num_seeds: int) -> Dict[str, Any]:
+        """Parse match parameters from string or dict."""
+        if isinstance(match_scheme_param, dict):
+            return match_scheme_param
+        elif match_scheme_param == "":
+            return {str(i): None for i in range(num_seeds)}
+        else:
+            try:
+                return json.loads(match_scheme_param)
+            except json.JSONDecodeError:
+                # If all methods are random, params can be None
+                if all(method == "random" for method in match_methods.values()):
+                    return {str(i): None for i in range(num_seeds)}
+                else:
+                    raise CustomizedError("Invalid JSON format for match_scheme_param")
+
+
+# Maintain backward compatibility with original functions
+def match_all_hosts(ntwk_, match_method, param, num_seed):
+    """Original function signature for backward compatibility."""
+    matcher = SeedHostMatcher(ntwk_)
+    return matcher.match_all_seeds(match_method, param, num_seed)
+
+
+def write_match(match_dict, wk_dir):
+    """Original function signature for backward compatibility."""
     match_path = os.path.join(wk_dir, "seed_host_match.csv")
-    _save_dict_to_csv(sorted_match, match_path)
+    FileManager.save_matching_csv(match_dict, match_path)
     return match_path
 
-def match_all_hosts(ntwk_, match_method, param, num_seed):
-    """
-    Returns matching in the form of dictionary where keys are seeds and values are hosts.
-    E.g., {0: 232, 1:256, 2:790, 3:4, 4:760} (dict[int, int])
 
-    Parameters:
-        ntwk_ (nx.Graph): Contact network.
-        match_method (dict[int, str]): A dictionary of hosts as keys and matching method as values.
-        param (dict[int, Union[int, list[int, int], None]]): A dictionary of hosts as k
-        eys and matching parameters as values.
-        num_seed (int): Number of seeds. 
-    """
-    ntwk_size = ntwk_.number_of_nodes()
-    if num_seed > ntwk_size:
-        raise CustomizedError(f"It is not allowed to match {num_seed} seeds to {ntwk_size} hosts. "
-                        "Please reduce the number of seeds or increase the host population size")
-    
-    # Preprocess the network
-    dict_edges_node = _build_dict_edges_node(ntwk_)
-    nodes_sorted, _ = _sort_node_by_edge(dict_edges_node)
-    taken_hosts_id = []
+def read_network(network_path):
+    """Original function signature for backward compatibility."""
+    return FileManager.read_network(network_path)
 
-    # Gather the nodes by their matching method
-    dict_method_seeds = {'ranking': [], 'percentile': [], 'random': []}
 
-    for seed_id in range(num_seed):
-        idx_method = match_method.get(str(seed_id))
-        if idx_method not in [None, 'ranking', 'percentile', 'random']:
-            raise CustomizedError("Please provide a valid matching method in ('ranking', "
-                        f"'percentile', 'random') instead of {idx_method} for seed {seed_id}")
-        elif idx_method != None:
-            dict_method_seeds[idx_method].append(seed_id) 
-        else: 
-            dict_method_seeds["random"].append(seed_id)
-    
-    # Define the matching function by the method param and process methods in the specified order
-    match_functions = {'ranking': match_ranking, 'percentile': match_percentile,'random': match_random}
-    match_dict = {}
-    for method in ['ranking', 'percentile', 'random']:
-        match_function = match_functions[method]
-        for seed_id in dict_method_seeds[method]:
-            matched_host = match_function(nodes_sorted, taken_hosts_id, param.get(str(seed_id)))
-            match_dict[seed_id] = matched_host
-            taken_hosts_id.append(matched_host)
-    return match_dict
+def read_user_matchingfile(file_path):
+    """Original function signature for backward compatibility."""
+    return FileManager.read_user_matching_file(file_path)
 
-def run_seed_host_match(method, wkdir, num_seed, path_matching="", match_scheme="", match_scheme_param = "", rand_seed = None):
-    """
-    Executes seed host matching process in command line and write the matching file 
-    in the specified directory.
 
-    Parameters:
-        method (str): "user_input" for user-provided matching or "randomly_generate".
-        wkdir (str): Full path to the workding directory.
-        num_seed (int): Number of seeds for matching.
-        path_matching (str): Full path to the user-provided matching file.
-        match_scheme (str): JSON string of matching methods for seeds.
-        match_scheme_param (str): JSON string of matching parameters for seeds.
+def run_seed_host_match(method: str, wkdir: str, num_seed: int, 
+                       path_matching: str = "", match_scheme: str = "", 
+                       match_scheme_param: str = "", rand_seed: Optional[int] = None):
+    """Main function maintaining original API."""
+    orchestrator = MatchingOrchestrator(wkdir, rand_seed)
+    return orchestrator.run_matching(method, num_seed, match_scheme, match_scheme_param, path_matching)
+#########################################################
 
-    Returns:
-        seed_vs_host (dict[int, int]): A dictionary that maps seeds to hosts.
-        error_message (str): Error message.
-    """
-    if rand_seed != None:
-        np.random.seed(rand_seed)		
-    # Generate network path
-    ntwk_path = os.path.join(wkdir, "contact_network.adjlist")
-    seed_vs_host = None
-    error_message = None
-    # Process the parameters and save the matching results have we match all host
-    try:
-        match_path = None
-        if method == "user_input":
-            if path_matching=="":
-                raise CustomizedError("Path to the user-provided matching file (-path_matching) "
-                          "needs to be provided in user_provided mode")
-            elif os.path.exists(path_matching) == False:
-                raise CustomizedError("Path to the user-provided matching file (-path_matching) "
-                          "doesn't exist")
-            else: 
-                read_user_matchingfile(path_matching)
-        elif method == "randomly_generate":
-            if match_scheme == "" and match_scheme_param == "":
-                match_scheme = {seed_id: "random" for seed_id in range(num_seed)}
-                match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
-            else:
-                try:
-                    match_scheme = json.loads(match_scheme)
-                except json.decoder.JSONDecodeError:
-                    raise CustomizedError(f"The matching methods {match_scheme} is "
-                           "not a valid json format")
-                try:
-                    match_scheme_param = json.loads(match_scheme_param)
-                except json.decoder.JSONDecodeError:
-                    if list(set(match_scheme.values())) != ["random"]:
-                        raise CustomizedError(f"The matching parameters {match_scheme_param} is "
-                     "not a valid json format")
-                    elif match_scheme_param == "": 
-                        raise CustomizedError(f"Please specify the matching parameters (-match_scheme_param) for " \
-                           "'ranking' or 'percentile'")
-                    match_scheme_param = {seed_id: None for seed_id in range(num_seed)}
-            seed_vs_host = match_all_hosts(ntwk_=read_network(ntwk_path), match_method = match_scheme, 
-                               param = match_scheme_param, num_seed = num_seed)
-            match_path = write_match(seed_vs_host, wkdir)
-        else:
-            raise CustomizedError(f"Please provide a permitted method (-method): "
-                        f"user_input/randomly_generate instead of your current input {method}")
-        print("******************************************************************** \n" +
-              "                         SEEDS AND HOSTS MATCHED                     \n" +
-              "********************************************************************")
-        print("Seed host matching:", match_path)
-    except Exception as e:
-        print(f"Seed and host match - A error occured: {e}.")
-        error_message = e
-
-    return seed_vs_host, error_message
 
 def read_config_and_match(config_all):
-    """
-    Write matching file given the configuration file.
-
-    Parameters:
-        file_path (str): Full path to the configuration file.
-        num_seed (int): Number of seeds.
-    """
-    match_random_config = config_all["SeedHostMatching"]["randomly_generate"]
-    match_method = match_random_config["match_scheme"]
-    match_method_param = match_random_config["match_scheme_param"]
-    path_matching = config_all["SeedHostMatching"]["user_input"]["path_matching"]
-    method = config_all["SeedHostMatching"]['method']
-    num_seed = config_all["SeedsConfiguration"]["seed_size"]
-    rand_seed = config_all["BasicRunConfiguration"].get("random_number_seed", None)
-    _, error = run_seed_host_match(method = method, wkdir = config_all["BasicRunConfiguration"]["cwdir"], 
-                     num_seed = num_seed, path_matching = path_matching, 
-    match_scheme = match_method, match_scheme_param = match_method_param, rand_seed = rand_seed)
-
+    """Original function for config-based matching."""
+    match_config = config_all["SeedHostMatching"]
+    basic_config = config_all["BasicRunConfiguration"]
+    
+    orchestrator = MatchingOrchestrator(
+        basic_config["cwdir"], 
+        basic_config.get("random_number_seed")
+    )
+    
+    _, error = orchestrator.run_matching(
+        method=match_config['method'],
+        num_seeds=config_all["SeedsConfiguration"]["seed_size"],
+        match_scheme=match_config["randomly_generate"]["match_scheme"],
+        match_scheme_param=match_config["randomly_generate"]["match_scheme_param"],
+        path_matching=match_config["user_input"]["path_matching"]
+    )
+    
     return error
 
+
 def main():
+    """Command-line interface maintaining original structure."""
     parser = argparse.ArgumentParser(description='Match seeds and hosts.')
-    parser.add_argument('-method',  action='store',dest='method', type=str, required=True, 
-                     help="Methods of the seed host matching")
-    parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, 
-                     help="Working directory")
-    parser.add_argument('-num_init_seq', action='store',dest='num_seed', type=int, required=True, 
-                     help="Number of seeds to be matched.")
-    ### optional parameters
-    parser.add_argument('-path_matching',  action='store',dest='path_matching', type=str, 
-                     required=False, help="Path to the user-provided matching file", default="")
-    parser.add_argument('-match_scheme',  action='store',dest='match_scheme', type=str, 
-                     required=False, help="Scheme of matching", default="")
-    parser.add_argument('-match_scheme_param', action='store', dest='match_scheme_param', 
-                     type=str, required=False, help="Matching parameters for each seed", default="")
-    parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
-
+    parser.add_argument('-method', required=True, help="Matching method")
+    parser.add_argument('-wkdir', required=True, help="Working directory")  
+    parser.add_argument('-num_init_seq', required=True, type=int, help="Number of seeds")
+    parser.add_argument('-path_matching', default="", help="User matching file path")
+    parser.add_argument('-match_scheme', default="", help="Matching scheme JSON")
+    parser.add_argument('-match_scheme_param', default="", help="Matching parameters JSON")
+    parser.add_argument('-random_seed', type=int, help="Random seed")
+    
     args = parser.parse_args()
-    method = args.method
-    wkdir = args.wkdir
-    num_seed = args.num_seed
-    path_matching = args.path_matching
-    match_scheme = args.match_scheme
-    match_scheme_param = args.match_scheme_param
-    rand_seed = args.random_seed
 
-    run_seed_host_match(method = method, wkdir = wkdir, num_seed = num_seed, path_matching = path_matching, 
-                     match_scheme = match_scheme, match_scheme_param = match_scheme_param, rand_seed = rand_seed)
+    orchestrator = MatchingOrchestrator(
+        args.wkdir, 
+        args.random_seed
+    )
+    
+    orchestrator.run_matching(
+        method = args.method,
+        num_seeds = args.num_init_seq,
+        match_scheme = args.match_scheme,
+        match_scheme_param = args.match_scheme_param,
+        path_matching = args.path_matching
+    )
+
 
 if __name__ == "__main__":
     main()

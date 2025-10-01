@@ -4,7 +4,8 @@ from utils import load_config_as_dict, save_config, CreateToolTip
 import json
 import networkx as nx
 import os
-from network_generator import run_network_generation
+# from network_generator import run_network_generation
+from e3SIM_codes.network_generator import NetworkManager
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
@@ -118,11 +119,23 @@ class NetworkModel:
                 config = load_config_as_dict(self.config_path)
                 wk_dir = config["BasicRunConfiguration"]["cwdir"]
                 pop_size = config["NetworkModelParameters"]["host_size"]
-                network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="user_input",
-                        path_network=chosen_file)
+
+                try:
+                    manager = NetworkManager(wk_dir)
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to initialize NetworkManager:\n{e}")
+                    return
+                network, error = manager.run(
+                    pop_size = pop_size,
+                    wk_dir = wk_dir,
+                    method = "user_input",
+                    path_network = chosen_file
+                )
+                # network, error = run_network_generation(
+                #         pop_size=pop_size,
+                #         wk_dir=wk_dir,
+                #         method="user_input",
+                #         path_network=chosen_file)
                 
                 if error:
                     messagebox.showerror("Error", error)
@@ -287,37 +300,52 @@ class NetworkModel:
 
                 if network_model == "ER":
                     p_ER = config["NetworkModelParameters"]["randomly_generate"]["ER"]["p_ER"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="ER",
-                        p_ER=p_ER,
-                        rand_seed=rand_seed)
+                    try:
+                        manager = NetworkManager(wk_dir)
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to initialize NetworkManager:\n{e}")
+                        return
+                    _ , error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "ER",
+                        p_ER = p_ER,
+                        rand_seed = rand_seed)
                 elif network_model == "BA":
                     m = config["NetworkModelParameters"]["randomly_generate"]["BA"]["ba_m"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="BA",
-                        m=m,
-                        rand_seed=rand_seed)
+                    try:
+                        manager = NetworkManager(wk_dir)
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to initialize NetworkManager:\n{e}")
+                        return
+                    _ , error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "BA",
+                        m = m,
+                        rand_seed = rand_seed)
                 elif network_model == "RP":
                     rp_size = config["NetworkModelParameters"]["randomly_generate"]["RP"]["rp_size"]
                     p_within = \
                         config["NetworkModelParameters"]["randomly_generate"]["RP"]["p_within"]
                     p_between = \
                         config["NetworkModelParameters"]["randomly_generate"]["RP"]["p_between"]
-                    network, error = run_network_generation(
-                        pop_size=pop_size,
-                        wk_dir=wk_dir,
-                        method="randomly_generate",
-                        model="RP",
-                        rp_size=rp_size,
-                        p_within=p_within,
-                        p_between=p_between,
-                        rand_seed=rand_seed)
+                    try:
+                        manager = NetworkManager(wk_dir)
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to initialize NetworkManager:\n{e}")
+                        return
+                    _ , error = manager.run(
+                        pop_size = pop_size,
+                        wk_dir = wk_dir,
+                        method = "randomly_generate",
+                        model = "RP",
+                        rp_size = rp_size,
+                        p_within = p_within,
+                        p_between = p_between,
+                        rand_seed = rand_seed)
                 else:
                     raise ValueError("Unsupported model.")
 
