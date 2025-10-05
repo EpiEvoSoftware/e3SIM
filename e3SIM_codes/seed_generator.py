@@ -1,7 +1,7 @@
 import os, subprocess, shutil, tskit, pyslim, numpy as np
-from e3SIM_codes.error_handling import CustomizedError
-from e3SIM_codes.base_func import *
-import ete4 as Tree
+from error_handling import CustomizedError
+from base_func import *
+import ete3 as Tree
 
 NUM_VCF_FORMAT_COLUMNS = 9
 POS_COL = 1

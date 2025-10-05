@@ -5,8 +5,7 @@ from utils import (load_config_as_dict, no_validate_update_val, no_validate_upda
                    TabBase, GroupControls, EasyPathSelector, EasyTitle, EasyCombobox, 
                    EasyRadioButton, EasyButton, EasyEntry, EasyRateMatrix, EasyImage,
                    CreateToolTip)
-# from seed_generator import run_seed_generation
-from e3SIM_codes.seed_generator import SeedConfig, SeedGenerator
+from seed_generator import *
 
 class SeedsConfiguration(TabBase):
     def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):

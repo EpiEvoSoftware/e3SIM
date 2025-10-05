@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union, Optional, Any
 
 # Assuming these exist in your project
-from e3SIM_codes.error_handling import CustomizedError
-from e3SIM_codes.base_func import *
+from error_handling import CustomizedError
+from base_func import *
 
 # Magic numbers
 HUNDRED = 100

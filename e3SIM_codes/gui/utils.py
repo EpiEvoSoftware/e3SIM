@@ -164,8 +164,8 @@ class TabBase:
         self.tab_parent.add(parent, text=tab_title)
         if hide:
             self.tab_parent.tab(self.tab_index, state="disabled")
-        self.control_frame = ttk.Frame(self.parent, width=300)
-        self.control_frame.pack(padx=10, pady=10)
+        self.control_frame = ttk.Frame(self.parent)
+        self.control_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
 
 class EasyWidgetBase:

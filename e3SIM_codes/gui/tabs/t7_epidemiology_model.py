@@ -91,9 +91,9 @@ class EpidemiologyModel(TabBase):
 
         self.render_title("Evolutionary Components Setting", hide, 0, 1, frow())
         self.render_transmissibility(hide, 0, 1, frow(by=1))
-        self.render_cap_transmissibility(hide, 1, 1, frow(increment=False))
+        # self.render_cap_transmissibility(hide, 1, 1, frow(increment=False))
         self.render_drug_resistance(hide, 0, 1, frow())
-        self.render_cap_drugresist(hide, 1, 1, frow(increment=False))
+        # self.render_cap_drugresist(hide, 1, 1, frow(increment=False))
 
         self.render_title("Transition Probabilities between Compartments", hide, 0, 1, frow())
         self.render_S_IE_prob(hide, 0, 1, frow(by=1))
@@ -192,15 +192,15 @@ class EpidemiologyModel(TabBase):
         self.visible_components.add(component)
         return component
 
-    def render_cap_transmissibility(self, hide, column, columnspan, frow):
-        text = "The Maximum Transmissibility for Each Epoch (List Numerical)"
-        keys_path = ['EpidemiologyModel','genetic_architecture','cap_transmissibility']
-        component = EasyEntry(
-            keys_path, self.config_path, text, 'Max transmissibility', 
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
-        )
-        self.visible_components.add(component)
-        return component
+    # def render_cap_transmissibility(self, hide, column, columnspan, frow):
+    #     text = "The Maximum Transmissibility for Each Epoch (List Numerical)"
+    #     keys_path = ['EpidemiologyModel','genetic_architecture','cap_transmissibility']
+    #     component = EasyEntry(
+    #         keys_path, self.config_path, text, 'Max transmissibility', 
+    #         self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+    #     )
+    #     self.visible_components.add(component)
+    #     return component
 
     def render_drug_resistance(self, hide, column, columnspan, frow):
         text = "Which Drug-resistance Trait to Use for Each Epoch (List Integer)"
@@ -213,15 +213,15 @@ class EpidemiologyModel(TabBase):
         self.visible_components.add(component)
         return component
 
-    def render_cap_drugresist(self, hide, column, columnspan, frow):
-        text = "The Maximum Drug-resistance for Each Epoch (List Numerical)"
-        keys_path = ['EpidemiologyModel','genetic_architecture','cap_drugresist']
-        component = EasyEntry(
-            keys_path, self.config_path, text, 'Max Drug-resistance',
-            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
-        )
-        self.visible_components.add(component)
-        return component
+    # def render_cap_drugresist(self, hide, column, columnspan, frow):
+    #     text = "The Maximum Drug-resistance for Each Epoch (List Numerical)"
+    #     keys_path = ['EpidemiologyModel','genetic_architecture','cap_drugresist']
+    #     component = EasyEntry(
+    #         keys_path, self.config_path, text, 'Max Drug-resistance',
+    #         self.scrollable_frame, column, frow, 'list numerical', hide, columnspan
+    #     )
+    #     self.visible_components.add(component)
+    #     return component
 
 ####################################
 ### Transition Probabilities
