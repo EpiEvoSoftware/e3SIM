@@ -1,7 +1,7 @@
 import os, subprocess, shutil, tskit, pyslim, numpy as np
 from error_handling import CustomizedError
 from base_func import *
-import ete3 as Tree
+import ete4 as Tree
 
 NUM_VCF_FORMAT_COLUMNS = 9
 POS_COL = 1
