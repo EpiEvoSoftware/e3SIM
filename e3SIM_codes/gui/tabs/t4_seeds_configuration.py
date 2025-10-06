@@ -832,18 +832,7 @@ class SeedsConfiguration(TabBase):
                         return
                     generator = SeedGenerator(config)
                     error = generator.run()
-                    # error = run_seed_generation(
-                    #     method=method,
-                    #     wk_dir=cwdir,
-                    #     seed_size=seed_size,
-                    #     Ne=Ne,
-                    #     mu=mu,
-                    #     n_gen=n_gen,
-                    #     ref_path=ref_path,
-                    #     rand_seed=rand_seed,
-                    #     use_subst_matrix=use_subst_matrix, 
-                    #     mu_matrix=mu_matrix
-                    # )
+
                 elif method == "SLiM_burnin_epi":
                     epi_config = seeds_config["SLiM_burnin_epi"]
                     seeded_host_id = epi_config["seeded_host_id"]
@@ -866,26 +855,7 @@ class SeedsConfiguration(TabBase):
                     I_E_prob = epi_config["I_E_prob"]
                     R_S_prob = epi_config["R_S_prob"]
                     host_size = config["NetworkModelParameters"]["host_size"]
-                    # error = run_seed_generation(
-                    #     method=method,
-                    #     wk_dir=cwdir,
-                    #     seed_size=seed_size,
-                    #     use_subst_matrix=use_subst_matrix, 
-                    #     mu=mu,
-                    #     mu_matrix=mu_matrix,
-                    #     n_gen=n_gen,
-                    #     seeded_host_id=seeded_host_id,
-                    #     S_IE_prob=S_IE_prob,
-                    #     E_I_prob=E_I_prob,
-                    #     E_R_prob=E_R_prob,
-                    #     latency_prob=latency_prob,
-                    #     I_R_prob=I_R_prob,
-                    #     I_E_prob=I_E_prob,
-                    #     R_S_prob=R_S_prob,
-                    #     host_size=host_size,
-                    #     ref_path=ref_path,
-                    #     rand_seed=rand_seed
-                    # )
+
                     try:
                         config = SeedConfig(
                             method=method,
@@ -915,14 +885,7 @@ class SeedsConfiguration(TabBase):
                 elif method == "user_input":
                     path_seeds_vcf = seeds_config["user_input"]["path_seeds_vcf"]
                     path_seeds_phylogeny = seeds_config["user_input"]["path_seeds_phylogeny"]
-                    # error = run_seed_generation(
-                    #     method=method,
-                    #     wk_dir=cwdir,
-                    #     seed_size=seed_size,
-                    #     seed_vcf=path_seeds_vcf,
-                    #     path_seeds_phylogeny=path_seeds_phylogeny,
-                    #     rand_seed=rand_seed
-                    # )
+
                     try:
                         config = SeedConfig(
                             method=method,

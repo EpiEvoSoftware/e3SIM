@@ -743,9 +743,6 @@ class GenomeElement(TabBase):
         return component
     
 
-
-
-
 ########################
 ## RUN
     def effect_size_generation(self):
@@ -753,87 +750,44 @@ class GenomeElement(TabBase):
             return
 
         config = load_config_as_dict(self.config_path)
-        evol_config = config["EvolutionModel"]
+
         genome_config = config["GenomeElement"]
 
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
         rand_seed = config["BasicRunConfiguration"]["random_number_seed"]
         num_seed = config["SeedsConfiguration"]["seed_size"]
-        n_gen = evol_config["n_generation"]
-        use_subst_matrix = evol_config["subst_model_parameterization"] == "mutation rate matrix"
-        mut_rate = evol_config["mut_rate"]
-        mu_matrix_values = evol_config["mut_rate_matrix"]
-        mu_matrix = json.dumps({"A": mu_matrix_values[0], "C": mu_matrix_values[1], 
-                                "G": mu_matrix_values[2], "T": mu_matrix_values[3]})
 
         method = genome_config["effect_size"]["method"]
-        ref = genome_config["ref_path"]
-        trait_n = genome_config["traits_num"]
 
-        if method == "user_input":
-            effsize_path = genome_config["effect_size"]["user_input"]["path_effsize_table"]
-            gff_in = None
-            causal_sizes = None
-            es_lows = None
-            es_highs = None
-            norm_or_not = None
-            final_T = None
-        elif method == "randomly_generate":
-            effsize_path = ""
-            gff_in = genome_config["effect_size"]["randomly_generate"]["gff"]
-            causal_sizes = genome_config["effect_size"]["randomly_generate"]["genes_num"]
-            es_lows = genome_config["effect_size"]["randomly_generate"]["effsize_min"]
-            es_highs = genome_config["effect_size"]["randomly_generate"]["effsize_max"]
-            norm_or_not = genome_config["effect_size"]["randomly_generate"]["normalize"]
-            final_T = genome_config["effect_size"]["randomly_generate"]["final_trait"]
+        try:
+            config = GeneticEffectConfig(
+                method = method,
+                wk_dir = wk_dir,
+                n_seed = num_seed,
+                func = genome_config["effect_size"]["effsize_params"]["effsize_function"],
+                calibration = genome_config["effect_size"]["calibration"]["do_calibration"],
+                random_seed = rand_seed,
+                csv = genome_config["effect_size"]["filepath"]["csv_path"],
+                gff = genome_config["effect_size"]["filepath"]["gff_path"],
+                trait_num = genome_config["traits_num"],
+                pis = genome_config["effect_size"]["causalsites_params"]["pis"],
+                Ks = genome_config["effect_size"]["causalsites_params"]["Ks"],
+                taus = genome_config["effect_size"]["effsize_params"]["normal"]["taus"],
+                bs = genome_config["effect_size"]["effsize_params"]["laplace"]["bs"],
+                nv = genome_config["effect_size"]["effsize_params"]["studentst"]["nv"],
+                s = genome_config["effect_size"]["effsize_params"]["studentst"]["s"],
+                var_target = genome_config["effect_size"]["calibration"]["V_target"],
+                calibration_link = genome_config["trait_prob_link"]["calibration"],
+                Rs = genome_config["trait_prob_link"]["Rs"],
+                link = genome_config["trait_prob_link"]["link"],
+                site_method = genome_config["effect_size"]["causalsites_params"]["method"]
+            )
+        except Exception as e:
+            return e
 
-            if norm_or_not:
-                if n_gen <= 0:
-                    messagebox.showerror(
-                        "Value Error", "Number of Generations (Evolutionary Model) "
-                        "has to be a positive integer if normalization is turned on.")
-                    return
-                if not use_subst_matrix and mut_rate == 0:
-                    messagebox.showerror(
-                        "Value Error", "Mutation rate (Evolutionary Model) "
-                        "has to be a positive number if normalization is turned on.")
-                    return
-                if use_subst_matrix:
-                    if sum(sum(lst) for lst in mu_matrix_values) == 0:
-                        messagebox.showerror(
-                            "Value Error", "Mutation rate matrix (Evolutionary Model) cannot be"
-                            " all 0s if normalization is turned on and using substitution matrix")
-                        return
-                    if ref == "":
-                        messagebox.showerror(
-                            "Value Error", "Pathogen Reference Genome File (Basic Configuration) "
-                            "must be provided if normalization is turned on and if using "
-                            "substitution matrix.")
-                        return
-        else:
-            messagebox.showerror(
-                "Value Error", "Please select a method to generate the genetic architecture.")
-            return
-    
-        err = run_effsize_generation(
-            method,
-            wk_dir,
-            effsize_path=effsize_path,
-            gff_in=gff_in,
-            trait_n=trait_n,
-            causal_sizes=causal_sizes,
-            es_lows=es_lows,
-            es_highs=es_highs,
-            norm_or_not=norm_or_not,
-            n_gen=n_gen,
-            num_seed=num_seed,
-            use_subst_matrix=use_subst_matrix,
-            mut_rate=mut_rate,
-            mu_matrix=mu_matrix,
-            rand_seed=rand_seed,
-            ref=ref,
-            final_T=final_T
-        )
+        generator = EffectGenerator(config) # no validation going on so leave it out of the try catch clause
+        err = generator.run()
+
         if err:
             messagebox.showerror("Generation Error", "Generation Error: " + str(err))
         else:

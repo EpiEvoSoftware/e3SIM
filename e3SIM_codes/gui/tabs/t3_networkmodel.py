@@ -130,11 +130,6 @@ class NetworkModel:
                     method = "user_input",
                     path_network = chosen_file
                 )
-                # network, error = run_network_generation(
-                #         pop_size=pop_size,
-                #         wk_dir=wk_dir,
-                #         method="user_input",
-                #         path_network=chosen_file)
                 
                 if error:
                     messagebox.showerror("Error", error)

@@ -1,4 +1,4 @@
-name: e3SIM
+name: e3SIM_slim43
 channels:
   - conda-forge
   - anaconda
@@ -257,7 +257,7 @@ dependencies:
   - setuptools=70.0.0
   - sip=6.7.12
   - six=1.16.0
-  - slim=4.0.1
+  - slim=4.3
   - sysroot_linux-64=2.12
   - tk=8.6.13
   - tktable=2.10

@@ -598,29 +598,32 @@ def seeds_generation_byconfig(all_config):
     R_S_prob = seeds_config["SLiM_burnin_epi"]["R_S_prob"]
     random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
-    config = SeedConfig(wk_dir = wk_dir,
-                        method = method,
-                        seed_size = seed_size,
-                        seed_vcf=seed_vcf, 
-                        Ne=Ne,
-                        ref_path=ref_path, 
-                        mu=mu, 
-                        n_gen=n_gen, 
-                        path_seeds_phylogeny=path_seeds_phylogeny,
-                        host_size=host_size, 
-                        seeded_host_id=seeded_host_id, 
-                        S_IE_prob=S_IE_prob,
-                        E_I_prob=E_I_prob, 
-                        E_R_prob=E_R_prob, 
-                        latency_prob=latency_prob, 
-                        I_R_prob=I_R_prob, 
-                        I_E_prob=I_E_prob, 
-                        R_S_prob=R_S_prob, 
-                        rand_seed = random_number_seed,
-                        use_subst_matrix=use_subst_matrix, 
-                        mu_matrix=mu_matrix)
+    try:
+        config = SeedConfig(wk_dir = wk_dir,
+                            method = method,
+                            seed_size = seed_size,
+                            seed_vcf=seed_vcf, 
+                            Ne=Ne,
+                            ref_path=ref_path, 
+                            mu=mu, 
+                            n_gen=n_gen, 
+                            path_seeds_phylogeny=path_seeds_phylogeny,
+                            host_size=host_size, 
+                            seeded_host_id=seeded_host_id, 
+                            S_IE_prob=S_IE_prob,
+                            E_I_prob=E_I_prob, 
+                            E_R_prob=E_R_prob, 
+                            latency_prob=latency_prob, 
+                            I_R_prob=I_R_prob, 
+                            I_E_prob=I_E_prob, 
+                            R_S_prob=R_S_prob, 
+                            rand_seed = random_number_seed,
+                            use_subst_matrix=use_subst_matrix, 
+                            mu_matrix=mu_matrix)
+    except Exception as e:
+        return e
     
-    generator = SeedGenerator(config)
+    generator = SeedGenerator(config) # since there is not much validation of parameter going on here, just left it out of the try catch block
     error = generator.run()
     
     return error

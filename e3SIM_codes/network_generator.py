@@ -179,8 +179,12 @@ def network_generation_byconfig(all_config):
     # RNG seed
     random_number_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
 
-    manager = NetworkManager(wk_dir)
-    _, error = manager.run(
+    try:
+        manager = NetworkManager(wk_dir)
+    except Exception as e:
+        return e
+
+    _ , error = manager.run(
         method=ntwk_method,
         model=model,
         pop_size=pop_size,
