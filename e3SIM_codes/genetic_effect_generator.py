@@ -21,16 +21,15 @@ DEFAULT_VTGT = 1.0 # Default target variance for calibrating effect sizes
 
 # ------------- Genetic Effect Configuration ----------------------- #
 class GeneticEffectConfig:
-    def __init__(self, method, wk_dir, n_seed, func, calibration, trait_num, random_seed, pis, **kwargs):
+    def __init__(self, method, wk_dir, num_init_seq, calibration, trait_num, random_seed, pis, **kwargs):
         self.method = method # 'gff' | 'csv'
         self.wk_dir = wk_dir 
-        self.n_seed = n_seed # number of seeds to generate
+        self.num_init_seq = num_init_seq # number of seeds to generate
         self.calibration = calibration # whether to do calibration
         self.trait_num = trait_num # number of traits
-        self.func = func # n | st | l
         self.random_seed = random_seed
         self.pis = pis
-        self.params = kwargs # gff, csv, nv, bs, taus, s, site_method, Rs, var_target, caliberation link
+        self.params = kwargs # gff, csv, nv, bs, taus, s, site_method, Rs, var_target, caliberation link, func (n | st | l)
 
     def validate(self):
         if not os.path.exists(self.wk_dir):
@@ -38,15 +37,15 @@ class GeneticEffectConfig:
         if self.method not in ("csv", "gff"):
             raise CustomizedError(f"{self.method} isn't a valid method. Please provide a permitted method. "
                             "(csv/gff)")
-        if self.n_seed <= 0:
+        if self.num_init_seq <= 0:
             raise CustomizedError("Seed size must be positive.")
         if len(self.trait_num.keys()) != 2:
             raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
         if sum(self.trait_num.values()) < 1:
             raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
-        if self.func not in ("n", "l", "st"):
-            raise CustomizedError(f"{self.func} isn't a valid method for sampling effect sizes. Please choose a permitted method."
-                                "(n/l/st)")
+        # if self.func not in ("n", "l", "st"):
+        #     raise CustomizedError(f"{self.func} isn't a valid method for sampling effect sizes. Please choose a permitted method."
+        #                         "(n/l/st)")
         if self.method=="gff":
             if self.params.get("site_method") not in ("p", "n"):
                 raise CustomizedError(f"{self.params.get("site_method")} isn't a valid method for resampling causal sites. Please choose a permitted method."
@@ -65,13 +64,13 @@ class GeneticEffectConfig:
                     raise CustomizedError("The success probability for causal site sampling has to be an integer.")
 
         
-            if self.func == "n" and len(self.params.get("taus")) != sum(self.trait_num.values()):
+            if self.params.get("func") == "n" and len(self.params.get("taus")) != sum(self.trait_num.values()):
                 raise CustomizedError(f"The given length of the variance (-taus) {self.params.get("taus")}"
                             f" do not match the number of traits to be drawn {self.trait_num} in the point normal mode.")
-            if self.func == "l" and len(self.params.get("bs")) != sum(self.trait_num.values()):
+            if self.params.get("func") == "l" and len(self.params.get("bs")) != sum(self.trait_num.values()):
                 raise CustomizedError(f"The given length of the scales (-bs) {self.params.get("bs")}"
                             f" do not match the number of traits to be drawn {self.trait_num} in the laplace mode.")
-            if self.func == "st" and len(self.params.get("s")) != sum(self.trait_num.values()):
+            if self.params.get("func")== "st" and len(self.params.get("s")) != sum(self.trait_num.values()):
                 raise CustomizedError(f"The given length of the scales (-s) {self.params.get("s")}"
                             f" do not match the number of traits to be drawn {self.trait_num} in the laplace mode.")
 
@@ -252,7 +251,7 @@ class EffectGenerator:
             should be a pandas data frame where rows are sites
             and columns are traits
         """
-        func = self.cfg.func # default is n if nothing is given
+        func = self.cfg.get("func") # default is n if nothing is given
 
         if func == "n":
             for i in range(sum(self.cfg.trait_num.values())):
@@ -332,22 +331,22 @@ class EffectGenerator:
             print("WARNING: seed_generator.py hasn't been run. "
                     "If you want to use seed sequence different from the reference genome, "
                     "you must run seed_generator first", flush = True)
-            empty_data = {"Seed_ID": [f"seed_{i}" for i in range(self.cfg.n_seed)],
-            **{trait: [0] * self.cfg.n_seed for trait in trait_cols}}
+            empty_data = {"Seed_ID": [f"seed_{i}" for i in range(self.cfg.num_init_seq)],
+            **{trait: [0] * self.cfg.num_init_seq for trait in trait_cols}}
 
             return pd.DataFrame(empty_data)
 
         else:
             seeds = sorted([f for f in os.listdir(seeds_vcf_dir) if f.endswith(".vcf")])
             df_AF = df_eff.iloc[:, 0].to_frame(name="Sites")
-            for i in range(self.cfg.n_seed):
+            for i in range(self.cfg.num_init_seq):
                 df_AF[f"seed_{i}"] = 0
-            if len(seeds) > self.cfg.n_seed:
-                print(f"WARNING: More seeding sequences ({len(seeds)}) than the specified number ({self.cfg.n_seed}) "
-                    f"are detected. Only the first {self.cfg.n_seed} files will be used", flush = True)
+            if len(seeds) > self.cfg.num_init_seq:
+                print(f"WARNING: More seeding sequences ({len(seeds)}) than the specified number ({self.cfg.num_init_seq}) "
+                    f"are detected. Only the first {self.cfg.num_init_seq} files will be used", flush = True)
             all_effpos = df_eff["Sites"].tolist()
 
-            for seed_idx , seed_file in enumerate(seeds[:self.cfg.n_seed]):
+            for seed_idx , seed_file in enumerate(seeds[:self.cfg.num_init_seq]):
                 with open(os.path.join(seeds_vcf_dir, seed_file), "r") as seed_vcf:
                     sum_trait = np.zeros(len(trait_cols)) # number of traits
                     for line in seed_vcf:
@@ -363,7 +362,7 @@ class EffectGenerator:
 
             # Convert list of arrays to DataFrame
             df_out = pd.DataFrame(seed_vals, columns=trait_cols)
-            df_out["Seed_ID"] = list(range(self.cfg.n_seed))
+            df_out["Seed_ID"] = list(range(self.cfg.num_init_seq))
             df_out = df_out[["Seed_ID"] + trait_cols]
             return df_out, df_AF
 
@@ -383,15 +382,15 @@ class EffectGenerator:
             Empirical variance of each trait before calibration.
         """
         # Extract numeric parts (exclude site identifiers)
-        geno = seeds_state.iloc[:, 1:].to_numpy(dtype=float)  # (n_sites, n_seeds)
+        geno = seeds_state.iloc[:, 1:].to_numpy(dtype=float)  # (n_sites, num_init_seqs)
         eff = df_eff.iloc[:, 1:].to_numpy(dtype=float)        # (n_sites, n_traits)
 
         # Compute allele frequency and center genotype
         AF_all = geno.mean(axis=1, keepdims=True)             # (n_sites, 1)
-        center_geno = geno - AF_all                           # (n_sites, n_seeds)
+        center_geno = geno - AF_all                           # (n_sites, num_init_seqs)
 
-        # Compute centered trait matrix: (n_seeds, n_traits)
-        center_trait = center_geno.T @ eff                    # (n_seeds, n_traits)
+        # Compute centered trait matrix: (num_init_seqs, n_traits)
+        center_trait = center_geno.T @ eff                    # (num_init_seqs, n_traits)
 
         # Empirical variance of each trait
         var_empirical = (center_trait ** 2).sum(axis=0) / (geno.shape[1] - 2)
@@ -524,7 +523,7 @@ def effsize_generation_byconfig(all_config):
         config = GeneticEffectConfig(
             method = genetic_config["effect_size"]["method"],
             wk_dir = wk_dir,
-            n_seed = num_seed,
+            num_init_seq = num_seed,
             func = genetic_config["effect_size"]["effsize_params"]["effsize_function"],
             calibration = genetic_config["effect_size"]["calibration"]["do_calibration"],
             random_seed = random_seed,
@@ -562,7 +561,7 @@ def main():
     parser.add_argument('-trait_n', action='store', dest='trait_n', type=ast.literal_eval, required=True, 
         help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
     # parser.add_argument('-redo', action='store',dest='redo', type=str, required=False, default="sites", help="Which steps to redo in the effect size generating process (sites/effsize/none)")
-    parser.add_argument('-func', action='store',dest='func', type=str, required=True, help="Function to generate the effect sizes given causal sites. (n/l/st)")
+    parser.add_argument('-func', action='store',dest='func', type=str, required=False, help="Function to generate the effect sizes given causal sites. (n/l/st)")
     # parser.add_argument('-pleiotropy', action='store',dest='pleiotropy', type=str2bool, required=False, help="Whether to do pleiotropy", default=False)
     parser.add_argument('-site_method', action='store',dest='site_method', type=str, required=False, help="Method to sample causal site, by probability (p) or by number of sites (n)", default="p")
     parser.add_argument('-pis','--pis', nargs='+', help='The probability of the Bernoulli trials for each candidate sites for each trait. Should be a float list with the same length of the number of traits in total. Required when site_method=p.', required=False, type=float, default=[])
@@ -572,7 +571,7 @@ def main():
     parser.add_argument('-nv','--nv', action='store', help='Degree of freedom of the Student\'s t\'s distribution of the effect sizes for each trait under the student\'s t model. Optional when func=st', required=False, type=float, default=3)
     parser.add_argument('-s','--s', nargs='+', help='Scales of the Student\'s t distribution of the effect sizes for each trait under the Student\'s t model. Required when func=st', required=False, type=float, default=[])
     parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
-    parser.add_argument('-n_seed', action='store', dest = 'n_seed', required = True, type = int, default = 1)
+    parser.add_argument('-num_init_seq', action='store', dest = 'num_init_seq', required = True, type = int, default = 1)
     parser.add_argument('-calibration', action='store',dest='calibration', type=str2bool, required=False, help="Whether to calibrate the effect size values", default=False)
     parser.add_argument('-var_target', '--var_target', nargs='+', help='The target variance of the seeds\' genetic values', required=False, type=float, default=[])
     parser.add_argument('-calibration_link', action='store',dest='calibration_link', type=str2bool, required=False, help="Whether to calibrate the link-scale slope", default=False)
@@ -583,10 +582,10 @@ def main():
     config = GeneticEffectConfig(
         method = args.method,
         wk_dir = args.wkdir,
-        n_seed = args.n_seed,
-        func = args.func,
+        num_init_seq = args.num_init_seq,
         calibration = args.calibration,
         random_seed = args.random_seed,
+        func = args.func,
         csv = args.csv,
         gff = args.gff,
         trait_num = args.trait_n,
