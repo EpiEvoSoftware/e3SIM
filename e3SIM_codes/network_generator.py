@@ -2,7 +2,7 @@ import os
 import argparse
 import networkx as nx
 import numpy as np
-from error_handling import CustomizedError
+from e3SIM_codes.error_handling import CustomizedError
 
 
 # ---------------- Base Class ---------------- #
