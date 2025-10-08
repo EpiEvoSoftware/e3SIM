@@ -13,7 +13,7 @@ matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.lines import Line2D
-from seed_host_matcher import *
+from e3SIM_codes.seed_host_matcher import *
 
 
 class ScrollableFrame(ttk.Frame):
@@ -253,14 +253,34 @@ class HostMatch(TabBase):
             return
         match_methods, match_params = out
 
-        match_dict = run_seed_host_match(
-            "randomly_generate", cwdir, num_seeds, 
-            match_scheme=match_methods, match_scheme_param=match_params, rand_seed=rand_seed)
-        if match_dict[0] is not None:
-            match_dict = match_dict[0]
-        else:
-            messagebox.showerror("Matching Error", "Matching Error: " + str(match_dict[1]))
+        # match_dict = run_seed_host_match(
+        #     "randomly_generate", cwdir, num_seeds, 
+        #     match_scheme=match_methods, match_scheme_param=match_params, rand_seed=rand_seed)
+        # if match_dict[0] is not None:
+        #     match_dict = match_dict[0]
+        # else:
+        #     messagebox.showerror("Matching Error", "Matching Error: " + str(match_dict[1]))
+        #     return
+
+        try:
+            orchestrator = MatchingOrchestrator(
+                cwdir,
+                rand_seed
+            )
+        except Exception as e:
+            return e
+        
+        match_dict, error = orchestrator.run_matching(
+            method = "randomly_generate",
+            num_seeds = num_seeds,
+            match_scheme = match_methods,
+            match_scheme_param = match_params
+        )
+
+        if not match_dict:
+            messagebox.showerror("Matching Error", "Matching Error: " + error)
             return
+
 
         for child in self.table.get_children():
             row = self.table.item(child)['values']

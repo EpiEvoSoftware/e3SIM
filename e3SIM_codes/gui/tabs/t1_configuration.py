@@ -2,9 +2,7 @@ import tkinter as tk
 import os
 from tkinter import ttk, messagebox, filedialog
 from utils import render_next_button, load_config_as_dict, save_config, CreateToolTip
-from base_func import check_ref_format
-
-
+from e3SIM_codes.base_func import check_ref_format
 
 
 class Configuration:

@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union, Optional, Any
 
 # Assuming these exist in your project
-from error_handling import CustomizedError
-from base_func import *
+from e3SIM_codes.error_handling import CustomizedError
+from e3SIM_codes.base_func import *
 
 # Magic numbers
 HUNDRED = 100
@@ -175,7 +175,7 @@ class SeedHostMatcher:
             for seed_id in method_groups[method]:
                 param = match_params.get(str(seed_id))
                 host = self._match_single_seed(method, param)
-                seed_to_host[seed_id] = host
+                seed_to_host[int(seed_id)] = host
         
         return seed_to_host
     
@@ -223,7 +223,7 @@ class FileManager:
         """Read network from file."""
         network_path = Path(network_path)
         if not network_path.exists():
-            raise FileNotFoundError(
+            raise CustomizedError(
                 f"Network file '{network_path}' not found. "
                 "Please run network generation first."
             )
@@ -235,24 +235,24 @@ class FileManager:
         file_path = Path(file_path)
         
         if not file_path.exists():
-            raise FileNotFoundError(f"Matching file {file_path} not found")
+            raise CustomizedError(f"Matching file {file_path} not found")
         
         if file_path.suffix.lower() == ".json":
             try:
                 with open(file_path, 'r') as file:
-                    return json.load(file)
+                    return {int(k): v for k, v in json.load(file).items()}
             except json.JSONDecodeError as e:
-                raise ValueError(f"Invalid JSON in {file_path}: {e}")
+                raise CustomizedError(f"Invalid JSON in {file_path}: {e}")
         
         elif file_path.suffix.lower() == ".csv":
             try:
                 df = pd.read_csv(file_path)
                 return dict(zip(df['seed'], df['host_id']))
             except Exception as e:
-                raise ValueError(f"Invalid CSV in {file_path}: {e}")
+                raise CustomizedError(f"Invalid CSV in {file_path}: {e}")
         
         else:
-            raise ValueError("Matching file must be JSON or CSV")
+            raise CustomizedError("Matching file must be JSON or CSV")
 
 
 class MatchingOrchestrator:

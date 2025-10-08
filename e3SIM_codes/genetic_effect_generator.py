@@ -21,15 +21,16 @@ DEFAULT_VTGT = 1.0 # Default target variance for calibrating effect sizes
 
 # ------------- Genetic Effect Configuration ----------------------- #
 class GeneticEffectConfig:
-    def __init__(self, method, wk_dir, num_init_seq, calibration, trait_num, random_seed, pis, **kwargs):
+    def __init__(self, method, wk_dir, num_init_seq, calibration, trait_num, random_seed, **kwargs):
         self.method = method # 'gff' | 'csv'
         self.wk_dir = wk_dir 
         self.num_init_seq = num_init_seq # number of seeds to generate
         self.calibration = calibration # whether to do calibration
         self.trait_num = trait_num # number of traits
         self.random_seed = random_seed
-        self.pis = pis
-        self.params = kwargs # gff, csv, nv, bs, taus, s, site_method, Rs, var_target, caliberation link, func (n | st | l)
+        # self.pis = pis
+        self.params = kwargs # gff, csv, nv, bs, taus, s, site_method (n | p), Rs, var_target, caliberation link, 
+        # func (n | st | l), pis, Ks, link
 
     def validate(self):
         if not os.path.exists(self.wk_dir):
@@ -51,17 +52,17 @@ class GeneticEffectConfig:
                 raise CustomizedError(f"{self.params.get("site_method")} isn't a valid method for resampling causal sites. Please choose a permitted method."
                                 "(n/p)")
             if self.params.get("site_method") == "p":
-                if len(self.pis) != sum(self.trait_num.values()):
+                if len(self.params.get("pis")) != sum(self.trait_num.values()):
                     raise CustomizedError("If you wish to sample causal sites from the candidate region using Bernoulli trials, "
                         f"Please provide the success probability list (-pis) with the same length as your trait quantities({sum(self.trait_num.values())})")
-                if any(x < 0 or x > 1 for x in self.pis):
+                if any(x < 0 or x > 1 for x in self.params.get("pis")):
                     raise CustomizedError("The success probability for causal site sampling has to be within [0, 1].")
             elif self.params.get("site_method")=="n":
                 if len(self.params.get("Ks")) != sum(self.trait_num.values()):
                     raise CustomizedError("If you wish to sample causal sites from the candidate region using specified numbers by uniform sampling, "
                         f"Please provide the causal site number list (-Ks) with the same length as your trait quantities({sum(self.trait_num.values())})")
                 if any(type(x)!=int for x in self.params["Ks"]):
-                    raise CustomizedError("The success probability for causal site sampling has to be an integer.")
+                    raise CustomizedError("The number of sites for traits has to be an integer.")
 
         
             if self.params.get("func") == "n" and len(self.params.get("taus")) != sum(self.trait_num.values()):
@@ -127,7 +128,7 @@ class EffectGenerator:
     def _build_effect_df(self) -> pd.DataFrame:
         if self.cfg.method == "gff":
             candidates = self._read_gff_sites()
-            df_sites = self._select_sites(candidates, self.cfg.params["site_method"], self.cfg.pis, self.cfg.params["Ks"])
+            df_sites = self._select_sites(candidates, self.cfg.params["site_method"], self.cfg.params.get("pis"), self.cfg.params.get("Ks"))
             return self._sample(df_sites)
         elif self.cfg.method == "csv":
             df = self._read_effsize_csv()
@@ -251,7 +252,7 @@ class EffectGenerator:
             should be a pandas data frame where rows are sites
             and columns are traits
         """
-        func = self.cfg.get("func") # default is n if nothing is given
+        func = self.cfg.params.get("func") # default is n if nothing is given
 
         if func == "n":
             for i in range(sum(self.cfg.trait_num.values())):
@@ -326,21 +327,22 @@ class EffectGenerator:
 
         seed_vals = []
 
+        df_AF = df_eff.iloc[:, 0].to_frame(name = "Sites")
+        for i in range(self.cfg.num_init_seq):
+            df_AF[f"seed_{i}"] = 0
+
         # raise exception if we do not have access to VCF of individual seeds
         if not os.path.exists(seeds_vcf_dir):
             print("WARNING: seed_generator.py hasn't been run. "
                     "If you want to use seed sequence different from the reference genome, "
-                    "you must run seed_generator first", flush = True)
+                    "you must run seed_generator first - NOW you are regarding reference genome as seeding sequences", flush = True)
             empty_data = {"Seed_ID": [f"seed_{i}" for i in range(self.cfg.num_init_seq)],
-            **{trait: [0] * self.cfg.num_init_seq for trait in trait_cols}}
+            **{trait: [0] * self.cfg.num_init_seq for trait in trait_cols}} # seed X trait
 
-            return pd.DataFrame(empty_data)
+            return pd.DataFrame(empty_data), df_AF
 
         else:
             seeds = sorted([f for f in os.listdir(seeds_vcf_dir) if f.endswith(".vcf")])
-            df_AF = df_eff.iloc[:, 0].to_frame(name="Sites")
-            for i in range(self.cfg.num_init_seq):
-                df_AF[f"seed_{i}"] = 0
             if len(seeds) > self.cfg.num_init_seq:
                 print(f"WARNING: More seeding sequences ({len(seeds)}) than the specified number ({self.cfg.num_init_seq}) "
                     f"are detected. Only the first {self.cfg.num_init_seq} files will be used", flush = True)
@@ -364,7 +366,7 @@ class EffectGenerator:
             df_out = pd.DataFrame(seed_vals, columns=trait_cols)
             df_out["Seed_ID"] = list(range(self.cfg.num_init_seq))
             df_out = df_out[["Seed_ID"] + trait_cols]
-            return df_out, df_AF
+            return df_out, df_AF # seed X trait, site X seed
 
 
     def _calibrate(self, df_eff: pd.DataFrame, seeds_state: pd.DataFrame) -> pd.DataFrame:
@@ -463,7 +465,7 @@ class EffectGenerator:
                 -np.log(Rs[trans_num:]) / SD_safe[trans_num:] if drug_num else np.array([])
             ])
         else:
-            raise ValueError(f"Unknown link_type: {link_type}")
+            raise CustomizedError(f"Unknown link_type: {link_type}")
 
         # Split by trait type
         alpha_trans = alphas[:trans_num] if trans_num else np.array([])
@@ -607,16 +609,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
-
-        
-    
-
-        
-
-
-
-
-
-
