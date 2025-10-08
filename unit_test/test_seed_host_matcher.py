@@ -12,7 +12,7 @@ curr_dir = os.path.dirname(__file__)
 e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
 if e3SIM_dir not in sys.path:
     sys.path.insert(0, e3SIM_dir)
-    
+
 # Assuming the main module is named seed_host_match.py
 from seed_host_matcher import (
     NetworkPreprocessor,
@@ -639,10 +639,10 @@ class TestIntegration:
 class TestBackwardCompatibility:
     """Test backward compatibility functions."""
     
-    @patch('e3SIM_codes.seed_host_matcher.SeedHostMatcher')
+    @patch('seed_host_matcher.SeedHostMatcher')
     def test_match_all_hosts(self, mock_matcher_class):
         """Test backward compatible match_all_hosts function."""
-        from e3SIM_codes.seed_host_matcher import match_all_hosts
+        from seed_host_matcher import match_all_hosts
         
         mock_network = Mock()
         mock_matcher = Mock()
@@ -660,10 +660,10 @@ class TestBackwardCompatibility:
         mock_matcher.match_all_seeds.assert_called_once()
         assert result == {0: 3, 1: 2}
     
-    @patch('e3SIM_codes.seed_host_matcher.FileManager')
+    @patch('seed_host_matcher.FileManager')
     def test_write_match(self, mock_file_manager):
         """Test backward compatible write_match function."""
-        from e3SIM_codes.seed_host_matcher import write_match
+        from seed_host_matcher import write_match
         
         match_dict = {0: 3, 1: 2}
         wk_dir = "/test/dir"
@@ -674,10 +674,10 @@ class TestBackwardCompatibility:
         mock_file_manager.save_matching_csv.assert_called_once_with(match_dict, expected_path)
         assert result == expected_path
     
-    @patch('e3SIM_codes.seed_host_matcher.FileManager')
+    @patch('seed_host_matcher.FileManager')
     def test_read_network_compat(self, mock_file_manager):
         """Test backward compatible read_network function."""
-        from e3SIM_codes.seed_host_matcher import read_network
+        from seed_host_matcher import read_network
         
         mock_network = Mock()
         mock_file_manager.read_network.return_value = mock_network
@@ -687,10 +687,10 @@ class TestBackwardCompatibility:
         mock_file_manager.read_network.assert_called_once_with("test.adjlist")
         assert result == mock_network
     
-    @patch('e3SIM_codes.seed_host_matcher.FileManager')
+    @patch('seed_host_matcher.FileManager')
     def test_read_user_matchingfile(self, mock_file_manager):
         """Test backward compatible read_user_matchingfile function."""
-        from e3SIM_codes.seed_host_matcher import read_user_matchingfile
+        from seed_host_matcher import read_user_matchingfile
         
         mock_matching = {0: 3}
         mock_file_manager.read_user_matching_file.return_value = mock_matching
