@@ -8,8 +8,11 @@ import pandas as pd
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+curr_dir = os.path.dirname(__file__)
+e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
+if e3SIM_dir not in sys.path:
+    sys.path.insert(0, e3SIM_dir)
+    
 # Assuming the main module is named seed_host_match.py
 from seed_host_matcher import (
     NetworkPreprocessor,

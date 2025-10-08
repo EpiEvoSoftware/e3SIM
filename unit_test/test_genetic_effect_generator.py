@@ -8,8 +8,11 @@ from unittest.mock import Mock, patch, MagicMock, mock_open
 import json
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+curr_dir = os.path.dirname(__file__)
+e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
+if e3SIM_dir not in sys.path:
+    sys.path.insert(0, e3SIM_dir)
+    
 # Import the modules to test
 # Note: Adjust these imports based on your actual module structure
 from genetic_effect_generator import (

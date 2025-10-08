@@ -8,7 +8,12 @@ import subprocess
 import tskit
 import pyslim
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+curr_dir = os.path.dirname(__file__)
+e3SIM_dir = os.path.join(curr_dir, '../e3SIM_codes')
+if e3SIM_dir not in sys.path:
+    sys.path.insert(0, e3SIM_dir)
 
 from seed_generator import SeedConfig, VCFHandler, PhylogenyHandler,SimulationRunner, SeedGenerator
 from error_handling import CustomizedError
