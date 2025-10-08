@@ -7,8 +7,8 @@ from unittest.mock import patch, mock_open
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from e3SIM_codes.network_generator import BaseNetworkGenerator, ERGenerator, RPGenerator, BAGenerator, UserInputGenerator
-from e3SIM_codes.error_handling import CustomizedError
+from network_generator import BaseNetworkGenerator, ERGenerator, RPGenerator, BAGenerator, UserInputGenerator
+from error_handling import CustomizedError
 # ==================== UNIT TESTS ====================
 
 class TestBaseNetworkGenerator:

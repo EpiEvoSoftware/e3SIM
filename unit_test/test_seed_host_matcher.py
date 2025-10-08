@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch, MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Assuming the main module is named seed_host_match.py
-from e3SIM_codes.seed_host_matcher import (
+from seed_host_matcher import (
     NetworkPreprocessor,
     HostMatcher,
     SeedHostMatcher,

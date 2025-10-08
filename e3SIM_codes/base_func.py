@@ -1,5 +1,5 @@
 import json, os, argparse
-from e3SIM_codes.error_handling import CustomizedError
+from error_handling import CustomizedError
 from Bio import SeqIO
 
 def recursive_update(default, user):

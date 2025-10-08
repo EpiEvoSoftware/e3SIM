@@ -18,10 +18,10 @@ import numpy as np
 from pathlib import Path
 import json
 import logging
-# from epievosoftware.original_pipeline.e3SIM_codes.post_simulation_func import plot_per_transmission_tree, plot_strain_distribution_trajectory, plot_SEIR_trajectory, run_per_data_processing
-from e3SIM_codes.post_simulation_func import *
-from e3SIM_codes.error_handling import CustomizedError
-from e3SIM_codes.base_func import *
+# from epievosoftware.original_pipeline.post_simulation_func import plot_per_transmission_tree, plot_strain_distribution_trajectory, plot_SEIR_trajectory, run_per_data_processing
+from post_simulation_func import *
+from error_handling import CustomizedError
+from base_func import *
 
 
 # ========================= Enums and Constants =========================

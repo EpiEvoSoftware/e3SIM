@@ -2,7 +2,7 @@ from tkinter import messagebox
 import os
 import shutil
 import sys
-from e3SIM_codes.outbreak_simulator import *
+from outbreak_simulator import *
 from utils import (load_config_as_dict, save_config, no_validate_update, 
                    TabBase, EasyCombobox, EasyRadioButton, EasyEntry, EasyButton)
 

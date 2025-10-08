@@ -4,7 +4,7 @@ from utils import load_config_as_dict, save_config, CreateToolTip
 import json
 import networkx as nx
 import os
-from e3SIM_codes.network_generator import *
+from network_generator import *
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt

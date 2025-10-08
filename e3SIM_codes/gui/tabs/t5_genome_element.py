@@ -5,7 +5,7 @@ import json
 from utils import (load_config_as_dict, save_config, no_validate_update_val, no_validate_update,
                    TabBase, GroupControls, EasyPathSelector, EasyTitle, EasyCombobox,
                    EasyRadioButton, EasyButton, EasyEntry, EasyLabel, CreateToolTip)
-from e3SIM_codes.genetic_effect_generator import *
+from genetic_effect_generator import *
 
 class GenomeElement(TabBase):
     def _ensure_scrollable_t5(self):

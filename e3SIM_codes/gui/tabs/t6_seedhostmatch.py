@@ -13,7 +13,7 @@ matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.lines import Line2D
-from e3SIM_codes.seed_host_matcher import *
+from seed_host_matcher import *
 
 
 class ScrollableFrame(ttk.Frame):

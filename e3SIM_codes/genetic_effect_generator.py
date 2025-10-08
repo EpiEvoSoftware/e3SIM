@@ -1,5 +1,5 @@
-from e3SIM_codes.base_func import *
-from e3SIM_codes.error_handling import CustomizedError
+from base_func import *
+from error_handling import CustomizedError
 import numpy as np
 import ast
 import pandas as pd

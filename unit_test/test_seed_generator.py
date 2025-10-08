@@ -10,8 +10,8 @@ import pyslim
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from e3SIM_codes.seed_generator import SeedConfig, VCFHandler, PhylogenyHandler,SimulationRunner, SeedGenerator
-from e3SIM_codes.error_handling import CustomizedError
+from seed_generator import SeedConfig, VCFHandler, PhylogenyHandler,SimulationRunner, SeedGenerator
+from error_handling import CustomizedError
 
 # ==================== Test SeedConfig ====================
 
@@ -189,7 +189,7 @@ class TestPhylogenyHandler:
         expected_path = os.path.join(str(tmp_path), "seeds_phylogeny.txt")
         assert phylo_handler.tree_path == expected_path
     
-    @patch('e3SIM_codes.seed_generator.Tree')
+    @patch('seed_generator.Tree')
     @patch('shutil.copyfile')
     def test_copy_input_valid(self, mock_copy, mock_tree, phylo_handler, tmp_path):
         """Test copying valid phylogeny input"""
@@ -215,7 +215,7 @@ class TestPhylogenyHandler:
                 os.path.join(phylo_handler.wk_dir, "seeds.nwk")
             )
     
-    @patch('e3SIM_codes.seed_generator.Tree')
+    @patch('seed_generator.Tree')
     def test_copy_input_invalid_tips(self, mock_tree, phylo_handler):
         """Test copying phylogeny with invalid tip labels"""
         source_path = "/path/to/phylogeny.nwk"
@@ -237,7 +237,7 @@ class TestPhylogenyHandler:
         with pytest.raises(CustomizedError, match="doesn't exist"):
             phylo_handler.copy_input("/non/existent/path.nwk")
     
-    @patch('e3SIM_codes.seed_generator.Tree')
+    @patch('seed_generator.Tree')
     def test_scale_tree_rooted(self, mock_tree, phylo_handler, tmp_path):
         """Test scaling a rooted tree"""
         mock_tree_instance = Mock()
@@ -257,7 +257,7 @@ class TestPhylogenyHandler:
         assert mock_node2.dist == 5.0
         mock_tree_instance.write.assert_called_once()
     
-    @patch('e3SIM_codes.seed_generator.Tree')
+    @patch('seed_generator.Tree')
     def test_scale_tree_unrooted(self, mock_tree, phylo_handler):
         """Test scaling an unrooted tree raises error"""
         mock_tree_instance = Mock()

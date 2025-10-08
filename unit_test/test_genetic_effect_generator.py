@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 # Import the modules to test
 # Note: Adjust these imports based on your actual module structure
-from e3SIM_codes.genetic_effect_generator import (
+from genetic_effect_generator import (
     GeneticEffectConfig,
     EffectGenerator,
     CustomizedError,
@@ -173,9 +173,9 @@ class TestEffectGenerator:
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
     
-    @patch('e3SIM_codes.genetic_effect_generator.EffectGenerator._read_gff_sites')
-    @patch('e3SIM_codes.genetic_effect_generator.EffectGenerator._compute_seed_traits')
-    @patch('e3SIM_codes.genetic_effect_generator.EffectGenerator._write_outputs')
+    @patch('genetic_effect_generator.EffectGenerator._read_gff_sites')
+    @patch('genetic_effect_generator.EffectGenerator._compute_seed_traits')
+    @patch('genetic_effect_generator.EffectGenerator._write_outputs')
     def test_run_successful(self, mock_write, mock_compute, mock_read_gff):
         """Test successful run of effect generator"""
         mock_read_gff.return_value = [100, 200, 300]
@@ -501,7 +501,7 @@ class TestEffsizeGenerationByConfig:
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
     
-    @patch('e3SIM_codes.genetic_effect_generator.EffectGenerator.run')
+    @patch('genetic_effect_generator.EffectGenerator.run')
     def test_effsize_generation_byconfig_success(self, mock_run):
         """Test successful generation from config"""
         mock_run.return_value = None
@@ -539,7 +539,7 @@ class TestIntegration:
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
     
-    @patch('e3SIM_codes.genetic_effect_generator.EffectGenerator._read_gff_sites')
+    @patch('genetic_effect_generator.EffectGenerator._read_gff_sites')
     def test_complete_workflow_gff(self, mock_read_gff):
         """Test complete workflow with GFF method"""
         mock_read_gff.return_value = list(range(100, 200))

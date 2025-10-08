@@ -1,11 +1,11 @@
 ### The main script to run the whole pipeline
 import argparse, sys
 from base_func import *
-from e3SIM_codes.network_generator import network_generation_byconfig
+from network_generator import network_generation_byconfig
 from seed_generator import seeds_generation_byconfig
-from e3SIM_codes.genetic_effect_generator import effsize_generation_byconfig
-from e3SIM_codes.seed_host_matcher import read_config_and_match
-from e3SIM_codes.outbreak_simulator import all_slim_simulation_by_config
+from genetic_effect_generator import effsize_generation_byconfig
+from seed_host_matcher import read_config_and_match
+from outbreak_simulator import all_slim_simulation_by_config
 
 header = r"""
 
