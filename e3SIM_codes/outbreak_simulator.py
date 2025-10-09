@@ -317,7 +317,7 @@ class GenomeElement:
                         f"as number of transmissibility traits ({self.traits_num["transmissibility"]})"
                 )
             if param =="alpha_drug":
-                if len(values) != self.traits_num["transmissibility"]:
+                if len(values) != self.traits_num["drug_resistance"]:
                     raise CustomizedError(
                         f"{param} {values} must have the same length "
                         f"as number of drug_resistance traits ({self.traits_num["drug_resistance"]})"
@@ -789,9 +789,10 @@ class SimulationRunner:
         if result.returncode != 0:
             print(f"SLiM failed for run {run_id}: {result.stderr.decode()}", flush = True)
             return False
-        
+   
         # Check for output
         sample_path = output_dir / "sample.csv.gz"
+
         return sample_path.exists()
     
     def _get_seed_for_run(self, run_id: int) -> Optional[int]:
@@ -978,13 +979,16 @@ class SimulationOrchestrator:
             # self.post_processor.process_all_results([1])
             
             print("Simulation pipeline completed successfully", flush = True)
-            
-        except Exception as e:
-            raise CustomizedError(f"Simulation pipeline failed: {e}")
 
-        print("******************************************************************** \n" + 
+            print("******************************************************************** \n" + 
           "                FINISHED. THANK YOU FOR USING.					    \n" + 
           "********************************************************************", flush = True)
+
+            return None
+            
+        except Exception as e:
+            print(f"Simulation pipeline failed: {e}")
+            return e
     
     def _generate_parameter_file(self):
         """Generate SLiM parameter file."""
@@ -1065,6 +1069,18 @@ class SimulationOrchestrator:
 
     def _print_list_no_space(self, lst):
         return ",".join(str(x) for x in lst)
+
+# ======================== Config-based Interface ================= 
+def all_slim_simulation_by_config(all_config):
+    try:
+        orchestrator = SimulationOrchestrator(all_config)
+    except Exception as e:
+        return e
+
+    error = orchestrator.run()
+
+    return error
+
 
 # ========================= CLI Interface =========================
 

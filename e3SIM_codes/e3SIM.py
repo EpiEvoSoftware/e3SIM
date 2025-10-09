@@ -50,7 +50,7 @@ def main():
     _exit(error)
 
     ## Seed-host match
-    error = read_config_and_match(param_dict) ######## UNIFINISHED
+    error = read_config_and_match(param_dict)
     _exit(error)
 
     ## Simulation
