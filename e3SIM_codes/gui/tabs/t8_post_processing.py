@@ -190,7 +190,9 @@ class PostProcessing(TabBase):
         cwdir = config["BasicRunConfiguration"]["cwdir"]
         target = os.path.join(cwdir, "config_file.json")
         try:
-            create_slim_config(config)
+            # create_slim_config(config)
+            orchestrator = SimulationOrchestrator(self.config_path)
+            orchestrator.initialize() # generate slim config
             messagebox.showinfo("Configuration check Passed.")
         except IOError as e:
             print("Errors checking configuration: %s" % e)
