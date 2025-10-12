@@ -275,6 +275,8 @@ class GenomeElement:
     alpha_drug: list[int | float]
     causal_gene_path: Path
 
+    DEFAULT_ALPHA = 0.405
+
     def __post_init__(self):
         print("Checking \"GenomeElement\"...... ", flush = True)
         if not Path(self.ref_path).exists():
@@ -297,7 +299,7 @@ class GenomeElement:
         print("\"GenomeElement\" Checked. ", flush = True)
 
         for param in ("alpha_trans", "alpha_drug"):
-            value = getattr(self, param)
+            # value = getattr(self, param)
             # try:
             #     ConfigValidator.validate_integer(value, param)
             # except CustomizedError:
@@ -311,13 +313,21 @@ class GenomeElement:
                 raise CustomizedError(f"({param}) has to be a list []")
 
             if param =="alpha_trans":
-                if len(values) != self.traits_num["transmissibility"]:
+                if len(values) == 0:
+                    self.param = [DEFAULT_ALPHA for i in range(self.traits_num["transmissibility"])]
+                    print(f"Warning: The link scale slope is not specified for transmissibility traits"
+                        f"Will use default values {DEFAULT_ALPHA}")
+                elif len(values) != self.traits_num["transmissibility"]:
                     raise CustomizedError(
                         f"{param} {values} must have the same length "
                         f"as number of transmissibility traits ({self.traits_num["transmissibility"]})"
                 )
             if param =="alpha_drug":
-                if len(values) != self.traits_num["drug_resistance"]:
+                if len(values) == 0:
+                    self.param = [DEFAULT_ALPHA for i in range(self.traits_num["drug_resistance"])]
+                    print(f"Warning: The link scale slope is not specified for drug-resistance traits"
+                        f"Will use default values {DEFAULT_ALPHA}")
+                elif len(values) != self.traits_num["drug_resistance"]:
                     raise CustomizedError(
                         f"{param} {values} must have the same length "
                         f"as number of drug_resistance traits ({self.traits_num["drug_resistance"]})"

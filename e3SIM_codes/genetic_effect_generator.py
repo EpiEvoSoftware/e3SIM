@@ -15,8 +15,12 @@ GFF_START = 3
 GFF_END = 4
 GFF_INFO = 8
 
-DEFAULT_R = 1.0  # Default odds ratio / hazard ratio per SD
+DEFAULT_R_OHR = 1.5  # Default odds ratio / transmisison hazard ratio per SD
+DEFAULT_R_CLR = 0.667  # Default clearance ratio per SD
 DEFAULT_VTGT = 1.0 # Default target variance for calibrating effect sizes
+DEFAULT_MU = 0.003
+EXP_BETAPRIOR = 1.0 / 6.0 # Expected allele frequency
+
 
 
 # ------------- Genetic Effect Configuration ----------------------- #
@@ -35,9 +39,9 @@ class GeneticEffectConfig:
     def validate(self):
         if not os.path.exists(self.wk_dir):
             raise CustomizedError(f"Working directory {self.wk_dir} does not exist.")
-        if self.method not in ("csv", "gff"):
+        if self.method not in ("user_input", "randomly_generate"):
             raise CustomizedError(f"{self.method} isn't a valid method. Please provide a permitted method. "
-                            "(csv/gff)")
+                            "(user_input/randomly_generate)")
         if self.num_init_seq <= 0:
             raise CustomizedError("Seed size must be positive.")
         if len(self.trait_num.keys()) != 2:
@@ -47,22 +51,29 @@ class GeneticEffectConfig:
         # if self.func not in ("n", "l", "st"):
         #     raise CustomizedError(f"{self.func} isn't a valid method for sampling effect sizes. Please choose a permitted method."
         #                         "(n/l/st)")
-        if self.method=="gff":
-            if self.params.get("site_method") not in ("p", "n"):
-                raise CustomizedError(f"{self.params.get("site_method")} isn't a valid method for resampling causal sites. Please choose a permitted method."
-                                "(n/p)")
-            if self.params.get("site_method") == "p":
-                if len(self.params.get("pis")) != sum(self.trait_num.values()):
-                    raise CustomizedError("If you wish to sample causal sites from the candidate region using Bernoulli trials, "
-                        f"Please provide the success probability list (-pis) with the same length as your trait quantities({sum(self.trait_num.values())})")
-                if any(x < 0 or x > 1 for x in self.params.get("pis")):
-                    raise CustomizedError("The success probability for causal site sampling has to be within [0, 1].")
-            elif self.params.get("site_method")=="n":
-                if len(self.params.get("Ks")) != sum(self.trait_num.values()):
-                    raise CustomizedError("If you wish to sample causal sites from the candidate region using specified numbers by uniform sampling, "
-                        f"Please provide the causal site number list (-Ks) with the same length as your trait quantities({sum(self.trait_num.values())})")
-                if any(type(x)!=int for x in self.params["Ks"]):
-                    raise CustomizedError("The number of sites for traits has to be an integer.")
+        if self.method=="randomly_generate":
+            # if self.params.get("site_method") not in ("p", "n"):
+            #     raise CustomizedError(f"{self.params.get("site_method")} isn't a valid method for resampling causal sites. Please choose a permitted method."
+            #                     "(n/p)")
+            if self.params.get("site_frac") == []:
+                self.params["site_frac"] = [DEFAULT_MU for i in range(sum(self.trait_num.values()))]
+            if len(self.params.get("site_frac")) != sum(self.trait_num.values()):
+                raise CustomizedError("If you wish to sample causal sites from the candidate regions, "
+                        f"Please provide the expected fraction of causal sites for each trait (-site_frac) with the same length as your trait quantities({sum(self.trait_num.values())})")
+            if any(x < 0 or x > 1 for x in self.params.get("site_frac")):
+                raise CustomizedError("The expected fraction for causal site sampling has to be within (0, 1).")
+            if self.params.get("site_disp") < 0:
+                raise CustomizedError("The dispersion of causal site fraction (-site_disp) has to be positive")
+            # elif self.params.get("site_method")=="n":
+            #     if len(self.params.get("Ks")) != sum(self.trait_num.values()):
+            #         raise CustomizedError("If you wish to sample causal sites from the candidate region using specified numbers by uniform sampling, "
+            #             f"Please provide the causal site number list (-Ks) with the same length as your trait quantities({sum(self.trait_num.values())})")
+            #     if any(type(x)!=int for x in self.params["Ks"]):
+            #         raise CustomizedError("The number of sites for traits has to be an integer.")
+
+            if self.params.get("func") not in ("n", "l", "st"):
+                raise CustomizedError(f"{self.params.get("func")} isn't a valid method for sampling effect sizes. Please choose a permitted method."
+                                 "(n/l/st) for -func")
 
         
             if self.params.get("func") == "n" and len(self.params.get("taus")) != sum(self.trait_num.values()):
@@ -80,7 +91,11 @@ class GeneticEffectConfig:
                 raise CustomizedError(f"If you would like to calibrate the link-scale slope,"
                             f" -link value needs to be either 'logit' or 'cloglog'.")
             if self.params.get("Rs") == []:
-                self.params["Rs"] = np.full(sum(self.trait_num.values()), DEFAULT_R)
+                if self.params.get("link") == "logit":
+                    self.params["Rs"] = np.full(sum(self.trait_num.values()), DEFAULT_R_OHR)
+                if self.params.get("link") == "cloglog":
+                    self.params["Rs"] = np.concatenate([np.full(self.trait_num["transmissibility"], DEFAULT_R_OHR), 
+                        np.full(self.trait_num["drug_resistance"], DEFAULT_R_CLR)])
             elif len(self.params.get("Rs")) != sum(self.trait_num.values()):
                 raise CustomizedError("If you wish to provide a odds ratio / hazard ratio per SD for calibration"
                     f"Please provide a list with the same length as your trait quantities({sum(self.trait_num.values())})")
@@ -99,7 +114,9 @@ class EffectGenerator:
         try:
             self.cfg.validate()
             df_eff = self._build_effect_df()
+            print("Effect sizes sampled!")
             seeds, seeds_state = self._compute_seed_traits(df_eff)
+            print("Seeding sequences' traits calculated!")
             df_eff = self._rename_columns(df_eff)
             if self.cfg.calibration:
                 if self.cfg.params.get("var_target") == []:
@@ -108,8 +125,12 @@ class EffectGenerator:
                     raise CustomizedError("If you wish to provide a target variance for calibration"
                             f"Please provide a list with the same length as your trait quantity {sum(self.cfg.trait_num.values())}")
                 df_eff, em_var = self._calibrate(df_eff, seeds_state)
-                if self.cfg.params.get("calibration_link"):
-                    calibrated_alphas = self._calibrate_linkslope(self.cfg.params.get("Rs"), self.cfg.params.get("link"), em_var, self.cfg.trait_num)
+                seeds, seeds_state = self._compute_seed_traits(df_eff)
+                print("Effect sizes calibrated and seeding sequences' traits recalculated!")
+            if self.cfg.params.get("calibration_link"):
+                if not self.cfg.calibration:
+                    em_var = self._variance_calc(df_eff, seeds_state)
+                calibrated_alphas = self._calibrate_linkslope(self.cfg.params.get("Rs"), self.cfg.params.get("link"), em_var, self.cfg.trait_num)
 
             seeds_named = self._rename_columns(seeds)
             self._write_outputs(df_eff, seeds_named)
@@ -126,17 +147,84 @@ class EffectGenerator:
         
     # ---------- Build effect df ----------
     def _build_effect_df(self) -> pd.DataFrame:
-        if self.cfg.method == "gff":
-            candidates = self._read_gff_sites()
-            df_sites = self._select_sites(candidates, self.cfg.params["site_method"], self.cfg.params.get("pis"), self.cfg.params.get("Ks"))
+        if self.cfg.method == "randomly_generate":
+            # candidates = self._read_gff_sites()
+            candidates = self._read_candregion_csv()
+            df_sites = self._select_sites(candidates, self.cfg.params.get("site_frac"), self.cfg.params.get("site_disp"))
+            print("Causal sites selected!")
             return self._sample(df_sites)
-        elif self.cfg.method == "csv":
+        elif self.cfg.method == "user_input":
             df = self._read_effsize_csv()
             return(df)
         else:
             raise CustomizedError("method must be 'gff' or 'csv'")
 
     # ---------- IO ----------
+    def _read_candregion_csv(self):
+        """
+        Returns causal sites provided by the csv file
+        """
+        csv_path = self.cfg.params.get("csv")
+        if not os.path.exists(csv_path):
+            raise CustomizedError(
+                f"The provided candidate genomic region file '{csv_path}' does not exist."
+            )
+
+        df = pd.read_csv(csv_path)
+        num_all_traits = (
+            self.cfg.trait_num["transmissibility"] + self.cfg.trait_num["drug_resistance"]
+        )
+
+        if df.shape[0] == 0:
+            print(
+                "WARNING: No causal sites were detected from the imported CSV file. "
+                "Please check your CSV file if this is not desired, or use the non-genetic option in OutbreakSimulator.",
+                flush=True,
+            )
+
+        # Need: at least 2 columns for [start, end] + one column per trait
+        if num_all_traits > df.shape[1] - 2:
+            raise CustomizedError(
+                f"The number of traits in the provided candidate regions CSV '{csv_path}' "
+                f"isn't sufficient for the required number of traits '{self.cfg.trait_num}'."
+            )
+
+        # Ensure numeric
+        df.iloc[:, 0] = pd.to_numeric(df.iloc[:, 0], errors="raise")
+        df.iloc[:, 1] = pd.to_numeric(df.iloc[:, 1], errors="raise")
+
+        cand_causal_sites = {i: [] for i in range(num_all_traits)}
+
+        # For each row (region), expand [start, end] to the list of sites
+        for i in range(df.shape[0]):
+            start = int(df.iat[i, 0])
+            end = int(df.iat[i, 1])
+            if end < start:
+                # swap or skip; here we swap and warn
+                start, end = end, start
+                print(f"WARNING: swapped start/end in row {i} (end < start).", flush=True)
+            this_range = list(range(start, end + 1))  # inclusive end
+
+            # For each trait column j (0-based), check indicator in column j+2
+            for j in range(num_all_traits):
+                val = df.iat[i, j + 2]
+                try:
+                    flag = float(val) > 0
+                except Exception:
+                    flag = False
+                if flag:
+                    cand_causal_sites[j].extend(this_range)
+
+        # Deduplicate & sort for stability
+        for j in cand_causal_sites:
+            cand_causal_sites[j] = sorted(set(cand_causal_sites[j]))
+
+        return cand_causal_sites
+
+        
+
+
+
     def _read_gff_sites(self):
         """
         Returns causal sites provided by the gff.
@@ -179,6 +267,9 @@ class EffectGenerator:
             just_read = just_read.iloc[:, :self.cfg.trait_num["transmissibility"] + self.cfg.trait_num["drug_resistance"] + 1]
         just_read.columns = sum([["Sites"], 
                          [f"trait_{i}" for i in range(self.cfg.trait_num["transmissibility"] + self.cfg.trait_num["drug_resistance"])]], [])
+        if just_read.shape[0] == 0:
+            print("WARNING: No causal sites were detected from the imported CSV file."
+                "Please check your CSV file if this is not a desired situation or use the non-genetic option in OutbreakSimulator.")
         return just_read
 
         
@@ -191,49 +282,82 @@ class EffectGenerator:
         seeds.to_csv(os.path.join(self.cfg.wk_dir, "seeds_trait_values.csv"), index = False)
     
     # ---------- Selection & redo ----------
-    def _select_sites(self, candidates, method, pis, Ks):
+    def _select_sites(self, candidates, frac=0.003, dispersion=100):
         """
         Returns causal sites chosen from the regions
 
         Parameters:
-            candidates (list[int]): Candidate causal sites.
-            pis (list[float]): A list of pis for Bernoulli trials for each trait.
+            candidates (dict[int: list[int]]): Candidate causal sites.
+            frac (list[float]): Expected fraction of causal sites within the candidate regions (mu_i)
+            dispersion (float): Prior dispersion of site fraction
         """
-        sites_num = len(candidates)
-        cand_array = np.array(candidates)
+        # First do permutation:
+        trait_ids = list(candidates.keys())
+        # Normalize frac to a dict per trait
+        if isinstance(frac, (float, int)):
+            mu = {tid: float(frac) for tid in trait_ids}
+        elif isinstance(frac, list):
+            if len(frac) != len(trait_ids):
+                raise CustomizedError("Length of 'frac' must match number of traits.")
+            mu = {tid: float(frac[k]) for k, tid in enumerate(trait_ids)}
+        elif isinstance(frac, dict):
+            mu = {tid: float(frac[tid]) for tid in trait_ids}
+        else:
+            raise CustomizedError("Unsupported type for 'frac'.")
 
-        # Sample sites for each trait
-        trait_sites = []
-        if method=="p":
-            for pi in pis:
-                # Bernoulli trials: 1 if selected, 0 if not
-                selected = scipy.stats.bernoulli.rvs(pi, size=sites_num).astype(bool)
-                trait_sites.append(cand_array[selected])
-        elif method=="n":
-            for k in Ks:
-                if k > sites_num:
-                    raise CustomizedError(f"You required a causal site quantity {k} that is larger than the candidate site list {sites_num}. Please consider using a smaller k.")
-                # Sample Ki sites for each trait i
-                selected = np.random.choice(sites_num, k, replace=False)
-                trait_sites.append(cand_array[selected])
-        
-        # Get unique sites across all traits
-        all_sites = np.concatenate(trait_sites) if trait_sites else np.array([])
-        unique_sites = np.unique(all_sites)
-        
-        if len(unique_sites) == 0:
-            print("WARNING: No causal sites were drawn from the candidate sites. "
-                "It's recommended to consider increasing the Bernoulli trial parameter Pis "
-                "and rerun the program if this is not a demanded behavior", flush=True)
-        
-        # Build DataFrame
-        df_out = pd.DataFrame({'Sites': unique_sites})
-        
-        # Mark which traits each site affects
-        for i, trait_site_list in enumerate(trait_sites):
-            df_out[f'trait_{i}'] = df_out['Sites'].isin(trait_site_list).astype(int)
-        
-        df_out.sort_values(by='Sites', inplace=True)
+        permuted = list(np.random.permutation(trait_ids))
+
+        already_selected = set()
+        trait_sites = {tid: [] for tid in trait_ids}
+
+        for tid in permuted:
+            # Available candidates after excluding sites already used by previous traits
+            available = sorted(set(candidates[tid]) - already_selected)
+            sites_num = len(available)
+
+            if sites_num == 0:
+                print(
+                    f"WARNING: No available candidate sites remain for trait {tid}; skipping.",
+                    flush=True,
+                )
+                continue
+
+            # Beta–Binomial draw for K_i
+            a_i = mu[tid] * dispersion
+            b_i = (1.0 - mu[tid]) * dispersion
+            # Guard against invalid a/b if mu is 0 or 1
+            a_i = max(a_i, 1e-12)
+            b_i = max(b_i, 1e-12)
+            pi_i = float(np.random.beta(a_i, b_i))
+
+            # Draw until K_i >= 1
+            K_i = 0
+            while K_i == 0:
+                K_i = int(np.random.binomial(sites_num, pi_i))
+
+            # Sample indices without replacement
+            if K_i >= sites_num:
+            # Use all available, warn if capped
+                if K_i > sites_num:
+                    print(
+                        f"WARNING: Drawn K_i={K_i} exceeds available={sites_num} for trait {tid}; using all available.",
+                        flush=True,
+                    )
+                selected_idx = list(range(sites_num))
+            else:
+                selected_idx = np.random.choice(sites_num, K_i, replace=False).tolist()
+
+            chosen = [available[k] for k in selected_idx]
+            trait_sites[tid] = chosen
+            already_selected.update(chosen)
+
+        # Build tidy DataFrame of unique sites and trait indicators
+        all_sites = sorted(already_selected)
+        df_out = pd.DataFrame({"Sites": all_sites})
+
+        for tid, site_list in trait_sites.items():
+            df_out[f"trait_{tid}"] = df_out["Sites"].isin(site_list).astype(int)
+
         return df_out
 
     # ---------- Sampling (uni or MV) ----------
@@ -369,21 +493,18 @@ class EffectGenerator:
             return df_out, df_AF # seed X trait, site X seed
 
 
-    def _calibrate(self, df_eff: pd.DataFrame, seeds_state: pd.DataFrame) -> pd.DataFrame:
+    def _variance_calc(self, df_eff: pd.DataFrame, seeds_state: pd.DataFrame) -> pd.Series:
         """
-        Optional calibration placeholder.
+        Calculate the empirical seeding population trait variances.
+        0 variance will be fixed using uniform beta prior
 
         Parameters:
             df_eff (dataframe): Uncalibrated effect size data frame
             seeds_state (dataframe): df_AF, mutation state of the seeds
 
         Returns
-            df_eff_calibrated : pd.DataFrame
-            Calibrated effect sizes with the same structure as df_eff.
             var_empirical : pd.Series
-            Empirical variance of each trait before calibration.
         """
-        # Extract numeric parts (exclude site identifiers)
         geno = seeds_state.iloc[:, 1:].to_numpy(dtype=float)  # (n_sites, num_init_seqs)
         eff = df_eff.iloc[:, 1:].to_numpy(dtype=float)        # (n_sites, n_traits)
 
@@ -397,6 +518,31 @@ class EffectGenerator:
         # Empirical variance of each trait
         var_empirical = (center_trait ** 2).sum(axis=0) / (geno.shape[1] - 2)
         var_empirical = pd.Series(var_empirical, index=df_eff.columns[1:])
+
+
+        for col in var_empirical.index:
+            if np.isclose(var_empirical.loc[col], 0.0):
+                var_empirical.loc[col] = df_eff[col].pow(2).sum() * EXP_BETAPRIOR
+
+        return var_empirical
+
+
+
+    def _calibrate(self, df_eff: pd.DataFrame, seeds_state: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calibration of effect sizes
+
+        Parameters:
+            df_eff (dataframe): Uncalibrated effect size data frame
+            seeds_state (dataframe): df_AF, mutation state of the seeds
+
+        Returns
+            df_eff_calibrated : pd.DataFrame
+            Calibrated effect sizes with the same structure as df_eff.
+            var_empirical : pd.Series
+            Empirical variance of each trait before calibration.
+        """
+        var_empirical = _variance_calc(df_eff, seeds_state)
 
         # Target variances
         var_target = np.array(self.cfg.params["var_target"], dtype=float)
@@ -450,13 +596,14 @@ class EffectGenerator:
         trait_num: Dictionary of the number of traits
 
         """
+
         SD_em = np.sqrt(var_em)
         SD_safe = np.where(SD_em > 0, SD_em, np.nan)
 
         trans_num = trait_num["transmissibility"]
         drug_num = trait_num["drug_resistance"]
 
-            # Base slope computation
+        # Base slope computation
         if link_type == "logit":
             alphas = np.log(Rs) / SD_safe
         elif link_type == "cloglog":
@@ -476,11 +623,11 @@ class EffectGenerator:
 
         for i, val in enumerate(alpha_trans):
             label = f"transmissibility_{i+1}"
-            print(f"  {label}: {'NA' if np.isnan(val) else f'{val:.4f}'}")
+            print(f"  {label}: {0 if np.isnan(val) else f'{val:.4f}'}")
 
         for i, val in enumerate(alpha_drug):
             label = f"drug_resistance_{i+1}"
-            print(f"  {label}: {'NA' if np.isnan(val) else f'{val:.4f}'}")
+            print(f"  {label}: {0 if np.isnan(val) else f'{val:.4f}'}")
 
         
         if np.all(np.isfinite(alpha_trans)) and np.all(np.isfinite(alpha_drug)):
@@ -500,10 +647,10 @@ class EffectGenerator:
             print(config_json)
             return config_json
 
-        else:
-            print('TIPS: slopes shown as "NA" will have to be specified manually since slope calibration failed for those traits.\
-                Please write non-NA values into your configuration file under the "trait_prob_link" key')
-            return({})
+        # if np.any(alpha_trans==0 or alpha_drug==0):
+        #     print('TIPS: slopes shown as "0.0000" represents mono\
+        #         Please write non-NA values into your configuration file under the "trait_prob_link" key')
+            # return({})
 
 
 
@@ -530,7 +677,7 @@ def effsize_generation_byconfig(all_config):
             calibration = genetic_config["effect_size"]["calibration"]["do_calibration"],
             random_seed = random_seed,
             csv = genetic_config["effect_size"]["filepath"]["csv_path"],
-            gff = genetic_config["effect_size"]["filepath"]["gff_path"],
+            # gff = genetic_config["effect_size"]["filepath"]["gff_path"],
             trait_num = genetic_config["traits_num"],
             pis = genetic_config["effect_size"]["causalsites_params"]["pis"],
             Ks = genetic_config["effect_size"]["causalsites_params"]["Ks"],
@@ -556,31 +703,36 @@ def effsize_generation_byconfig(all_config):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate or modify seeds.')
-    parser.add_argument('-method', action='store',dest='method', type=str, required=True, help="Method of the genetic element file generation, using csv or gff")
+    parser.add_argument('-method', action='store',dest='method', type=str, choices=['user_input', 'randomly_generate'], required=True, help="Method of the genetic element file generation, using csv or gff")
     parser.add_argument('-wkdir', action='store',dest='wkdir', type=str, required=True, help="Working directory")
-    parser.add_argument('-csv', action='store',dest='csv', type=str, required=False, help="Path to the user-provided effect size genetic element csv file", default="")
-    parser.add_argument('-gff', action='store',dest='gff', type=str, required=False, help='Path to the gff file', default="")
+    parser.add_argument('-csv', action='store',dest='csv', type=str, required=True, help="Path to the user-provided effect size genetic element csv file", default="")
+    # parser.add_argument('-gff', action='store',dest='gff', type=str, required=False, help='Path to the gff file', default="")
     parser.add_argument('-trait_n', action='store', dest='trait_n', type=ast.literal_eval, required=True, 
         help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
     # parser.add_argument('-redo', action='store',dest='redo', type=str, required=False, default="sites", help="Which steps to redo in the effect size generating process (sites/effsize/none)")
     parser.add_argument('-func', action='store',dest='func', type=str, required=False, help="Function to generate the effect sizes given causal sites. (n/l/st)")
     # parser.add_argument('-pleiotropy', action='store',dest='pleiotropy', type=str2bool, required=False, help="Whether to do pleiotropy", default=False)
-    parser.add_argument('-site_method', action='store',dest='site_method', type=str, required=False, help="Method to sample causal site, by probability (p) or by number of sites (n)", default="p")
-    parser.add_argument('-pis','--pis', nargs='+', help='The probability of the Bernoulli trials for each candidate sites for each trait. Should be a float list with the same length of the number of traits in total. Required when site_method=p.', required=False, type=float, default=[])
-    parser.add_argument('-Ks','--Ks', nargs='+', help='The number of causal sites for each trait. Should be a integer list with the same length of the number of traits in total. Required when site_method=n.', required=False, type=int, default=[])
+    # parser.add_argument('-site_method', action='store',dest='site_method', type=str, required=False, help="Method to sample causal site, by probability (p) or by number of sites (n)", default="p")
+    parser.add_argument('-site_frac','--site_frac', nargs='+', help='The expected fraction of candidate sites being causal for each trait.', required=False, type=float, default=[])
+    parser.add_argument('-site_disp','--site_disp', action='store', help='The dispersion of fraction of candidate sites being causal for each trait.', required=False, type=float, default=100)
+    # parser.add_argument('-Ks','--Ks', nargs='+', help='The number of causal sites for each trait. Should be a integer list with the same length of the number of traits in total. Required when site_method=n.', required=False, type=int, default=[])
     parser.add_argument('-taus','--taus', nargs='+', help='Standard deviation of the effect sizes for each trait under the point normal model. Required when func=n', required=False, type=float, default=[])
     parser.add_argument('-bs','--bs', nargs='+', help='Scales of the laplace distribution of the effect sizes for each trait under the Laplace model. Required when func=l', required=False, type=float, default=[])
     parser.add_argument('-nv','--nv', action='store', help='Degree of freedom of the Student\'s t\'s distribution of the effect sizes for each trait under the student\'s t model. Optional when func=st', required=False, type=float, default=3)
     parser.add_argument('-s','--s', nargs='+', help='Scales of the Student\'s t distribution of the effect sizes for each trait under the Student\'s t model. Required when func=st', required=False, type=float, default=[])
     parser.add_argument('-random_seed', action = 'store', dest = 'random_seed', required = False, type = int, default = None)
     parser.add_argument('-num_init_seq', action='store', dest = 'num_init_seq', required = True, type = int, default = 1)
-    parser.add_argument('-calibration', action='store',dest='calibration', type=str2bool, required=False, help="Whether to calibrate the effect size values", default=False)
+    parser.add_argument('-calibration', action='store',dest='calibration', type=str2bool, help="Whether to calibrate the effect size values", default=None)
     parser.add_argument('-var_target', '--var_target', nargs='+', help='The target variance of the seeds\' genetic values', required=False, type=float, default=[])
     parser.add_argument('-calibration_link', action='store',dest='calibration_link', type=str2bool, required=False, help="Whether to calibrate the link-scale slope", default=False)
     parser.add_argument('-Rs', '--Rs', nargs='+', help='The odds ratio for the transmission/survival per SD of trait values under logit, or the hazard ratio per SD under cloglog', required=False, type=float, default=[])
     parser.add_argument('-link', action='store',dest='link', type=str, required=False, help="Link type: logit or cloglog", default="logit")
 
     args = parser.parse_args()
+
+    if args.calibration is None:
+        args.calibration = True if args.method == 'randomly_generate' else False
+
     config = GeneticEffectConfig(
         method = args.method,
         wk_dir = args.wkdir,
@@ -589,12 +741,14 @@ def main():
         random_seed = args.random_seed,
         func = args.func,
         csv = args.csv,
-        gff = args.gff,
+        # gff = args.gff,
         trait_num = args.trait_n,
-        site_method = args.site_method,
-        pis = args.pis,
+        # site_method = args.site_method,
+        # pis = args.pis,
+        site_frac = args.site_frac,
+        site_disp = args.site_disp,
         taus = args.taus,
-        Ks = args.Ks,
+        # Ks = args.Ks,
         bs = args.bs,
         nv = args.nv,
         s = args.s,
