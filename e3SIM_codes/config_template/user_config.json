@@ -153,18 +153,14 @@
       "drug_resistance": 0
     },
     "effect_size": {
-      "method": "csv",
-      "filepath": {
-        "csv_path": "",
-        "gff_path": ""
-      },
+      "method": "randomly_generate",
+      "csv_path": "",
       "causalsites_params": {
-        "method": "Choose a fixed number of causal sites for each trait",
-        "Ks": [],
-        "pis": []
+        "exp_fraction": [],
+        "fraction_dispersion": 100
       },
       "effsize_params": {
-        "effsize_function": "Normal distribution",
+        "effsize_function": "",
         "normal": {
           "taus": []
         },
@@ -177,14 +173,14 @@
         }
       },
       "calibration": {
-        "do_calibration": true,
+        "do_calibration": false,
         "V_target": []
       }
     },
     "trait_prob_link": {
       "link": "logit",
       "Rs": [],
-      "calibration": false,
+      "calibration": true,
       "logit": {
         "alpha_trans": [],
         "alpha_drug": []

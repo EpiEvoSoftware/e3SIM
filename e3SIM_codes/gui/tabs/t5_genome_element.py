@@ -120,7 +120,7 @@ class GenomeElement(TabBase):
         number_of_traits_title = self.render_number_of_traits_title(hide, 0, 7)
         transmissibility = self.render_transmissibility(hide, 0, 8)
         drug_resistance = self.render_drug_resistance(hide, 1, 8)
-        generate_method = self.render_generate_method(0, 10, 2, hide, 30) ###?
+        generate_method = self.render_generate_method(0, 10, 2, hide, 45) ###?
         self.generate_method = generate_method
 
         lst = [number_of_traits_title, transmissibility, drug_resistance, generate_method]
@@ -129,10 +129,10 @@ class GenomeElement(TabBase):
     
     def init_user_input_group(self):
         hide = (not self.initial_genome_config["use_genetic_model"] 
-                or self.initial_genome_config["effect_size"]["method"] != "csv")
+                or self.initial_genome_config["effect_size"]["method"] != "user_input")
         
         file_input = self.render_path_eff_size_table(hide, 0, 13, 2)
-        run_button = self.render_run_button(hide, 0, 17, "csv")
+        run_button = self.render_run_button(hide, 0, 17, "user_input")
 
         self.user_input_group_control = GroupControls()
         self.user_input_group_control.add(file_input)
@@ -142,15 +142,17 @@ class GenomeElement(TabBase):
 
     def init_random_generate_group(self):
         hide = (not self.initial_genome_config["use_genetic_model"] 
-                or self.initial_genome_config["effect_size"]["method"] != "gff")
+                or self.initial_genome_config["effect_size"]["method"] != "randomly_generate")
         parent = self.control_frame
 
-        gff = self.render_gff(hide, 0, 13, 1)
-        site_model = self.render_sitesmethod(hide, 0, 16)
+        candsites = self.render_path_candregion_table(hide, 0, 13, 2)
+        site_model = self.render_fraction(hide, 0, 1, 16)
+        disp_model = self.render_disp(hide, 1, 1, 16)
 
+        self.effsize_group_control = GroupControls()
         effsize_func = self.render_effsizefunc(hide, 0, 18)
-        run_button = self.render_run_button(hide, 0, 34, "gff")
-        lst = [gff, site_model, effsize_func, run_button]#, pis, Ks]
+        run_button = self.render_run_button(hide, 0, 34, "randomly_generate")
+        lst = [candsites, site_model, disp_model, effsize_func, run_button]#, pis, Ks]
         self.random_generate_group_control = GroupControls(lst)
         if not hide:
             self.global_group_control.add(self.random_generate_group_control)
@@ -158,15 +160,17 @@ class GenomeElement(TabBase):
 
     def init_effsizecalibration_group(self):
         hide = (not self.initial_genome_config["use_genetic_model"])
-        if self.initial_genome_config["effect_size"]["method"] == "csv":
+        if self.initial_genome_config["effect_size"]["method"] == "user_input":
             current_row = 18
         else:
             current_row = 35
+        self.cali_group_control = GroupControls()
         effsize_cali = self.render_calibration(hide, 0, current_row + 1)
 
     def init_alphacalibration_group(self):
+        self.calilink_group_control = GroupControls()
         hide = (not self.initial_genome_config["use_genetic_model"])
-        if self.initial_genome_config["effect_size"]["method"] == "csv":
+        if self.initial_genome_config["effect_size"]["method"] == "user_input":
             current_row = 21
         else:
             current_row = 38
@@ -262,7 +266,7 @@ class GenomeElement(TabBase):
         self.visible_components.add(component)
         return component
 
-    def render_generate_method(self, column=None, frow=None, columnspan=1, hide=True, width=20):
+    def render_generate_method(self, column=None, frow=None, columnspan=1, hide=True, width=30):
         def comboboxselected(var, to_rerender, to_derender):
             val = var.get()
             from_ui_mapping = {v: k for k, v in to_ui_mapping.items()}
@@ -271,30 +275,30 @@ class GenomeElement(TabBase):
 
             # Set render logic for generate method combobox
             match converted_val:
-                case "csv":
+                case "user_input":
                     self.user_input_group_control.rerender_itself()
                     self.random_generate_group_control.derender_itself()
-                case "gff":
+                case "randomly_generate":
                     self.random_generate_group_control.rerender_itself()
                     self.user_input_group_control.derender_itself()
             
             # Set render logic for use genetic model radiobutton
             match converted_val:
-                case "csv":
+                case "user_input":
                     self.global_group_control.add(self.user_input_group_control)
                     if self.random_generate_group_control in self.global_group_control.items:
                         self.global_group_control.items.remove(self.random_generate_group_control)
-                case "gff":
+                case "randomly_generate":
                     self.global_group_control.add(self.random_generate_group_control)
                     if self.user_input_group_control in self.global_group_control.items:
                         self.global_group_control.items.remove(self.user_input_group_control)
                     
         keys_path = ["GenomeElement", "effect_size", "method"]
-        text = "Method to Generate the Genetic Architecture"
+        text = "Method to Set up the Genetic Architecture"
         to_rerender, to_derender = None, None
         to_ui_mapping = {
-            "csv": "User Input from a CSV file",
-            "gff": "Random Generation from the GFF file",
+            "user_input": "User-defined Architecture",
+            "randomly_generate": "Random Generation from a CSV file with candidate genomic regions",
         }
         values = list(to_ui_mapping.values())
         component = EasyCombobox(
@@ -315,86 +319,112 @@ class GenomeElement(TabBase):
         )
         return component
 
-    def render_gff(self, hide=True, column=None, frow=None, columnspan=1):
-        keys_path = ["GenomeElement", "effect_size", "filepath", "gff_path"]
-        text = "Please provide the genome annotation (gff-like format):"
-        component = EasyPathSelector(
-            keys_path,
-            self.config_path,
-            text,
-            self.control_frame,
-            column,
-            hide,
-            frow,
-            columnspan,
-            labtext="The file has to have at least 5 columns, with the 4th and 5th column showing the starting and ending positions of one genetic element."
-        )
-        return component
+    # def render_gff(self, hide=True, column=None, frow=None, columnspan=1):
+    #     keys_path = ["GenomeElement", "effect_size", "csv_path"]
+    #     text = "Please provide the candidate regions file:"
+    #     component = EasyPathSelector(
+    #         keys_path,
+    #         self.config_path,
+    #         text,
+    #         self.control_frame,
+    #         column,
+    #         hide,
+    #         frow,
+    #         columnspan,
+    #         labtext="The file has to have at least 3 columns, with the 1st and 2nd column showing the starting and ending positions of one genetic element."
+    #     )
+    #     return component
 
     # def render_genes_num(self, hide=True, column=None, frow=None):
-    def render_sitesmethod(self, hide=True, column=None, frow=None):
-        def comboboxselected(var, to_rerender, to_derender):
-            no_validate_update(var, self.config_path, keys_path)
-            val = var.get()
-            from_ui_mapping = {v: k for k, v in to_ui_mapping.items()}
-            converted_val = from_ui_mapping.get(val, "")
-            #Toggle SIR/SEIR Models
-            if converted_val=="p":
-                pis = self.render_pis(False, 1, 1, 16)
-                ks = self.render_Ks(True, 1, 1, 16)
-                # ks.derender_itself()
-            else:
-                pis = self.render_pis(True, 1, 1, 16)
-                ks = self.render_Ks(False, 1, 1, 16)
-                # pis.derender_itself()
+    # def render_sitesmethod(self, hide=True, column=None, frow=None):
+    #     def comboboxselected(var, to_rerender, to_derender):
+    #         no_validate_update(var, self.config_path, keys_path)
+    #         val = var.get()
+    #         from_ui_mapping = {v: k for k, v in to_ui_mapping.items()}
+    #         converted_val = from_ui_mapping.get(val, "")
+    #         #Toggle SIR/SEIR Models
+    #         if converted_val=="p":
+    #             pis = self.render_pis(False, 1, 1, 16)
+    #             ks = self.render_Ks(True, 1, 1, 16)
+    #             # ks.derender_itself()
+    #         else:
+    #             pis = self.render_pis(True, 1, 1, 16)
+    #             ks = self.render_Ks(False, 1, 1, 16)
+    #             # pis.derender_itself()
 
-        keys_path = ["GenomeElement", "effect_size", "causalsites_params", "method"]
-        text = "Method to generate sites with non-zero effect sizes"
+    #     keys_path = ["GenomeElement", "effect_size", "causalsites_params", "method"]
+    #     text = "Method to generate sites with non-zero effect sizes"
         
-        to_ui_mapping = {
-            "p": "Bernoulli trials on each candidate site for each trait",
-            "n": "Choose a fixed number of causal sites for each trait",
-        }
-        values = list(to_ui_mapping.values())
-        to_rerender, to_derender = None, None
-        width=35
-        columnspan = 1
-        component = EasyCombobox(
-            keys_path, self.config_path, text, self.control_frame,
-            column, frow, values, to_rerender, to_derender,
-            comboboxselected, hide, width, columnspan, to_ui_mapping
-        )
-        self.visible_components.add(component)
+    #     to_ui_mapping = {
+    #         "p": "Bernoulli trials on each candidate site for each trait",
+    #         "n": "Choose a fixed number of causal sites for each trait",
+    #     }
+    #     values = list(to_ui_mapping.values())
+    #     to_rerender, to_derender = None, None
+    #     width=35
+    #     columnspan = 1
+    #     component = EasyCombobox(
+    #         keys_path, self.config_path, text, self.control_frame,
+    #         column, frow, values, to_rerender, to_derender,
+    #         comboboxselected, hide, width, columnspan, to_ui_mapping
+    #     )
+    #     self.visible_components.add(component)
 
-        return component
+    #     return component
 
-
-    def render_Ks(self, hide, column, columnspan, frow):
-        text = "Number of sites causal for each trait"
-        keys_path = ['GenomeElement','effect_size','causalsites_params', 'Ks']
+    def render_fraction(self, hide, column, columnspan, frow):
+        text = "Fraction of causal sites for each trait"
+        keys_path = ['GenomeElement','effect_size','causalsites_params', 'exp_fraction']
         component = EasyEntry(
-            keys_path, self.config_path, text, 'Number of causal sites',
-            self.control_frame, column, frow, 'list integer', hide, columnspan,
-            labtext="Number of sites causal for each trait."
-        )
-        self.visible_components.add(component)
-        self.global_group_control.add(component)
-        self.random_generate_group_control.add(component)
-
-        return component
-
-    def render_pis(self, hide, column, columnspan, frow):
-        text = "Probabilities of sites being causal for each trait"
-        keys_path = ['GenomeElement','effect_size','causalsites_params', 'pis']
-        component = EasyEntry(
-            keys_path, self.config_path, text, 'Probability of being causal per site',
+            keys_path, self.config_path, text, 'Expected fraction of being causal per site',
             self.control_frame, column, frow, 'list float', hide, columnspan,
-            labtext="Probabilities of sites being causal for each trait."
+            labtext="Fraction of causal sites for each trait."
         )
         self.visible_components.add(component)
-        self.random_generate_group_control.add(component)
+        self.global_group_control.add(component)
+        #self.random_generate_group_control.add(component)
+        return component
+
+    def render_disp(self, hide, column, columnspan, frow):
+        text = "Dispersion of the fraction"
+        keys_path = ["GenomeElement", "effect_size", "causalsites_params", "fraction_dispersion"]
+        component = EasyEntry(
+            keys_path, self.config_path, text, 'Dispersion of fraction',
+            self.control_frame, column, frow, 'float', hide, columnspan,
+            labtext="nv"
+        )
+        self.visible_components.add(component)
+        #self.random_generate_group_control.add(component)
         self.global_group_control.add(component)
         return component
+
+
+    # def render_Ks(self, hide, column, columnspan, frow):
+    #     text = "Number of sites causal for each trait"
+    #     keys_path = ['GenomeElement','effect_size','causalsites_params', 'Ks']
+    #     component = EasyEntry(
+    #         keys_path, self.config_path, text, 'Number of causal sites',
+    #         self.control_frame, column, frow, 'list integer', hide, columnspan,
+    #         labtext="Number of sites causal for each trait."
+    #     )
+    #     self.visible_components.add(component)
+    #     self.global_group_control.add(component)
+    #     self.random_generate_group_control.add(component)
+
+    #     return component
+
+    # def render_pis(self, hide, column, columnspan, frow):
+    #     text = "Probabilities of sites being causal for each trait"
+    #     keys_path = ['GenomeElement','effect_size','causalsites_params', 'pis']
+    #     component = EasyEntry(
+    #         keys_path, self.config_path, text, 'Probability of being causal per site',
+    #         self.control_frame, column, frow, 'list float', hide, columnspan,
+    #         labtext="Probabilities of sites being causal for each trait."
+    #     )
+    #     self.visible_components.add(component)
+    #     self.random_generate_group_control.add(component)
+    #     self.global_group_control.add(component)
+    #     return component
 
 
     def render_effsize_normaltaus(self, hide=True, column=None, frow=None):
@@ -474,11 +504,13 @@ class GenomeElement(TabBase):
 
     def render_calibration(self, hide=True, column=None, frow=None, columnspan=1):
         def update(var, to_rerender, to_derender):
+            self.cali_group_control.derender_itself()
             if var.get():
                 cali_var = self.render_Vtargets(False, 1, frow)
             else:
                 cali_var = self.render_Vtargets(True, 1, frow)
-            
+            self.cali_group_control.add(cali_var)
+
             config = load_config_as_dict(self.config_path)
             config["GenomeElement"]["effect_size"]["calibration"]["do_calibration"] = var.get()
             self.global_group_control.add(cali_var)
@@ -510,26 +542,33 @@ class GenomeElement(TabBase):
 
     def render_effsizefunc(self, hide=True, column=None, frow=None):
         def comboboxselected(var, to_rerender, to_derender):
+            self.effsize_group_control.derender_itself()
+
             no_validate_update(var, self.config_path, keys_path)
             val = var.get()
             from_ui_mapping = {v: k for k, v in to_ui_mapping.items()}
             converted_val = from_ui_mapping.get(val, "")
             #Toggle SIR/SEIR Models
             if converted_val == "n":
-                self.render_effsize_normaltaus(False, 0, 20)
-                self.render_effsize_laplacebs(True, 0, 20)
-                self.render_effsize_sts(True, 0, 20)
-                self.render_stnv(True, 1, 1, 20)
+                taus = self.render_effsize_normaltaus(False, 0, 20)
+                bs = self.render_effsize_laplacebs(True, 0, 20)
+                sts = self.render_effsize_sts(True, 0, 20)
+                nv = self.render_stnv(True, 1, 1, 20)
             elif converted_val == "l":
-                self.render_effsize_normaltaus(True, 0, 20)
-                self.render_effsize_laplacebs(False, 0, 20)
-                self.render_effsize_sts(True, 0, 20)
-                self.render_stnv(True, 1, 1, 20)
+                taus = self.render_effsize_normaltaus(True, 0, 20)
+                bs = self.render_effsize_laplacebs(False, 0, 20)
+                sts = self.render_effsize_sts(True, 0, 20)
+                nv = self.render_stnv(True, 1, 1, 20)
             elif converted_val == "st":
-                self.render_effsize_normaltaus(True, 0, 20)
-                self.render_effsize_laplacebs(True, 0, 20)
-                self.render_effsize_sts(False, 0, 20)
-                self.render_stnv(False, 1, 1, 20)
+                taus = self.render_effsize_normaltaus(True, 0, 20)
+                bs = self.render_effsize_laplacebs(True, 0, 20)
+                sts = self.render_effsize_sts(False, 0, 20)
+                nv = self.render_stnv(False, 1, 1, 20)
+
+            self.effsize_group_control.add(taus)
+            self.effsize_group_control.add(bs)
+            self.effsize_group_control.add(sts)
+            self.effsize_group_control.add(nv)
 
         keys_path = ["GenomeElement", "effect_size", "effsize_params", "effsize_function"]
         text = "Distribution to generate effezt sizes for each trait given selected sites"
@@ -555,9 +594,9 @@ class GenomeElement(TabBase):
 
 
     def render_run_button(self, hide=True, column=None, frow=None, method=""):
-        if method == "gff":
+        if method == "randomly_generate":
             text = "Run Effect Size Generation"
-        elif method == "csv":
+        elif method == "user_input":
             text = "Validating input (Required)"
         component = EasyButton(
             text,
@@ -572,7 +611,22 @@ class GenomeElement(TabBase):
 
     def render_path_eff_size_table(self, hide=True, column=None, frow=None, columnspan=1):
         text = "Please provide the Genetic Architecture File (CSV format):"
-        keys_path = ["GenomeElement", "effect_size", "filepath", "csv_path"]
+        keys_path = ["GenomeElement", "effect_size", "csv_path"]
+        component = EasyPathSelector(
+            keys_path,
+            self.config_path,
+            text,
+            self.control_frame,
+            column,
+            hide,
+            frow,
+            columnspan,
+        )
+        return component
+
+    def render_path_candregion_table(self, hide=True, column=None, frow=None, columnspan=1):
+        text = "Please provide the candidate regions File (CSV format):"
+        keys_path = ["GenomeElement", "effect_size", "csv_path"]
         component = EasyPathSelector(
             keys_path,
             self.config_path,
@@ -613,7 +667,7 @@ class GenomeElement(TabBase):
 
     def render_caliRs(self, hide=True, column=None, frow=None):
         keys_path = ["GenomeElement", "trait_prob_link", "Rs"]
-        text = "odds ratios for the calibration of the link coefficients"
+        text = "odds ratios or hazard ratios for the calibration of the link coefficients"
         component = EasyEntry(
             keys_path,
             self.config_path,
@@ -628,6 +682,7 @@ class GenomeElement(TabBase):
         )
         self.visible_components.add(component)
         self.global_group_control.add(component)
+        self.calilink_group_control.add(component)
         return component
 
     def render_Vtargets(self, hide=True, column=None, frow=None):
@@ -652,6 +707,7 @@ class GenomeElement(TabBase):
 
     def render_alphacalibration(self, hide=True, column=None, frow=None, columnspan=1):
         def update(var, to_rerender, to_derender):
+            self.calilink_group_control.derender_itself()
             if var.get():
                 self.render_caliRs(False, 1, frow)
             else:
@@ -763,15 +819,14 @@ class GenomeElement(TabBase):
             config = GeneticEffectConfig(
                 method = method,
                 wk_dir = wk_dir,
-                n_seed = num_seed,
+                num_init_seq = num_seed,
                 func = genome_config["effect_size"]["effsize_params"]["effsize_function"],
                 calibration = genome_config["effect_size"]["calibration"]["do_calibration"],
                 random_seed = rand_seed,
-                csv = genome_config["effect_size"]["filepath"]["csv_path"],
-                gff = genome_config["effect_size"]["filepath"]["gff_path"],
+                csv = genome_config["effect_size"]["method"]["csv_path"],
                 trait_num = genome_config["traits_num"],
-                pis = genome_config["effect_size"]["causalsites_params"]["pis"],
-                Ks = genome_config["effect_size"]["causalsites_params"]["Ks"],
+                site_frac = genome_config["effect_size"]["causalsites_params"]["exp_fraction"],
+                site_disp = genome_config["effect_size"]["causalsites_params"]["fraction_dispersion"],
                 taus = genome_config["effect_size"]["effsize_params"]["normal"]["taus"],
                 bs = genome_config["effect_size"]["effsize_params"]["laplace"]["bs"],
                 nv = genome_config["effect_size"]["effsize_params"]["studentst"]["nv"],

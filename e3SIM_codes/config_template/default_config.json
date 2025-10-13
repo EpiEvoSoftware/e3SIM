@@ -153,15 +153,11 @@
       "drug_resistance": 0
     },
     "effect_size": {
-      "method": "gff",
-      "filepath": {
-        "csv_path": "",
-        "gff_path": ""
-      },
+      "method": "randomly_generate",
+      "csv_path": "",
       "causalsites_params": {
-        "method": "",
-        "Ks": [],
-        "pis": []
+        "exp_fraction": [],
+        "fraction_dispersion": 100
       },
       "effsize_params": {
         "effsize_function":"",

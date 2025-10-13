@@ -542,7 +542,7 @@ class EffectGenerator:
             var_empirical : pd.Series
             Empirical variance of each trait before calibration.
         """
-        var_empirical = _variance_calc(df_eff, seeds_state)
+        var_empirical = self._variance_calc(df_eff, seeds_state)
 
         # Target variances
         var_target = np.array(self.cfg.params["var_target"], dtype=float)
@@ -556,9 +556,11 @@ class EffectGenerator:
         zero_var_traits = var_empirical.index[var_empirical == 0]
         for name in zero_var_traits:
             print(f"WARNING: No variance in trait {name}. Calibration not applicable. Original effect sizes preserved.")
-
+        print(df_eff)
         # Apply calibration
-        eff_calibrated = eff * c_i   # broadcast across sites -> ci = [1, n_traits]
+        print(c_i)
+        df_eff_calibrated = df_eff.copy()
+        df_eff_calibrated.iloc[:, 1:] = df_eff.iloc[:, 1:] * c_i
 
         # Construct calibrated DataFrame
         df_eff_calibrated = pd.concat(
