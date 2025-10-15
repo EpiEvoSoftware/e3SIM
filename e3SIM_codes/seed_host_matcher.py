@@ -400,12 +400,12 @@ def read_config_and_match(config_all):
 def main():
     """Command-line interface maintaining original structure."""
     parser = argparse.ArgumentParser(description='Match seeds and hosts.')
-    parser.add_argument('-method', required=True, help="Matching method")
-    parser.add_argument('-wkdir', required=True, help="Working directory")  
-    parser.add_argument('-num_init_seq', required=True, type=int, help="Number of seeds")
-    parser.add_argument('-path_matching', default="", help="User matching file path")
-    parser.add_argument('-match_scheme', default="", help="Matching scheme JSON")
-    parser.add_argument('-match_scheme_param', default="", help="Matching parameters JSON")
+    parser.add_argument('-method', required=True, choices=['user_input', 'randomly_generate'], help="Method for setting up the host-seed matching.")
+    parser.add_argument('-wkdir', required=True, help="Absolute path to the working directory")  
+    parser.add_argument('-num_init_seq', required=True, type=int, help="Number of seeding sequences.")
+    parser.add_argument('-path_matching', default="", help="Absolute path to a matching file, used in the user_input mode.")
+    parser.add_argument('-match_scheme', default="", help="A JSON string specifying the scheme for matching for each seed, used in the randomly_generate mode.")
+    parser.add_argument('-match_scheme_param', default="", help="A JSON string specifying the parameters for the corresponding matching scheme for each seed.")
     parser.add_argument('-random_seed', type=int, help="Random seed")
     
     args = parser.parse_args()

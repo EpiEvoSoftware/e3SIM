@@ -205,17 +205,16 @@ def main():
     parser = argparse.ArgumentParser(description="Generate a contact network\
                                      population size specified and store it in \
                                      the working directory as an adjacency list.")
-    parser.add_argument("-popsize", type=int, required=True)
-    parser.add_argument("-wkdir", type=str, required=True)
-    parser.add_argument("-method", type=str, required=True, choices=["user_input", "randomly_generate"])
-    parser.add_argument("-model", type=str, default="")
-    parser.add_argument("-path_network", type=str, default="")
-    parser.add_argument("-p_ER", type=float, default=0)
-    parser.add_argument("-rp_size", nargs="+", help = "Size of random partition graph groups", type=int, default=[])
-    parser.add_argument("-p_within", nargs="+", help = "Probability of edges for different groups \
-                         (decending order)", type=float, default=[])
-    parser.add_argument("-p_between", type=float, default=0)
-    parser.add_argument("-m", type=int, default=0)
+    parser.add_argument("-popsize", type=int, required=True, help="Size of the host population (Number of nodes in the contact network)")
+    parser.add_argument("-wkdir", type=str, required=True, help="Working directory.")
+    parser.add_argument("-method", type=str, required=True, choices=["user_input", "randomly_generate"], help="Method of specifying the host contact network for the simulation")
+    parser.add_argument("-model", type=str, choices=['ER', 'BA', "RP"], default="", help="Random network model. ER: Erdos-Renyi; BA: Barabasi-Alber; RP: Random partition (2 partitions only)")
+    parser.add_argument("-path_network", type=str, default="The path to the adjacency list file specifying the contact network. Required when doing user_input option.")
+    parser.add_argument("-p_ER", type=float, default=0, help="Probability for edge creation in an ER graph")
+    parser.add_argument("-rp_size", nargs="+", help = "Size of each partition in a RP graph", type=int, default=[])
+    parser.add_argument("-p_within", nargs="+", help = "Probabilities of edge creation within partitions", type=float, default=[])
+    parser.add_argument("-p_between", type=float, default=0, help="Probability of edge creation between partitions")
+    parser.add_argument("-m", type=int, default=0, help="Number of edges to attach from a new node to existing nodes in a BA graph")
     parser.add_argument("-random_seed", type=int, default=None)
 
     args = parser.parse_args()

@@ -712,7 +712,7 @@ def main():
     parser.add_argument('-trait_n', action='store', dest='trait_n', type=ast.literal_eval, required=True, 
         help="Number of traits that user want to generate a genetic architecture for transmissibility and drug resistance, format: '{\"transmissibility\": x, \"drug-resistance\": y}'", default="")
     # parser.add_argument('-redo', action='store',dest='redo', type=str, required=False, default="sites", help="Which steps to redo in the effect size generating process (sites/effsize/none)")
-    parser.add_argument('-func', action='store',dest='func', type=str, required=False, help="Function to generate the effect sizes given causal sites. (n/l/st)")
+    parser.add_argument('-func', action='store',dest='func', type=str, required=False, choices=['n', 'l', 'st'], help="Function to generate the effect sizes given causal sites. (n/l/st)")
     # parser.add_argument('-pleiotropy', action='store',dest='pleiotropy', type=str2bool, required=False, help="Whether to do pleiotropy", default=False)
     # parser.add_argument('-site_method', action='store',dest='site_method', type=str, required=False, help="Method to sample causal site, by probability (p) or by number of sites (n)", default="p")
     parser.add_argument('-site_frac','--site_frac', nargs='+', help='The expected fraction of candidate sites being causal for each trait.', required=False, type=float, default=[])
@@ -728,7 +728,7 @@ def main():
     parser.add_argument('-var_target', '--var_target', nargs='+', help='The target variance of the seeds\' genetic values', required=False, type=float, default=[])
     parser.add_argument('-calibration_link', action='store',dest='calibration_link', type=str2bool, required=False, help="Whether to calibrate the link-scale slope", default=False)
     parser.add_argument('-Rs', '--Rs', nargs='+', help='The odds ratio for the transmission/survival per SD of trait values under logit, or the hazard ratio per SD under cloglog', required=False, type=float, default=[])
-    parser.add_argument('-link', action='store',dest='link', type=str, required=False, help="Link type: logit or cloglog", default="logit")
+    parser.add_argument('-link', action='store',dest='link', type=str, required=False, choices=['logit', 'cloglog'], help="Link type: logit or cloglog", default="logit")
 
     args = parser.parse_args()
 
