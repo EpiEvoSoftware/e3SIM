@@ -5,19 +5,3 @@ function (numeric)additive_trait(o<Mutation> muts, s trait_type)
 }
 
 
-function (numeric)bialleleic_trait(o<Mutation> muts, s trait_type, numeric trait_locations, f cap, o<DataFrame> effsize_df)
-{
-	which_gene = unique(sapply(muts.position, "asInteger((findInterval(applyValue, trait_locations) + 1) / 2);"));
-	which_trait = strsplit(trait_type, sep="e")[1];
-	trait_value = size(which_gene) ? sum( effsize_pos.subset(which_gene - 1, current_epoch + 3)) else 0.0;
-	if (trait_value < cap)
-	{
-		return(trait_value);
-	}
-	else
-	{
-		return(cap);
-	}
-}
-
-

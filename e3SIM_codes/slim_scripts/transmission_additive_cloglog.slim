@@ -13,7 +13,7 @@ s1 reproduction()
 		{
 			infector_pathogen = sample(infector_subpop.individuals, 1);
 			muts = infector_pathogen.genome1.mutationsOfType(1);
-			transmissibility = 1 + additive_trait(muts, paste0("trans_", transmissibility_effsize[current_epoch]));
+			transmissibility = 1 + additive_trait(muts, paste0("transmissibility_", transmissibility_effsize[current_epoch]));
 
 			p_trans = 1 - exp(-lambda[current_epoch] * exp(alpha_trans[transmissibility_effsize[current_epoch] - 1] * additive_trait(muts, paste0("transmissibility_", transmissibility_effsize[current_epoch]))));
 

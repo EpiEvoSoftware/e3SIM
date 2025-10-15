@@ -24,6 +24,8 @@ from error_handling import CustomizedError
 from base_func import *
 
 
+DEFAULT_ALPHA = 0.405
+
 # ========================= Enums and Constants =========================
 
 class EpiModel(Enum):
@@ -275,8 +277,6 @@ class GenomeElement:
     alpha_drug: list[int | float]
     causal_gene_path: Path
 
-    DEFAULT_ALPHA = 0.405
-
     def __post_init__(self):
         print("Checking \"GenomeElement\"...... ", flush = True)
         if not Path(self.ref_path).exists():
@@ -314,8 +314,8 @@ class GenomeElement:
 
             if param =="alpha_trans":
                 if len(values) == 0:
-                    self.param = [DEFAULT_ALPHA for i in range(self.traits_num["transmissibility"])]
-                    print(f"Warning: The link scale slope is not specified for transmissibility traits"
+                    setattr(self, param, [DEFAULT_ALPHA] * self.traits_num["transmissibility"])
+                    print(f"Warning: The link scale slope is not specified for transmissibility traits. "
                         f"Will use default values {DEFAULT_ALPHA}")
                 elif len(values) != self.traits_num["transmissibility"]:
                     raise CustomizedError(
@@ -324,8 +324,8 @@ class GenomeElement:
                 )
             if param =="alpha_drug":
                 if len(values) == 0:
-                    self.param = [DEFAULT_ALPHA for i in range(self.traits_num["drug_resistance"])]
-                    print(f"Warning: The link scale slope is not specified for drug-resistance traits"
+                    setattr(self, param, [DEFAULT_ALPHA] * self.traits_num["drug_resistance"])
+                    print(f"Warning: The link scale slope is not specified for drug-resistance traits. "
                         f"Will use default values {DEFAULT_ALPHA}")
                 elif len(values) != self.traits_num["drug_resistance"]:
                     raise CustomizedError(
