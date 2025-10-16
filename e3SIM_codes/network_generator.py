@@ -140,7 +140,7 @@ class NetworkManager:
             )
             print("Contact network:", path, flush=True)
             return ntwk, None
-        except Exception as e:
+        except CustomizedError as e:
             print(f"Error during network generation: {e}")
             return None, e
 
@@ -181,7 +181,7 @@ def network_generation_byconfig(all_config):
 
     try:
         manager = NetworkManager(wk_dir)
-    except Exception as e:
+    except CustomizedError as e:
         return e
 
     _ , error = manager.run(

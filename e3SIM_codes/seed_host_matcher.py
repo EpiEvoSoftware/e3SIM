@@ -275,7 +275,7 @@ class MatchingOrchestrator:
             else:
                 raise CustomizedError(f"Invalid method '{method}'. Use 'user_input' or 'randomly_generate'")
         
-        except Exception as e:
+        except CustomizedError as e:
             print(f"Matching error: {e}")
             return None, e
     

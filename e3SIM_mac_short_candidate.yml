@@ -1,4 +1,5 @@
-name: e3SIM_linux_2025_short
+# you need to ONLY install phylobase for R manually
+name: e3SIM_mac_short
 channels:
   - conda-forge
   - bioconda
@@ -13,7 +14,7 @@ dependencies:
   - r-base
   - r-data.table
   - r-ggplot2
-  - r-phylobase
+  # - r-phylobase
   - slim=4.3
   - pip:
       - bio

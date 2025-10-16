@@ -453,7 +453,7 @@ class SeedGenerator:
             if self.config.params.get("use_subst_matrix"):
                 os.remove(os.path.join(self.wk_dir, MUT_MTX))
             return None
-        except Exception as e:
+        except CustomizedError as e:
             print(f"Seed sequences generation - An error occured : {e}.")
             return e
 
@@ -620,7 +620,7 @@ def seeds_generation_byconfig(all_config):
                             rand_seed = random_number_seed,
                             use_subst_matrix=use_subst_matrix, 
                             mu_matrix=mu_matrix)
-    except Exception as e:
+    except CustomizedError as e:
         return e
     
     generator = SeedGenerator(config) # since there is not much validation of parameter going on here, just left it out of the try catch block

@@ -134,11 +134,9 @@ class EffectGenerator:
             df_sites = self._select_sites(candidates, self.cfg.params.get("site_frac"), self.cfg.params.get("site_disp"))
             print("Causal sites selected!")
             return self._sample(df_sites)
-        elif self.cfg.method == "user_input":
+        else: # elif self.cfg.method == "user_input":
             df = self._read_effsize_csv()
             return(df)
-        else:
-            raise CustomizedError("method must be 'gff' or 'csv'")
 
     # ---------- IO ----------
     def _read_candregion_csv(self):
@@ -621,7 +619,6 @@ def effsize_generation_byconfig(all_config):
             calibration = genetic_config["effect_size"]["calibration"]["do_calibration"],
             random_seed = random_seed,
             csv = genetic_config["effect_size"]["filepath"]["csv_path"],
-            # gff = genetic_config["effect_size"]["filepath"]["gff_path"],
             trait_num = genetic_config["traits_num"],
             pis = genetic_config["effect_size"]["causalsites_params"]["pis"],
             Ks = genetic_config["effect_size"]["causalsites_params"]["Ks"],
@@ -635,7 +632,7 @@ def effsize_generation_byconfig(all_config):
             link = genetic_config["trait_prob_link"]["link"],
             site_method = genetic_config["effect_size"]["causalsites_params"]["method"]
         )
-    except Exception as e:
+    except CustomizedError as e:
         return e
 
     generator = EffectGenerator(config) # no validation going on so leave it out of the try catch clause

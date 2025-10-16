@@ -996,7 +996,7 @@ class SimulationOrchestrator:
 
             return None
             
-        except Exception as e:
+        except CustomizedError as e:
             print(f"Simulation pipeline failed: {e}")
             return e
     
@@ -1084,7 +1084,7 @@ class SimulationOrchestrator:
 def all_slim_simulation_by_config(all_config):
     try:
         orchestrator = SimulationOrchestrator(all_config)
-    except Exception as e:
+    except CustomizedError as e:
         return e
 
     error = orchestrator.run()
