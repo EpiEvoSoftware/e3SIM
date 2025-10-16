@@ -1,4 +1,5 @@
-gene_name,start,end,eff_size_transmissibility1,eff_size_dr1,eff_size_dr2
-segment1,450,550,0.0,0.3,0.0
-segment2,650,1000,0.2,0.0,0.0
-segment3,4300,4600,0.0,0.0,0.3
+Sites,transmissibility_1,drug_resistance_1
+22,1.7870297953023564,0.0
+148,-1.4099760318302432,0.0
+208,0.38939731950217604,0.0
+256,0.8336857667173677,0.0
