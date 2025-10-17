@@ -377,7 +377,7 @@ class GenomeElement(TabBase):
         keys_path = ['GenomeElement','effect_size','causalsites_params', 'exp_fraction']
         component = EasyEntry(
             keys_path, self.config_path, text, 'Expected fraction of being causal per site',
-            self.control_frame, column, frow, 'list float', hide, columnspan,
+            self.control_frame, column, frow, 'list numerical', hide, columnspan,
             labtext="Fraction of causal sites for each trait."
         )
         self.visible_components.add(component)
@@ -390,7 +390,7 @@ class GenomeElement(TabBase):
         keys_path = ["GenomeElement", "effect_size", "causalsites_params", "fraction_dispersion"]
         component = EasyEntry(
             keys_path, self.config_path, text, 'Dispersion of fraction',
-            self.control_frame, column, frow, 'float', hide, columnspan,
+            self.control_frame, column, frow, 'numerical', hide, columnspan,
             labtext="nv"
         )
         self.visible_components.add(component)
@@ -544,10 +544,10 @@ class GenomeElement(TabBase):
         def comboboxselected(var, to_rerender, to_derender):
             self.effsize_group_control.derender_itself()
 
-            no_validate_update(var, self.config_path, keys_path)
             val = var.get()
             from_ui_mapping = {v: k for k, v in to_ui_mapping.items()}
             converted_val = from_ui_mapping.get(val, "")
+            no_validate_update_val(converted_val, self.config_path, keys_path)
             #Toggle SIR/SEIR Models
             if converted_val == "n":
                 taus = self.render_effsize_normaltaus(False, 0, 20)
@@ -806,7 +806,6 @@ class GenomeElement(TabBase):
             return
 
         config = load_config_as_dict(self.config_path)
-
         genome_config = config["GenomeElement"]
 
         wk_dir = config["BasicRunConfiguration"]["cwdir"]
@@ -823,7 +822,7 @@ class GenomeElement(TabBase):
                 func = genome_config["effect_size"]["effsize_params"]["effsize_function"],
                 calibration = genome_config["effect_size"]["calibration"]["do_calibration"],
                 random_seed = rand_seed,
-                csv = genome_config["effect_size"]["method"]["csv_path"],
+                csv = genome_config["effect_size"]["csv_path"],
                 trait_num = genome_config["traits_num"],
                 site_frac = genome_config["effect_size"]["causalsites_params"]["exp_fraction"],
                 site_disp = genome_config["effect_size"]["causalsites_params"]["fraction_dispersion"],
@@ -834,8 +833,7 @@ class GenomeElement(TabBase):
                 var_target = genome_config["effect_size"]["calibration"]["V_target"],
                 calibration_link = genome_config["trait_prob_link"]["calibration"],
                 Rs = genome_config["trait_prob_link"]["Rs"],
-                link = genome_config["trait_prob_link"]["link"],
-                site_method = genome_config["effect_size"]["causalsites_params"]["method"]
+                link = genome_config["trait_prob_link"]["link"]
             )
         except Exception as e:
             return e

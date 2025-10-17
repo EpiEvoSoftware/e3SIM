@@ -517,7 +517,6 @@ class EffectGenerator:
         df_eff_calibrated = df_eff.copy()
         df_eff_calibrated.iloc[:, 1:] = df_eff.iloc[:, 1:] * c_i
 
-
         return df_eff_calibrated, var_empirical
         
         
@@ -614,17 +613,16 @@ def effsize_generation_byconfig(all_config):
     
     try:
         config = GeneticEffectConfig(
-            method = genetic_config["effect_size"]["method"],
+            method = method,
             wk_dir = wk_dir,
             num_init_seq = num_seed,
             func = genetic_config["effect_size"]["effsize_params"]["effsize_function"],
             calibration = genetic_config["effect_size"]["calibration"]["do_calibration"],
-            random_seed = random_seed,
-            csv = genetic_config["effect_size"]["filepath"]["csv_path"],
-            # gff = genetic_config["effect_size"]["filepath"]["gff_path"],
+            random_seed = rand_seed,
+            csv = genetic_config["effect_size"]["csv_path"],
             trait_num = genetic_config["traits_num"],
-            pis = genetic_config["effect_size"]["causalsites_params"]["pis"],
-            Ks = genetic_config["effect_size"]["causalsites_params"]["Ks"],
+            site_frac = genetic_config["effect_size"]["causalsites_params"]["exp_fraction"],
+            site_disp = genetic_config["effect_size"]["causalsites_params"]["fraction_dispersion"],
             taus = genetic_config["effect_size"]["effsize_params"]["normal"]["taus"],
             bs = genetic_config["effect_size"]["effsize_params"]["laplace"]["bs"],
             nv = genetic_config["effect_size"]["effsize_params"]["studentst"]["nv"],
@@ -632,8 +630,7 @@ def effsize_generation_byconfig(all_config):
             var_target = genetic_config["effect_size"]["calibration"]["V_target"],
             calibration_link = genetic_config["trait_prob_link"]["calibration"],
             Rs = genetic_config["trait_prob_link"]["Rs"],
-            link = genetic_config["trait_prob_link"]["link"],
-            site_method = genetic_config["effect_size"]["causalsites_params"]["method"]
+            link = genetic_config["trait_prob_link"]["link"]
         )
     except Exception as e:
         return e

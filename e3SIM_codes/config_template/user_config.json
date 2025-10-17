@@ -160,7 +160,7 @@
         "fraction_dispersion": 100
       },
       "effsize_params": {
-        "effsize_function": "",
+        "effsize_function":"",
         "normal": {
           "taus": []
         },
@@ -180,7 +180,7 @@
     "trait_prob_link": {
       "link": "logit",
       "Rs": [],
-      "calibration": true,
+      "calibration": false,
       "logit": {
         "alpha_trans": [],
         "alpha_drug": []
