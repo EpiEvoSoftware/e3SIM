@@ -1,0 +1,101 @@
+{
+  "BasicRunConfiguration": {
+    "cwdir": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.1_test_minimal_model",
+    "n_replicates": 3
+  },
+  "EvolutionModel": {
+    "subst_model_parameterization": "mut_rate",
+    "n_generation": 3650,
+    "mut_rate": 3.12e-10,
+    "within_host_reproduction": false,
+    "within_host_reproduction_rate": 0,
+    "cap_withinhost": 1
+  },
+  "SeedsConfiguration": {
+    "seed_size": 5,
+    "use_reference": false
+  },
+  "GenomeElement": {
+    "use_genetic_model": true,
+    "ref_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/../data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "traits_num": {
+      "transmissibility": 1,
+      "drug_resistance": 0
+    },
+    "trait_prob_link": {
+      "link": "logit",
+      "logit": {
+        "alpha_trans": [
+          0.5
+        ],
+        "alpha_drug": []
+      }
+    }
+  },
+  "NetworkModelParameters": {
+    "host_size": 10000
+  },
+  "EpidemiologyModel": {
+    "model": "SEIR",
+    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run/slimseeds.csv",
+    "epoch_changing": {
+      "n_epoch": 1,
+      "epoch_changing_generation": []
+    },
+    "genetic_architecture": {
+      "transmissibility": [
+        1
+      ],
+      "drug_resistance": [
+        0
+      ]
+    },
+    "transition_prob": {
+      "S_IE_prob": [
+        0.004
+      ],
+      "I_R_prob": [
+        0.008
+      ],
+      "R_S_prob": [
+        0.05
+      ],
+      "latency_prob": [
+        1
+      ],
+      "E_I_prob": [
+        0.01
+      ],
+      "I_E_prob": [
+        0
+      ],
+      "E_R_prob": [
+        0
+      ],
+      "sample_prob": [
+        1e-05
+      ],
+      "recovery_prob_after_sampling": [
+        0
+      ]
+    },
+    "massive_sampling": {
+      "event_num": 0,
+      "generation": [],
+      "sampling_prob": [],
+      "recovery_prob_after_sampling": []
+    },
+    "super_infection": false
+  },
+  "Postprocessing_options": {
+    "do_postprocess": true,
+    "tree_plotting": {
+      "branch_color_trait": 1,
+      "heatmap": "drug_resistance"
+    },
+    "sequence_output": {
+      "vcf": true,
+      "fasta": false
+    }
+  }
+}

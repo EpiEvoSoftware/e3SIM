@@ -6,13 +6,13 @@ def update_dir():
     """
     # config
     wkdir = os.getcwd()
-    config_path = os.path.join(wkdir, "test_config.json")
+    config_path = os.path.join(wkdir, "test_config_minimal.json")
     config = open(config_path, "r")
     config_dict = json.loads(config.read())
     # wkdir
     config_dict["BasicRunConfiguration"]["cwdir"] = wkdir
     # data path for config json
-    data_path = os.path.join(os.path.dirname(wkdir), "data", "TB", "GCF_000195955.2_ASM19595v2_genomic.fna")
+    data_path = os.path.join(os.path.dirname(wkdir), "../data", "TB", "GCF_000195955.2_ASM19595v2_genomic.fna")
     config_dict["GenomeElement"]["ref_path"] = data_path
     config_dict["EpidemiologyModel"]["slim_replicate_seed_file_path"] = os.path.join(wkdir, "slimseeds.csv")
 

@@ -170,6 +170,10 @@ class EpidemiologyConfig:
             if not isinstance(values, list):
                 raise CustomizedError(f"({param}) has to be a list []")
 
+            if param == "surviv_prob":
+                if not any (effsize>0 for effsize in self.drug_resistance_effsize):
+                    continue
+
             if len(values) != self.n_epoch:
                 raise CustomizedError(
                     f"{param} {values} must have the same length "
