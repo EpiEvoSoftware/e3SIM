@@ -31,7 +31,14 @@
 		}
 		else if (any(ll[0]==list_float_pars))
 		{
-			defineGlobal(ll[0], asFloat(strsplit(ll[1], sep=",")));	
+			if (ll[1]=="")
+			{
+				defineGlobal(ll[0], 0);	
+			}
+			else
+			{
+				defineGlobal(ll[0], asFloat(strsplit(ll[1], sep=",")));	
+			}
 		}
 		else if (any(ll[0]==bin_pars))
 		{
