@@ -1,9 +1,0 @@
-# Ignore all the generated files during installation testing
-#########################
-1/
-2/
-3/
-
-*.png
-simulation.slim
-slim.params
