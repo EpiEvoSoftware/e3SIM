@@ -448,10 +448,10 @@ class TestSeedGenerator:
     @patch.object(SeedGenerator, '_generate')
     def test_run_with_exception(self, mock_generate, seed_generator):
         """Test run with exception handling"""
-        mock_generate.side_effect = ValueError("Test error")
+        mock_generate.side_effect = CustomizedError("Test error")
         result = seed_generator.run()
         
-        assert isinstance(result, ValueError)
+        assert isinstance(result, CustomizedError)
         assert str(result) == "Test error"
 
 

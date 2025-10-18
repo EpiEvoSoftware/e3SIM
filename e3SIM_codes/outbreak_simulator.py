@@ -706,14 +706,10 @@ class SlimScriptGenerator:
             self.script_components.append("Exposed_process.slim")
         
         # Infection process
-        if not self.config.genome_config.use_genetic_model:
-            self.script_components.append("Infected_process_nogenetic.slim")
-        else: 
-            if any (effsize > 0 for effsize in self.config.epidemiology.drug_resistance_effsize):
-                link_func = self.config.genome_config.link
-                self.script_components.append(f"Infected_process_additive_{link_func}.slim")
-            if any (effsize == 0 for effsize in self.config.epidemiology.transmissibility_effsize):
-                self.script_components.append("Infected_process_nogenetic.slim")
+        self.script_components.append("Infected_process_nogenetic.slim")
+        if any (effsize > 0 for effsize in self.config.epidemiology.drug_resistance_effsize):
+            link_func = self.config.genome_config.link
+            self.script_components.append(f"Infected_process_additive_{link_func}.slim")
 
         # Massive sampling
         if self.config.epidemiology.n_massive_sample > 0:

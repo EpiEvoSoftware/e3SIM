@@ -39,7 +39,7 @@ class GeneticEffectConfig:
         if self.num_init_seq <= 0:
             raise CustomizedError("Seed size must be positive.")
         if len(self.trait_num.keys()) != 2:
-            raise CustomizedError("Please specify exactly 2 traits quantities in a list (-trait_n for transmissibility and drug resistance)")
+            raise CustomizedError("Please specify exactly 2 kinds of traits' quantities in a list (-trait_n for transmissibility and drug resistance)")
         if sum(self.trait_num.values()) < 1:
             raise CustomizedError("Please provide a list of trait quantities (-trait_n) that sums up to at least 1")
 
@@ -49,8 +49,8 @@ class GeneticEffectConfig:
             if len(self.params.get("site_frac")) != sum(self.trait_num.values()):
                 raise CustomizedError("If you wish to sample causal sites from the candidate regions, "
                         f"Please provide the expected fraction of causal sites for each trait (-site_frac) with the same length as your trait quantities({sum(self.trait_num.values())})")
-            if any(x < 0 or x > 1 for x in self.params.get("site_frac")):
-                raise CustomizedError("The expected fraction for causal site sampling has to be within [0, 1].")
+            if any(x <= 0 or x >= 1 for x in self.params.get("site_frac")):
+                raise CustomizedError("The expected fraction for causal site sampling has to be within (0, 1).")
             if self.params.get("site_disp") <= 0:
                 raise CustomizedError("The dispersion of causal site fraction (-site_disp) has to be positive")
 
@@ -284,10 +284,13 @@ class EffectGenerator:
             b_i = max(b_i, 1e-12)
             pi_i = float(np.random.beta(a_i, b_i))
 
+            print("start while")
             # Draw until K_i >= 1
             K_i = 0
             while K_i == 0:
                 K_i = int(np.random.binomial(sites_num, pi_i))
+            
+            print("end repeat")
 
             # Sample indices without replacement
             if K_i >= sites_num:
@@ -375,7 +378,7 @@ class EffectGenerator:
         Draw n effect sizes for one trait from a Laplace distribution.
 
         Parameters:
-            n (int): Number of effect sizes to draw using this hyperparameter tau
+            n (int): Number of effect sizes to draw using this hyperparameter b
             b (float): Scale of the Laplace distribution
         """
         return np.random.laplace(0, b, size=n)
@@ -385,7 +388,7 @@ class EffectGenerator:
         Draw n effect sizes for one trait from a Student's t distribution.
 
         Parameters:
-            n (int): Number of effect sizes to draw using this hyperparameter tau
+            n (int): Number of effect sizes to draw using this hyperparameter scale and nv
             scale (float): Scale of the student's t's distribution
             nv (float): Degrees of freedom of the Student's t distribution
         """
