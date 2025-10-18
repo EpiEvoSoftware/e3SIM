@@ -13,6 +13,7 @@
 
 e3SIM=YOURPATH_TO_E3SIM
 WKDIR=YOUR_WORKING_DIRECTORY # WKDIR=${PWD}
+RANDOMSEED=1100
 
 # Run this command to update the absolute path in the provided configuration file to match your local directory
 cd ${WKDIR}
@@ -25,7 +26,8 @@ python ${e3SIM}/network_generator.py \
         -popsize 10000 \
         -method randomly_generate \
         -model BA \
-        -m 2
+        -m 2 \
+        -random_seed ${RANDOMSEED}
 
 
 # SeedGenerator is skipped in this example.
@@ -35,9 +37,12 @@ python ${e3SIM}/network_generator.py \
 python ${e3SIM}/genetic_effect_generator.py \
         -wkdir ${WKDIR} \
         -method user_input \
-        -effsize_path ${WKDIR}/causal_gene_info.csv \
+        -num_init_seq 1 \
+        -csv ${WKDIR}/causal_gene_info.csv \
         -trait_n '{"transmissibility": 1, "drug_resistance": 2}' \
-        -n_seed 1
+        -calibration F \
+        -calibration_link T \
+        -random_seed ${RANDOMSEED}
 
 
 # HostSeedMatcher
@@ -46,7 +51,8 @@ python ${e3SIM}/seed_host_matcher.py \
 	-method randomly_generate \
         -num_init_seq 1 \
         -match_scheme '{"0": "ranking"}' \
-        -match_scheme_param '{"0": 5000}'
+        -match_scheme_param '{"0": 5000}' \
+        -random_seed ${RANDOMSEED}
 
 
 # OutbreakSimulator

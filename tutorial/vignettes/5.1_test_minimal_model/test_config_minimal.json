@@ -26,7 +26,7 @@
       "link": "logit",
       "logit": {
         "alpha_trans": [
-          0.5
+          0.6648
         ],
         "alpha_drug": []
       }
@@ -37,7 +37,7 @@
   },
   "EpidemiologyModel": {
     "model": "SEIR",
-    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run/slimseeds.csv",
+    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.1_test_minimal_model/slimseeds.csv",
     "epoch_changing": {
       "n_epoch": 1,
       "epoch_changing_generation": []

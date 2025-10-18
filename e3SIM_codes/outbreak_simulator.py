@@ -998,9 +998,13 @@ class SimulationOrchestrator:
 
             return None
             
-        except Exception as e:
-            print(f"Simulation pipeline failed: {e}")
-            return e
+        # except Exception as e:
+        #     print(f"Simulation pipeline failed: {e}")
+        #     return e
+
+        except Exception:
+            logging.exception("Simulation pipeline failed")  # prints full traceback
+            raise  
     
     def _generate_parameter_file(self):
         """Generate SLiM parameter file."""

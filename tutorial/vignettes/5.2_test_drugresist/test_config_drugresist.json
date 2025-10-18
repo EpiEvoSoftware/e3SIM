@@ -1,12 +1,12 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "test_drugresist", 
+    "cwdir": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.2_test_drugresist",
     "n_replicates": 3
   },
   "EvolutionModel": {
     "subst_model_parameterization": "mut_rate",
     "n_generation": 730,
-    "mut_rate": 1.8e-6,
+    "mut_rate": 1.8e-06,
     "within_host_reproduction": false,
     "within_host_reproduction_rate": 0,
     "cap_withinhost": 1
@@ -17,35 +17,110 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "COVID/EPI_ISL_402124.fasta",
-    "traits_num": {"transmissibility": 1, "drug_resistance": 2}
+    "ref_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/../data/COVID/EPI_ISL_402124.fasta",
+    "traits_num": {
+      "transmissibility": 1,
+      "drug_resistance": 2
+    },
+    "trait_prob_link": {
+      "link": "logit",
+      "logit": {
+        "alpha_trans": [
+          0.405
+        ],
+        "alpha_drug": [
+          0.0116,
+          0.0273
+        ]
+      }
+    }
   },
   "NetworkModelParameters": {
-    "use_network_model": true,
     "host_size": 10000
   },
   "EpidemiologyModel": {
     "model": "SEIR",
+    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.2_test_drugresist/slimseeds.csv",
     "epoch_changing": {
       "n_epoch": 3,
-      "epoch_changing_generation": [250, 500]
+      "epoch_changing_generation": [
+        250,
+        500
+      ]
     },
     "genetic_architecture": {
-      "transmissibility": [1, 1, 1],
-      "cap_transmissibility": [10, 10, 10],
-      "drug_resistance": [0, 1, 2],
-      "cap_drugresist": [0, 10, 10]
+      "transmissibility": [
+        1,
+        1,
+        1
+      ],
+      "cap_transmissibility": [
+        10,
+        10,
+        10
+      ],
+      "drug_resistance": [
+        0,
+        1,
+        2
+      ],
+      "cap_drugresist": [
+        0,
+        10,
+        10
+      ]
     },
     "transition_prob": {
-      "S_IE_prob": [0.04, 0.04, 0.04],
-      "I_R_prob": [0.03, 0.06, 0.05],
-      "R_S_prob": [0.05, 0.1, 0.1],
-      "latency_prob": [1, 1, 1],
-      "E_I_prob": [0.3, 0.3, 0.3],
-      "I_E_prob": [0, 0, 0],
-      "E_R_prob": [0, 0, 0],
-      "sample_prob": [0.0002, 0.0002, 0.0002],
-      "recovery_prob_after_sampling": [0, 0, 0]
+      "S_IE_prob": [
+        0.04,
+        0.02,
+        0.02
+      ],
+      "I_R_prob": [
+        0.03,
+        0.06,
+        0.05
+      ],
+      "R_S_prob": [
+        0.05,
+        0.1,
+        0.1
+      ],
+      "latency_prob": [
+        1,
+        1,
+        1
+      ],
+      "E_I_prob": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "I_E_prob": [
+        0,
+        0,
+        0
+      ],
+      "E_R_prob": [
+        0,
+        0,
+        0
+      ],
+      "sample_prob": [
+        0.0002,
+        0.0003,
+        0.0003
+      ],
+      "recovery_prob_after_sampling": [
+        0,
+        0,
+        0
+      ],
+      "surviv_prob": [
+        0.01,
+        0.96,
+        0.96
+      ]
     },
     "massive_sampling": {
       "event_num": 0,
@@ -63,7 +138,7 @@
     },
     "sequence_output": {
       "vcf": true,
-      "fasta": true
+      "fasta": false
     }
   }
 }

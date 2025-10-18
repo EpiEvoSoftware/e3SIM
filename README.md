@@ -1,22 +1,59 @@
-## $\textbf{e3SIM}$
+## e3SIM Zenodo Package  
+*Supporting materials for the manuscript “e3SIM: epidemiological-ecological-evolutionary simulation framework for genomic epidemiology”*
 
-$\text{e3SIM}$ (**E**pidemiological-**e**cological-**e**volutionary simulation framework for genetic epidemiology) is an outbreak simulator that simultaneously simulates transmission dynamics and molecular evolution of pathogens within a host population contact network using an agent-based, discrete, and forward-in-time approach. This software caters to users of all programming backgrounds. It has an easy-to-use graphical interface for beginners and allows advanced customization through command-line options for experienced coders. It works on both MacOS system and Linux system.
-The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is composed of many SLiM code chunks which is difficult to test one-by-one, our unit tests are mainly focused on the pre-simulation modules. The SLiM simulation codes are tested manually which are not logged in the Codecov calculation.
+This Zenodo record contains the source code, demo scripts, and example data used in the manuscript. Each archive includes its own `README.md` with detailed, step-by-step instructions.
 
-## Installation (Linux / macOS)
+---
 
-1. **Extract the source archive** \
-    Download and unzip the source archive:
+### Contents
+- **e3SIM-main.zip**: 
+Source code for the e3SIM framework. See `e3SIM-main/README.md` for installation, dependencies, and usage examples. 
+
+- **manuscript_data.zip**: 
+Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. See `demo/README.md` for details. 
+
+- **tutorials.zip**: 
+Two example pipelines demonstrating end-to-end use of e3SIM. Each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it. Within each folder, there is also a compressed `Output_for_compare.zip` folder that contains example outputs that users can compare their results to.
+    - `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
+    - `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
+
+- **e3SIM_manual.pdf**:
+Comprehensive manual for the e3SIM software.
+
+- **coverage.xml**:
+    - The coverage report generated using `pytest --cov=. --cov-report=xml` with the following session information:
+    ```
+    platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+    rootdir: e3SIM-main
+    plugins: cov-6.2.1
+    ```
+
+---
+
+
+### System requirements
+- **Operating systems**: macOS or Linux
+- **Prerequisites:**  
+    - [Python ≥ 3.12](https://www.python.org/) with `python` and `pip` available on your `PATH`
+    - [Conda](https://docs.conda.io/) (Miniconda or Anaconda)  
+    - [R ≥ 4.0](https://cran.r-project.org/) with command-line access (`Rscript`)  
+- **Build tools & libraries:**  
+    Listed in each archive’s `README.md` and in the provided Conda environment file (`.yml`). 
+
+
+### Installation 
+Follow these steps to install and verify e3SIM on your system. These steps mirror the installation section in `e3SIM-main/README.md`.
+
+1. **Extract the source archive** 
     
     ```sh
     unzip e3SIM-main.zip
     cd e3SIM-main
     ```
-This creates the e3SIM-main/ directory.
+This creates the `e3SIM-main/` directory.
     
 
-2. **Create the conda environment** \
-Create a conda environment with the provided environment file.
+2. **Create the Conda environment** 
 
     - **macOS**
         ```sh
@@ -62,7 +99,7 @@ Make sure `Rscript` is in your `PATH` (test with `Rscript --help`).
         q()
         ```
 
-5. **Verify Installation** \
+5. **Verify installation** \
 Run a small simulation to confirm everything is set up correctly:
 
     ```sh
@@ -74,13 +111,14 @@ Run a small simulation to confirm everything is set up correctly:
     python update_config.py 
     
     # Run the test simulation
-    python ${e3SIM}/outbreak_simulator.py -config test_config.json  
+    python ${e3SIM}/outbreak_simulator.py -config test_config.json 
     ```
         
     - You should see progress messages in the console.
     - Upon completion, check for output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
 
 
+---
 
 ### General Usage
 `${e3SIM}` should be set to the absolute path of the `e3SIM_codes` directory inside your e3SIM installation:
@@ -148,13 +186,8 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 
 
 ## Liscence
-$\text{e3SIM}$ is a free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+e3SIM is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ## Disclaimer
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+This program is distributed WITHOUT ANY WARRANTY.  See the
 [GNU General Public License](\url{http://www.gnu.org/licenses/}) for more details.
