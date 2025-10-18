@@ -558,7 +558,7 @@ class EasyCombobox(EasyWidgetBase):
 
     def _updater(self, event):
         self.comboboxselected(self.var, self.to_rerender, self.to_derender)
-        self.comboboxselected(self.var, self.to_rerender, self.to_derender)
+        # self.comboboxselected(self.var, self.to_rerender, self.to_derender)
 
 class EasyPathSelector(EasyWidgetBase):
     def __init__(

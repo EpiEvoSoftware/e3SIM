@@ -84,7 +84,8 @@
       "I_E_prob": [],
       "E_R_prob": [],
       "sample_prob": [],
-      "recovery_prob_after_sampling": []
+      "recovery_prob_after_sampling": [],
+      "surviv_prob": []
     },
     "massive_sampling": {
       "event_num": 0,

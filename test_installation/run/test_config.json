@@ -1,14 +1,12 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/annonymous/16756959/e3SIM-main/test_installation/run",
+    "cwdir": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run",
     "n_replicates": 3
   },
   "EvolutionModel": {
     "subst_model_parameterization": "mut_rate",
     "n_generation": 1000,
     "mut_rate": 3.12e-10,
-    "trans_type": "additive",
-    "dr_type": "additive",
     "within_host_reproduction": false,
     "within_host_reproduction_rate": 0,
     "cap_withinhost": 1
@@ -19,10 +17,19 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "/Users/px54/Documents/TB_software/annonymous/16756959/e3SIM-main/test_installation/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "ref_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
     "traits_num": {
       "transmissibility": 1,
       "drug_resistance": 0
+    },
+    "trait_prob_link": {
+      "link": "logit",
+      "logit": {
+        "alpha_trans": [
+          0.5
+        ],
+        "alpha_drug": []
+      }
     }
   },
   "NetworkModelParameters": {
@@ -30,6 +37,7 @@
   },
   "EpidemiologyModel": {
     "model": "SEIR",
+    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run/slimseeds.csv",
     "epoch_changing": {
       "n_epoch": 1,
       "epoch_changing_generation": []
@@ -38,13 +46,7 @@
       "transmissibility": [
         1
       ],
-      "cap_transmissibility": [
-        10
-      ],
       "drug_resistance": [
-        0
-      ],
-      "cap_drugresist": [
         0
       ]
     },
@@ -75,6 +77,9 @@
       ],
       "recovery_prob_after_sampling": [
         0
+      ],
+      "surviv_prob": [
+        0.992
       ]
     },
     "massive_sampling": {
@@ -92,7 +97,7 @@
     },
     "sequence_output": {
       "vcf": true,
-      "fasta": true
+      "fasta": false
     }
   }
 }

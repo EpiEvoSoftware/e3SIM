@@ -386,56 +386,57 @@ class NetworkModel:
         if host_size == 0:
             messagebox.showerror("Warning", "Warning: Your host size is currently 0.")
         
-        match network_model_params["randomly_generate"]["network_model"]:
-            case "ER":
-                try:
-                    p_ER = float(self.update_config_entries["p_ER"].get())
-                    assert(0 < p_ER <= 1)
-                    network_model_params["randomly_generate"]["ER"]["p_ER"] = p_ER
-                except (AssertionError, ValueError):
-                    messagebox.showerror(
-                        "Error", 
-                        "Please enter a valid float for ER probability parameter. (0 < p_ER <= 1)")
-                    return False
-                
-            case "RP":
-                try:
-                    rp_size = json.loads(self.update_config_entries["rp_size"].get())
-                    rp_size[0] = int(rp_size[0])
-                    rp_size[1] = int(rp_size[1])
-                    assert(len(rp_size) == 2)
-                    network_model_params["randomly_generate"]["RP"]["rp_size"] = rp_size
-                except (AssertionError, ValueError):
-                    messagebox.showerror("Error", "Please enter a valid list of two ints for partition sizes.")
-                    return False
-                
-                try:
-                    p_within = json.loads(self.update_config_entries["p_within"].get())
-                    p_within[0] = float(p_within[0])
-                    p_within[1] = float(p_within[1])
-                    assert(len(rp_size) == 2)
-                    network_model_params["randomly_generate"]["RP"]["p_within"] = p_within
-                except (AssertionError, ValueError):
-                    messagebox.showerror(
-                        "Error", 
-                        "Please enter a valid list of two floats for within-probabilities.")
-                    return False
-                
-                try:
-                    p_between = float(self.update_config_entries["p_between"].get())
-                    network_model_params["randomly_generate"]["RP"]["p_between"] = p_between
-                except ValueError:
-                    messagebox.showerror(
-                        "Error", "Please enter a valid float for between-probability.")
-                    return False
-                
-            case "BA":
-                try:
-                    ba_m = int(self.update_config_entries["ba_m"].get())
-                    network_model_params["randomly_generate"]["BA"]["ba_m"] = ba_m
-                except ValueError:
-                    messagebox.showerror("Error", "Please enter a valid integer for BA m parameter.")
-                    return False
+        if network_model_params["method"] == "randomly_generate":
+            match network_model_params["randomly_generate"]["network_model"]:
+                case "ER":
+                    try:
+                        p_ER = float(self.update_config_entries["p_ER"].get())
+                        assert(0 < p_ER <= 1)
+                        network_model_params["randomly_generate"]["ER"]["p_ER"] = p_ER
+                    except (AssertionError, ValueError):
+                        messagebox.showerror(
+                            "Error", 
+                            "Please enter a valid float for ER probability parameter. (0 < p_ER <= 1)")
+                        return False
+                    
+                case "RP":
+                    try:
+                        rp_size = json.loads(self.update_config_entries["rp_size"].get())
+                        rp_size[0] = int(rp_size[0])
+                        rp_size[1] = int(rp_size[1])
+                        assert(len(rp_size) == 2)
+                        network_model_params["randomly_generate"]["RP"]["rp_size"] = rp_size
+                    except (AssertionError, ValueError):
+                        messagebox.showerror("Error", "Please enter a valid list of two ints for partition sizes.")
+                        return False
+                    
+                    try:
+                        p_within = json.loads(self.update_config_entries["p_within"].get())
+                        p_within[0] = float(p_within[0])
+                        p_within[1] = float(p_within[1])
+                        assert(len(rp_size) == 2)
+                        network_model_params["randomly_generate"]["RP"]["p_within"] = p_within
+                    except (AssertionError, ValueError):
+                        messagebox.showerror(
+                            "Error", 
+                            "Please enter a valid list of two floats for within-probabilities.")
+                        return False
+                    
+                    try:
+                        p_between = float(self.update_config_entries["p_between"].get())
+                        network_model_params["randomly_generate"]["RP"]["p_between"] = p_between
+                    except ValueError:
+                        messagebox.showerror(
+                            "Error", "Please enter a valid float for between-probability.")
+                        return False
+                    
+                case "BA":
+                    try:
+                        ba_m = int(self.update_config_entries["ba_m"].get())
+                        network_model_params["randomly_generate"]["BA"]["ba_m"] = ba_m
+                    except ValueError:
+                        messagebox.showerror("Error", "Please enter a valid integer for BA m parameter.")
+                        return False
 
         save_config(self.config_path, config)
         return True

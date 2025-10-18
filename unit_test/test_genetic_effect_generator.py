@@ -1373,17 +1373,14 @@ class TestConfigFromDict:
                 },
                 "effect_size": {
                     "method": "user_input",
-                    "filepath": {
-                        "csv_path": csv_path
-                    },
+                    "csv_path": csv_path,
                     "calibration": {
                         "do_calibration": False,
                         "V_target": []
                     },
                     "causalsites_params": {
-                        "method": "beta_binomial",
-                        "pis": [],
-                        "Ks": []
+                        "exp_fraction": [],
+                        "fraction_dispersion": 100
                     },
                     "effsize_params": {
                         "effsize_function": "n",

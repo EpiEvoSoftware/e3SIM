@@ -170,6 +170,10 @@ class EpidemiologyConfig:
             if not isinstance(values, list):
                 raise CustomizedError(f"({param}) has to be a list []")
 
+            if param == "surviv_prob":
+                if not any (effsize>0 for effsize in self.drug_resistance_effsize):
+                    continue
+
             if len(values) != self.n_epoch:
                 raise CustomizedError(
                     f"{param} {values} must have the same length "
@@ -467,7 +471,6 @@ class ConfigParser:
     def parse_config_file(self, config_path: Union[str, Path]) -> SimulationConfig:
         """Parse configuration from JSON/YAML file."""
         config_path = Path(config_path)
-        print(config_path)
         
         if not config_path.exists():
             raise CustomizedError(f"Config file {config_path} not found")
@@ -509,7 +512,7 @@ class ConfigParser:
             seed_info = seed_info,
             genome_config = genome_element,
             postprocess_config = postprocessing,
-            slim_seed_file = Path(epidemiology_config.get("slim_replicate_seed_file_path", ""))
+            slim_seed_file = Path(epidemiology_config.slim_replicate_seed_file_path)
             if epidemiology_config.slim_replicate_seed_file_path else None
         )
     
@@ -680,15 +683,12 @@ class SlimScriptGenerator:
         self.script_components.append("self_reproduce.slim")
         
         # Transmission based on genetic model
-        if not self.config.genome_config.use_genetic_model:
-            self.script_components.append("transmission_nogenetic.slim")
-        else:
+        self.script_components.append("transmission_nogenetic.slim")
             # Add appropriate transmission model based on configuration
-            if any (effsize > 0 for effsize in self.config.epidemiology.transmissibility_effsize):
-                link_func = self.config.genome_config.link
-                self.script_components.append(f"transmission_additive_{link_func}.slim")
-            if any (effsize == 0 for effsize in self.config.epidemiology.transmissibility_effsize):
-                self.script_components.append("transmission_nogenetic.slim")
+        if self.config.genome_config.use_genetic_model and \
+            any (effsize > 0 for effsize in self.config.epidemiology.transmissibility_effsize):
+            link_func = self.config.genome_config.link
+            self.script_components.append(f"transmission_additive_{link_func}.slim")
         
         # Within-host reproduction
         if self.config.evolution.within_host_reproduction:
@@ -705,9 +705,10 @@ class SlimScriptGenerator:
         if self.config.epidemiology.model.value == "SEIR":
             self.script_components.append("Exposed_process.slim")
         
-        # Infection process
+        # Recovery process from infected states
         self.script_components.append("Infected_process_nogenetic.slim")
-        if any (effsize > 0 for effsize in self.config.epidemiology.drug_resistance_effsize):
+        if self.config.genome_config.use_genetic_model and \
+            any (effsize > 0 for effsize in self.config.epidemiology.drug_resistance_effsize):
             link_func = self.config.genome_config.link
             self.script_components.append(f"Infected_process_additive_{link_func}.slim")
 

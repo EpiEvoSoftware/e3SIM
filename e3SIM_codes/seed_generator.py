@@ -301,7 +301,7 @@ class SimulationRunner:
                             "-d", f"mtx_path=\"{mtx_path}\"", slim_script], stdout=fd)
             else:
                 subprocess.run(["slim", "-d", f"Ne={Ne}", "-d", f"ref_path=\"{ref_path}\"", "-d", \
-                        f"wk_dir=\"{self.wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", "-d", f"seed={rand_seed}", \
+                        f"wk_dir=\"{self.wk_dir}\"", "-d", f"mu={mu}", "-d", f"n_gen={n_gen}", "-seed", f"{rand_seed}", \
                         "-d", f"use_subst_matrix={self.bool2SLiM(use_subst_matrix)}", "-d", f"mtx_path=\"{mtx_path}\"", slim_script], stdout=fd)
         # VCF/NWK
         seeds_treeseq(seed_size)
@@ -389,7 +389,7 @@ class SimulationRunner:
                 "-d", f"use_subst_matrix={self.bool2SLiM(use_subst_matrix)}", 
                 "-d", f"mtx_path=\"{mtx_path}\""]
             if rand_seed:
-                args += ["-d", f"seed={rand_seed}"]
+                args += ["-seed", f"{rand_seed}"]
             args += [slim_script]
 
             subprocess.run(args, stdout=fd)

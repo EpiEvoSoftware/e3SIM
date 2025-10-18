@@ -1,3 +1,4 @@
+from numpy.random.mtrand import randint
 from base_func import *
 from error_handling import CustomizedError
 import numpy as np
@@ -15,6 +16,10 @@ DEFAULT_R_OHR = 1.5  # Default odds ratio / transmisison hazard ratio per SD
 DEFAULT_R_CLR = 0.667  # Default clearance ratio per SD
 DEFAULT_VTGT = 1.0 # Default target variance for calibrating effect sizes
 DEFAULT_MU = 0.003
+DEFAULT_TAUS = 1
+DEFAULT_BS = 1
+DEFAULT_NV = 3
+DEFAULT_S = 1
 EXP_BETAPRIOR = 1.0 / 6.0 # Expected allele frequency
 
 
@@ -58,15 +63,40 @@ class GeneticEffectConfig:
                 raise CustomizedError(f"{self.params.get("func")} isn't a valid method for sampling effect sizes. Please choose a permitted method."
                                  "(n/l/st) for -func")
 
-            if self.params.get("func") == "n" and len(self.params.get("taus")) != sum(self.trait_num.values()):
-                raise CustomizedError(f"The given length of the variance (-taus) {self.params.get("taus")}"
+            if self.params.get("func") == "n":
+                if len(self.params.get("taus")) != sum(self.trait_num.values()):
+                    if self.params.get("taus") == []:
+                        self.params["taus"] = [DEFAULT_TAUS for _ in range(sum(self.trait_num.values()))]
+                    else:
+                        raise CustomizedError(f"The given length of the variance (-taus) {self.params.get("taus")}"
                             f" do not match the number of traits to be drawn {self.trait_num} in the point normal mode.")
-            if self.params.get("func") == "l" and len(self.params.get("bs")) != sum(self.trait_num.values()):
-                raise CustomizedError(f"The given length of the scales (-bs) {self.params.get("bs")}"
+                if any(x < 0 for x in self.params["taus"]):
+                    raise CustomizedError("If you wish to provide a variance for the normal distribution (-taus)"
+                        f" All the entries have to be not negative.")
+            if self.params.get("func") == "l":
+                if len(self.params.get("bs")) != sum(self.trait_num.values()):
+                    if self.params.get("bs") == []:
+                        self.params["bs"] = [DEFAULT_BS for _ in range(sum(self.trait_num.values()))]
+                    else:
+                        raise CustomizedError(f"The given length of the scales (-bs) {self.params.get("bs")}"
                             f" do not match the number of traits to be drawn {self.trait_num} in the laplace mode.")
-            if self.params.get("func") == "st" and len(self.params.get("s")) != sum(self.trait_num.values()):
-                raise CustomizedError(f"The given length of the scales (-s) {self.params.get("s")}"
-                            f" do not match the number of traits to be drawn {self.trait_num} in the laplace mode.")
+                if any(x < 0 for x in self.params["bs"]):
+                    raise CustomizedError("If you wish to provide a scale for the laplace distribution (-bs)"
+                        f" All the entries have to be not negative.")
+            if self.params.get("func") == "st":
+                if len(self.params.get("s")) != sum(self.trait_num.values()):
+                    if self.params.get("s") == []:
+                        self.params["s"] = [DEFAULT_S for _ in range(sum(self.trait_num.values()))]
+                    else:
+                        raise CustomizedError(f"The given length of the scales (-s) {self.params.get("s")}"
+                            f" do not match the number of traits to be drawn {self.trait_num} in the student's t mode.")
+                if any(x < 0 for x in self.params["bs"]):
+                    raise CustomizedError("If you wish to provide a scale for the student's t distribution (-s)"
+                        f" All the entries have to be not negative.")
+                if self.params.get("nv") <=0 :
+                    raise CustomizedError(f"The degrees of freedom for the student's t distribution (-nv) {self.params.get("nv")}"
+                            f" has to be positive in the student's t mode.")
+
 
         if self.params.get("calibration_link"):
             if self.params.get("link") not in ["logit", "cloglog"]:
@@ -518,7 +548,6 @@ class EffectGenerator:
         df_eff_calibrated = df_eff.copy()
         df_eff_calibrated.iloc[:, 1:] = df_eff.iloc[:, 1:] * c_i
 
-
         return df_eff_calibrated, var_empirical
         
         
@@ -610,7 +639,7 @@ def effsize_generation_byconfig(all_config):
 
     genetic_config = all_config["GenomeElement"]
     wk_dir = all_config["BasicRunConfiguration"]["cwdir"]
-    random_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
+    rand_seed = all_config["BasicRunConfiguration"].get("random_number_seed", None)
     num_seed = all_config["SeedsConfiguration"]["seed_size"]
     
     try:
@@ -620,11 +649,11 @@ def effsize_generation_byconfig(all_config):
             num_init_seq = num_seed,
             func = genetic_config["effect_size"]["effsize_params"]["effsize_function"],
             calibration = genetic_config["effect_size"]["calibration"]["do_calibration"],
-            random_seed = random_seed,
-            csv = genetic_config["effect_size"]["filepath"]["csv_path"],
+            random_seed = rand_seed,
+            csv = genetic_config["effect_size"]["csv_path"],
             trait_num = genetic_config["traits_num"],
-            pis = genetic_config["effect_size"]["causalsites_params"]["pis"],
-            Ks = genetic_config["effect_size"]["causalsites_params"]["Ks"],
+            site_frac = genetic_config["effect_size"]["causalsites_params"]["exp_fraction"],
+            site_disp = genetic_config["effect_size"]["causalsites_params"]["fraction_dispersion"],
             taus = genetic_config["effect_size"]["effsize_params"]["normal"]["taus"],
             bs = genetic_config["effect_size"]["effsize_params"]["laplace"]["bs"],
             nv = genetic_config["effect_size"]["effsize_params"]["studentst"]["nv"],
@@ -632,8 +661,7 @@ def effsize_generation_byconfig(all_config):
             var_target = genetic_config["effect_size"]["calibration"]["V_target"],
             calibration_link = genetic_config["trait_prob_link"]["calibration"],
             Rs = genetic_config["trait_prob_link"]["Rs"],
-            link = genetic_config["trait_prob_link"]["link"],
-            site_method = genetic_config["effect_size"]["causalsites_params"]["method"]
+            link = genetic_config["trait_prob_link"]["link"]
         )
     except CustomizedError as e:
         return e

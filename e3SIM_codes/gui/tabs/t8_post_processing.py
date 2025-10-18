@@ -194,7 +194,11 @@ class PostProcessing(TabBase):
             orchestrator = SimulationOrchestrator(self.config_path)
             orchestrator.initialize() # generate slim config
             messagebox.showinfo("Configuration check Passed.")
-        except IOError as e:
+        except Exception as e:
+            #traceback.print_exc()
+            messagebox.showerror(
+                    "Value Error", "Please go back to check the set values. Errors checking configuration: %s" % e)
+            return
             print("Errors checking configuration: %s" % e)
         try:
             shutil.copy(self.config_path, target)

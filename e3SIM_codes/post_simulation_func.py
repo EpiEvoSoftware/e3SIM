@@ -366,7 +366,23 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
 
     # Write VCF file
     with open(vcf_path, "w") as f:
-        nu_ts = pyslim.convert_alleles(sampled_ts)
+        tables = sampled_ts.tables
+        original_mutations = tables.mutations
+        tables.mutations.clear()
+        for m_id, mutation in enumerate(original_mutations):
+            if mutation.metadata != {'mutation_list': []}:
+                print(metadata)
+                tables.mutations.add_row(
+                site=mutation.site,
+                node=mutation.node,
+                parent=mutation.parent,
+                time=mutation.time,
+                derived_state=mutation.derived_state,
+                metadata=mutation.metadata
+                )
+
+        new_ts = tables.tree_sequence()  
+        nu_ts = pyslim.convert_alleles(new_ts)
         nu_ts.write_vcf(f, individual_names = real_label.values())
 
     # Modify position values and write to final VCF file

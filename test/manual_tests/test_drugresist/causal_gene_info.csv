@@ -1,4 +1,0 @@
-gene_name,start,end,eff_size_transmissibility1,eff_size_dr1,eff_size_dr2
-segment1,450,500,0.0,0.2,0.0
-segment2,650,1000,0.2,0.0,0.0
-segment3,4300,4500,0.0,0.0,0.2

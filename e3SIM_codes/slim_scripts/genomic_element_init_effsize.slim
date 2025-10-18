@@ -1,3 +1,4 @@
+
 	range_genes = c();
 	defineGlobal("effsize_pos", readCSV(causal_gene_path, colNames = T));
 	n_causal_genes = effsize_pos.nrow;
@@ -32,7 +33,11 @@
 	defineGlobal("range_genes", range_genes);
 
 	defineGlobal("logit_beta", log(S_IE_rate) - log(1 - S_IE_rate));
-	defineGlobal("logit_s", log(surviv_prob) - log(1 - surviv_prob));
 	defineGlobal("lambda", -log(1 - S_IE_rate));
-	defineGlobal("kappa", -log(surviv_prob));
+
+	if (any(drugresistance_effsize>0))
+	{
+		defineGlobal("logit_s", log(surviv_prob) - log(1 - surviv_prob));
+		defineGlobal("kappa", -log(surviv_prob));
+	}
 

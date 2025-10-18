@@ -345,7 +345,7 @@ class TestSimulationRunner:
         # Check that subprocess.run was called with seed parameter
         call_args = mock_run.call_args[0][0]
         assert "-d" in call_args
-        assert "seed=12345" in call_args
+        assert "12345" in call_args
 
 
 # ==================== Test SeedGenerator ====================
