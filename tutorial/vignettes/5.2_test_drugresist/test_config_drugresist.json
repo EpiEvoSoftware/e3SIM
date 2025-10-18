@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.2_test_drugresist",
+    "cwdir": "5.2_test_drugresist",
     "n_replicates": 3
   },
   "EvolutionModel": {
@@ -17,7 +17,7 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/../data/COVID/EPI_ISL_402124.fasta",
+    "ref_path": "COVID/EPI_ISL_402124.fasta",
     "traits_num": {
       "transmissibility": 1,
       "drug_resistance": 2
@@ -40,7 +40,7 @@
   },
   "EpidemiologyModel": {
     "model": "SEIR",
-    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/tutorial/vignettes/5.2_test_drugresist/slimseeds.csv",
+    "slim_replicate_seed_file_path": "5.2_test_drugresist/slimseeds.csv",
     "epoch_changing": {
       "n_epoch": 3,
       "epoch_changing_generation": [
