@@ -170,7 +170,7 @@ class PostProcessing(TabBase):
             frow,
             self.generate_config_file,
             hide,
-            "",
+            sticky="w",
         )
         self.visible_components.add(component)
         return component

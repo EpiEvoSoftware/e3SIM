@@ -103,6 +103,7 @@ class EpidemiologyModel(TabBase):
         self.render_I_E_prob(hide, 0, 1, frow())
         self.render_I_R_prob(hide, 0, 1, frow())
         self.render_R_S_prob(hide, 0, 1, frow())
+        self.render_survival_prob(hide, 0, 1, frow())
         self.render_sample_prob(hide, 0, 1, frow())
         self.render_sampling_recovery_prob(hide, 0, 1, frow())
         self.render_image(hide, os.path.join(self.config_path, "../../../e3SIM_codes/gui/assets/t7.png"), 500, 300, 1, 1, 17)
@@ -326,6 +327,17 @@ class EpidemiologyModel(TabBase):
             keys_path, self.config_path, text, 'Post-sampling Recovery Prob. δ',
             self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
             labtext="Probability of instant recovery for each sampled host. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
+            )
+        self.visible_components.add(component)
+        return component
+
+    def render_survival_prob(self, hide, column, columnspan, frow):
+        text = r"Base Survival under Treatment Prob. s (List Numerical)"
+        keys_path = ['EpidemiologyModel','transition_prob','surviv_prob']
+        component = EasyEntry(
+            keys_path, self.config_path, text, 'Base Survival under Treatment Prob. s ',
+            self.scrollable_frame, column, frow, 'list numerical', hide, columnspan,
+            labtext="Base probability of per-pathogen survival under treatment. Has to be a list whose length is the number of epochs specified above, and each entry represents the parameter for one epoch (in time-order)."
             )
         self.visible_components.add(component)
         return component

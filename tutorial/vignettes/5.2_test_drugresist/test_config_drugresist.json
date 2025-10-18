@@ -54,20 +54,10 @@
         1,
         1
       ],
-      "cap_transmissibility": [
-        10,
-        10,
-        10
-      ],
       "drug_resistance": [
         0,
         1,
         2
-      ],
-      "cap_drugresist": [
-        0,
-        10,
-        10
       ]
     },
     "transition_prob": {
