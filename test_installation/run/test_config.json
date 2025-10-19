@@ -1,6 +1,6 @@
 {
   "BasicRunConfiguration": {
-    "cwdir": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run",
+    "cwdir": "test_installation/run",
     "n_replicates": 3
   },
   "EvolutionModel": {
@@ -17,7 +17,7 @@
   },
   "GenomeElement": {
     "use_genetic_model": true,
-    "ref_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/data/TB/GCF_000195955.2_ASM19595v2_genomic.fna",
+    "ref_path": "GCF_000195955.2_ASM19595v2_genomic.fna",
     "traits_num": {
       "transmissibility": 1,
       "drug_resistance": 0
@@ -37,7 +37,7 @@
   },
   "EpidemiologyModel": {
     "model": "SEIR",
-    "slim_replicate_seed_file_path": "/Users/px54/Documents/TB_software/revision_October/e3SIM/test_installation/run/slimseeds.csv",
+    "slim_replicate_seed_file_path": "slimseeds.csv",
     "epoch_changing": {
       "n_epoch": 1,
       "epoch_changing_generation": []
