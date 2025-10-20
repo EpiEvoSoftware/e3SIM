@@ -1,7 +1,0 @@
-s9 early(){
-	r_inds = which(current_hoststates==3);
-	draw_uniform = runif(length(r_inds));
-	state_transition = findInterval(draw_uniform, c(0, R_S_rate[current_epoch]));
-	Host_states[r_inds[which(state_transition==0)]]=0;
-}
-

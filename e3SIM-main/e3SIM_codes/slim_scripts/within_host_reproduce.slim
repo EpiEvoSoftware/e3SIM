@@ -1,0 +1,24 @@
+s2 reproduction()
+{
+	// Within-host reproduction, only activated when within-host evolution is T.
+	all_subpops = sim.subpopulations;
+	host_ids = which((Host_states==2)&(all_subpops.individualCount < cap_withinhost));
+	subpops = all_subpops[host_ids];
+
+	for (i in subpops)
+	{
+		all_individuals = i.individuals;
+		reproduce_event = which(rbinom(length(all_individuals), 1, within_host_reproduction_rate)==1);
+		if (length(reproduce_event)>0)
+		{
+			for (j in reproduce_event)
+			{
+				parent = all_individuals[j];
+				i.addRecombinant(parent.haploidGenome1, NULL, NULL, NULL, NULL, NULL).tag = parent.tag;
+			}
+		}
+	}
+	self.active=0;
+}
+
+

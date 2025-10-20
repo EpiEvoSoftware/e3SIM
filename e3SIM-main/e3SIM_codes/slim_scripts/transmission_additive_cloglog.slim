@@ -1,0 +1,45 @@
+s1 reproduction()
+{
+	// Transmission
+	print(community.tick);
+	infectors = which(Host_states==2);
+	subpops = sim.subpopulations;
+	infector_subpops = subpops[infectors];
+
+	for (infector_subpop in infector_subpops)
+	{	
+		contact_ids = infector_subpop.getValue("Contacts");
+		if (length(contact_ids)>0)
+		{
+			infector_pathogen = sample(infector_subpop.individuals, 1);
+			muts = infector_pathogen.genome1.mutationsOfType(1);
+			transmissibility = 1 + additive_trait(muts, paste0("transmissibility_", transmissibility_effsize[current_epoch]));
+
+			p_trans = 1 - exp(-lambda[current_epoch] * exp(alpha_trans[transmissibility_effsize[current_epoch] - 1] * additive_trait(muts, paste0("transmissibility_", transmissibility_effsize[current_epoch]))));
+
+			trans_event = rbinom(length(contact_ids), 1, p_trans);
+			contacts_states = Host_states[contact_ids];
+			
+			if (super_infection==T) 
+			{
+				infectee_id = contact_ids[which((trans_event==1) & (subpops[contact_ids].individualCount < cap_withinhost) & (contacts_states!=3))];
+			}
+			else 
+			{
+				infectee_id = contact_ids[which((trans_event==1)&(contacts_states==0))];
+			}
+
+			for (i in infectee_id)
+			{
+				infectee_pathogen = subpops[i].addRecombinant(infector_pathogen.genome1, NULL, NULL, NULL, NULL, NULL);
+				infectee_pathogen.setValue("infector", infector_subpop.tag);
+				infectee_pathogen.tag = infector_pathogen.tag;
+				line = paste(community.tick, infector_subpop.tag, i);
+				writeFile(paste0(cwdir, runid, "/infection_raw.csv"), line, append=T, compress=T);
+			}
+		}
+	}
+	self.active=0;
+}
+
+

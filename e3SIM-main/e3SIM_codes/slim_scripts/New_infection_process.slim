@@ -1,0 +1,21 @@
+s10 early(){
+	hosts = sim.subpopulations;
+	
+	s_inds = which((current_hoststates==0)&(hosts.individualCount>0));
+
+
+	for (s_ind in s_inds)
+	{
+		s_ind_pathogens = hosts[s_ind].individuals;
+		remain_strain = sample(s_ind_pathogens, 1);
+		sim.killIndividuals(s_ind_pathogens[which(s_ind_pathogens!=remain_strain)]);
+		line = paste(community.tick, remain_strain.getValue("infector"), s_ind);
+		writeFile(paste0(cwdir, runid, "/infection.csv"), line, append=T, compress=T);
+	}
+
+	draw_uniform = runif(length(s_inds));
+	state_transition = findInterval(draw_uniform, c(0, latency_prob[current_epoch]));
+	Host_states[s_inds[which(state_transition==0)]] = 1;    //state_transition=0 means going to latent state while =1 means going to active state
+	Host_states[s_inds[which(state_transition > 0)]] = 2;
+}
+

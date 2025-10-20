@@ -1,0 +1,2 @@
+class CustomizedError(Exception):
+    pass

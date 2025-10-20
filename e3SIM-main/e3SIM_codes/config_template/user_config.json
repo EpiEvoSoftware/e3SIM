@@ -1,0 +1,246 @@
+{
+  "BasicRunConfiguration": {
+    "cwdir": "",
+    "n_replicates": 1,
+    "random_number_seed": null
+  },
+  "EvolutionModel": {
+    "n_generation": 0,
+    "subst_model_parameterization": "",
+    "mut_rate": 0.0,
+    "mut_rate_matrix": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "within_host_reproduction": false,
+    "within_host_reproduction_rate": 0.0,
+    "cap_withinhost": 1
+  },
+  "NetworkModelParameters": {
+    "method": "",
+    "host_size": 0,
+    "user_input": {
+      "path_network": ""
+    },
+    "randomly_generate": {
+      "network_model": "",
+      "ER": {
+        "p_ER": 0
+      },
+      "RP": {
+        "rp_size": [
+          0,
+          0
+        ],
+        "p_within": [
+          0,
+          0
+        ],
+        "p_between": 0
+      },
+      "BA": {
+        "ba_m": 0
+      }
+    }
+  },
+  "SeedsConfiguration": {
+    "seed_size": 1,
+    "use_reference": false,
+    "method": "",
+    "user_input": {
+      "path_seeds_vcf": "",
+      "path_seeds_phylogeny": ""
+    },
+    "SLiM_burnin_WF": {
+      "burn_in_Ne": 0,
+      "burn_in_generations": 0,
+      "subst_model_parameterization": "",
+      "burn_in_mutrate": 0.0,
+      "burn_in_mutrate_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    "SLiM_burnin_epi": {
+      "burn_in_generations": 0,
+      "subst_model_parameterization": "",
+      "burn_in_mutrate": 0.0,
+      "burn_in_mutrate_matrix": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "seeded_host_id": [],
+      "S_IE_prob": 0,
+      "E_I_prob": 0,
+      "E_R_prob": 0,
+      "latency_prob": 0,
+      "I_R_prob": 0,
+      "I_E_prob": 0,
+      "R_S_prob": 0
+    }
+  },
+  "GenomeElement": {
+    "use_genetic_model": true,
+    "ref_path": "",
+    "traits_num": {
+      "transmissibility": 0,
+      "drug_resistance": 0
+    },
+    "effect_size": {
+      "method": "randomly_generate",
+      "csv_path": "",
+      "causalsites_params": {
+        "exp_fraction": [],
+        "fraction_dispersion": 100
+      },
+      "effsize_params": {
+        "effsize_function":"",
+        "normal": {
+          "taus": []
+        },
+        "laplace": {
+          "bs": []
+        },
+        "studentst": {
+          "s": [],
+          "nv": 3
+        }
+      },
+      "calibration": {
+        "do_calibration": false,
+        "V_target": []
+      }
+    },
+    "trait_prob_link": {
+      "link": "logit",
+      "Rs": [],
+      "calibration": false,
+      "logit": {
+        "alpha_trans": [],
+        "alpha_drug": []
+      },
+      "cloglog": {
+        "alpha_trans": [],
+        "alpha_drug": []
+      }
+    }
+  },
+  "SeedHostMatching": {
+    "method": "",
+    "user_input": {
+      "path_matching": ""
+    },
+    "randomly_generate": {
+      "match_scheme": "",
+      "match_scheme_param": ""
+    }
+  },
+  "EpidemiologyModel": {
+    "slim_replicate_seed_file_path": "",
+    "model": "",
+    "epoch_changing": {
+      "n_epoch": 1,
+      "epoch_changing_generation": []
+    },
+    "genetic_architecture": {
+      "transmissibility": [],
+      "drug_resistance": []
+    },
+    "transition_prob": {
+      "S_IE_prob": [],
+      "I_R_prob": [],
+      "R_S_prob": [],
+      "latency_prob": [],
+      "E_I_prob": [],
+      "I_E_prob": [],
+      "E_R_prob": [],
+      "sample_prob": [],
+      "recovery_prob_after_sampling": [],
+      "surviv_prob": []
+    },
+    "massive_sampling": {
+      "event_num": 0,
+      "generation": [],
+      "sampling_prob": [],
+      "recovery_prob_after_sampling": []
+    },
+    "super_infection": false
+  },
+  "Postprocessing_options": {
+    "do_postprocess": true,
+    "tree_plotting": {
+      "branch_color_trait": 1,
+      "heatmap": "none"
+    },
+    "sequence_output": {
+      "vcf": true,
+      "fasta": true
+    }
+  }
+}

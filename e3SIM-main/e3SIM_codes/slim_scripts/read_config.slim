@@ -1,0 +1,59 @@
+
+	str_pars = c("cwdir", "trans_type", "dr_type", "ref_path", "causal_gene_path", "seed_host_matching_path", "contact_network_path", "epi_model", "transition_matrix_path");
+	int_pars = c("n_generation", "cap_withinhost", "seed_size", "n_epoch", "n_massive_sample", "host_size", "cap_withinhost");
+	float_pars = c("mut_rate", "within_host_reproduction_rate");
+	list_int_pars = c("epoch_changing_generation", "transmissibility_effsize", "drugresistance_effsize", "massive_sample_generation");
+	list_float_pars = c("S_IE_rate", "I_R_rate", "R_S_rate", "latency_prob", "E_I_rate", "I_E_rate", "E_R_rate", "sample_rate", "recovery_prob_after_sampling", "massive_sample_prob", "massive_sample_recover_prob", "surviv_prob", "alpha_trans", "alpha_drug");
+	bin_pars = c("within_host_reproduction", "use_genetic_model", "super_infection", "transition_matrix");
+
+	// config_path has to be command line input
+	defineGlobal("configs", readFile(config_path));
+
+	// Reading all the variables
+	for (l in configs)
+	{
+		ll = strsplit(l, ":");
+		if (any(ll[0]==int_pars))
+		{
+			defineGlobal(ll[0], asInteger(ll[1]));
+		}
+		else if (any(ll[0]==str_pars))
+		{
+			defineGlobal(ll[0], ll[1]);
+		}
+		else if (any(ll[0]==float_pars))
+		{
+			defineGlobal(ll[0], asFloat(ll[1]));	
+		}
+		else if (any(ll[0]==list_int_pars))
+		{
+			defineGlobal(ll[0], asInteger(strsplit(ll[1], sep=",")));	
+		}
+		else if (any(ll[0]==list_float_pars))
+		{
+			if (ll[1]=="")
+			{
+				defineGlobal(ll[0], 0);	
+			}
+			else
+			{
+				defineGlobal(ll[0], asFloat(strsplit(ll[1], sep=",")));	
+			}
+		}
+		else if (any(ll[0]==bin_pars))
+		{
+			defineGlobal(ll[0], asLogical(ll[1]));	
+		}
+	}
+
+	defineGlobal("current_epoch", 0);
+
+	if (strsuffix(cwdir, "/") == F)
+	{
+		defineGlobal("cwdir", paste0(cwdir, "/"));
+	}
+
+
+
+
+

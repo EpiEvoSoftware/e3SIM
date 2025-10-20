@@ -1,8 +1,0 @@
-s5 late() 
-{
-	// When the simulation reaches specified ticks, output treeseq and end the simulation.
-	inds = sim.subpopulations.individuals;
-	sim.killIndividuals(inds);
-	sim.treeSeqOutput(paste0(cwdir, runid, "/sampled_genomes.trees"));
-	sim.simulationFinished();
-}

@@ -1,0 +1,4 @@
+Start,End,transmissibility_1,drug_resistance_1
+1,50000,1,0
+50001,100000,0,1
+200000,300000,1,1

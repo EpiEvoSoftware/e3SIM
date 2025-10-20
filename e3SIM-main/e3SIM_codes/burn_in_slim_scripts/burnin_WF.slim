@@ -1,0 +1,64 @@
+initialize() {
+
+	suppressWarnings(T);
+	initializeSLiMModelType("WF");
+	initializeSLiMOptions(nucleotideBased=T);
+	defineConstant("L", initializeAncestralNucleotides(ref_path)); // Read in a reference genome
+	initializeRecombinationRate(0);
+
+	initializeMutationTypeNuc(0, 1, "f", 0.0); // Neutral mutations
+	if (use_subst_matrix==0)
+	{
+		initializeGenomicElementType(0, 0, 1.0, mmJukesCantor(mu / 3));
+	}
+	else
+	{
+		mm1 = readCSV(mtx_path, colNames = T);
+		defineGlobal("mm", mm1.asMatrix());
+		initializeGenomicElementType(0, 0, 1.0, mutationMatrix = mm);
+	}
+	
+	initializeGenomicElement(0, 0, L - 1);
+	print(g0.mutationMatrix);
+	initializeTreeSeq();
+}
+
+
+1 first()
+{
+	community.rescheduleScriptBlock(s0, ticks = n_gen);
+	if (strsuffix("/", wk_dir)==F)
+	{
+		defineConstant("cwdir", paste0(wk_dir, "/"));
+	}
+	else
+	{
+		defineConstant("cwdir", wk_dir);
+	}
+}
+
+
+1 early() {
+    sim.addSubpop("p1", Ne);
+    p1.setCloningRate(1.0);
+}
+
+1: early()
+{
+    sim.subpopulations.individuals.genome2.removeMutations();
+
+	// remove mutations in the haploid genomes that have fixed
+	muts = sim.mutationsOfType(0);
+	freqs = sim.mutationFrequencies(NULL, muts);
+	if (any(freqs == 0.5)) 
+		sim.subpopulations.genomes.removeMutations(muts[freqs == 0.5], T);
+}
+
+s0 late()
+{
+	// At the end of the burn-in process, sample the number of seeds from the last generation and assign number (0:seedsize-1) randomly to them. 
+	sim.treeSeqOutput(paste0(cwdir, "seeds.trees"));
+	sim.simulationFinished();
+}
+
+

@@ -1,0 +1,29 @@
+1 early() {
+	// Read into the contact network file
+	lines_contact = readFile(contact_network_path);
+
+	for (l in lines_contact)
+	{
+		if (strprefix(l, "#") == F)
+		{
+			ll = strsplit(l, " ");
+			ll = asInteger(strsplit(l, " "));
+			host = ll[0];
+			contact_size = length(ll) - 1;
+			if (contact_size > 0)
+			{
+				contact_dict = Dictionary();
+				contact_dict.setValue("Contacts", ll[1:contact_size]);
+				current_contact = Dictionary();
+				current_contact.setValue("Contacts", host);
+				sim.subpopulations[host].appendKeysAndValuesFrom(contact_dict);
+				for (each_contact in ll[1:contact_size])
+				{
+					sim.subpopulations[each_contact].appendKeysAndValuesFrom(current_contact);
+				}
+				// For each host (Host is modeled as subpopulation in SLiM), the tag is the vector of contacts
+			}
+		}
+	}
+}
+

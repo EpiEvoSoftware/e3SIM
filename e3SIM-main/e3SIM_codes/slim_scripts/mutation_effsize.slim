@@ -1,0 +1,25 @@
+mutation(m1) {
+
+	// Set mutational effects for new m2 mutation 
+	which_site = asInteger(which(trait_locs == mut.position));
+
+	if (n_trans_traits>0)
+	{
+		for (t_num in 1:n_trans_traits)
+		{
+			mut.setValue(paste0("transmissibility_", t_num), effsize_pos.subset(which_site, t_num)); 
+		}
+	}
+	
+	if (n_dr_traits>0)
+	{
+		for (t_num in 1:n_dr_traits)
+		{
+			mut.setValue(paste0("drug_resistance_", t_num), effsize_pos.subset(which_site, t_num + n_trans_traits)); 
+		}
+	}
+	
+	return T;
+
+}
+

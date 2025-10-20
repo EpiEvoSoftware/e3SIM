@@ -1,0 +1,209 @@
+1 first() {
+	// Schedule all the blocks.
+	// Turn on warnings
+	suppressWarnings(F);
+	print("Scheduling block");
+
+	// self reproduction (for mutation accumulation) run every tick
+	community.rescheduleScriptBlock(s0, ticks = 2:n_generation);
+	all_gens_vector = 2:n_generation;
+
+	// s1, transmission block with genetic effect sizes
+	// s13, transmission block without genetic effect sizes
+	if (use_genetic_model)
+	{
+		not_genetic_gens = c();
+		// not_genetic_epochs = which(transmissibility_effsize==0);
+		if (any(transmissibility_effsize==0))
+		{
+			not_genetic_epochs = which(transmissibility_effsize==0);
+		}
+		else
+		{
+			not_genetic_epochs = NULL;
+		}
+		if (length(not_genetic_epochs) > 0)
+		{
+			for (epoch_indx in not_genetic_epochs)
+			{
+				if (epoch_indx == 0)
+				{
+					start_gen = 2;
+					if (n_epoch==1)
+					{
+						end_gen = n_generation;
+					}
+					else
+					{
+						end_gen = epoch_changing_generation[epoch_indx] - 1;
+					}
+				}
+				else if (epoch_indx == n_epoch - 1)
+				{
+					start_gen = epoch_changing_generation[epoch_indx - 1];
+					end_gen = n_generation;
+				}
+				else
+				{
+					start_gen = epoch_changing_generation[epoch_indx - 1];
+					end_gen = epoch_changing_generation[epoch_indx] - 1;
+				}
+				not_genetic_gens = c(not_genetic_gens, start_gen:end_gen);
+			}
+			community.rescheduleScriptBlock(s13, ticks = not_genetic_gens);
+			if (length(setDifference(all_gens_vector, not_genetic_gens))>0){
+				community.rescheduleScriptBlock(s1, ticks = setDifference(all_gens_vector, not_genetic_gens));
+			}
+		}
+		else
+		{
+			community.rescheduleScriptBlock(s1, ticks = all_gens_vector);
+		}
+	}
+	else
+	{
+		community.rescheduleScriptBlock(s13, ticks = all_gens_vector);
+	}
+
+
+	// s2, within-host reproduction block, will be disabled if within_host_evolution is false
+	if (within_host_reproduction==T)
+	{
+		community.rescheduleScriptBlock(s2, ticks = all_gens_vector);
+	}
+
+	// s6, kill all old pathogens, run at all generations as a component of the mutation process
+	community.rescheduleScriptBlock(s6, ticks = all_gens_vector);
+
+	// s14, store the current state profile of hosts, so that any host will just be manipulated once.
+	community.rescheduleScriptBlock(s14, ticks = all_gens_vector);
+
+	// s3, State transition process without drug resistance
+	// s7, treatment block, will activate only at the generations specified by treatment_gens as substitution of s3
+	// either s3 or s7 will be run each tick
+	not_dr_gens = c();
+	if (any(drugresistance_effsize==0))
+	{
+		not_dr_epochs = which(drugresistance_effsize==0);
+	}
+	else
+	{
+		not_dr_epochs = NULL;
+	}
+	
+
+
+	if (n_epoch==1)
+	{
+		if (isNULL(not_dr_epochs)==F)
+		{
+			not_dr_gens = c(not_dr_gens, 2:n_generation);
+		}
+	}
+	else
+	{
+		for (epoch_indx in not_dr_epochs)
+		{
+			if (epoch_indx == 0)
+			{
+
+				start_gen = 2;
+				end_gen = epoch_changing_generation[epoch_indx] - 1;
+			}
+			else if (epoch_indx == n_epoch - 1)
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = n_generation;
+			}
+			else
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = epoch_changing_generation[epoch_indx] - 1;
+			}
+			not_dr_gens = c(not_dr_gens, start_gen:end_gen);
+		}
+	}
+	
+	if (isNULL(not_dr_gens)==F)
+	{
+		if (any(not_dr_gens > 1))
+		{
+			community.rescheduleScriptBlock(s3, ticks = not_dr_gens);
+		}
+	}
+
+	if (length(not_dr_gens) < n_generation - 1)
+	{
+		if (isNULL(not_dr_gens))
+		{
+			community.rescheduleScriptBlock(s7, ticks = 2:n_generation);
+		}
+		else
+		{
+			community.rescheduleScriptBlock(s7, ticks = setDifference(all_gens_vector, not_dr_gens));
+		}
+	}
+
+
+	// s12, epoch changing, only executed in epoch_changing_generations
+	if (n_epoch > 1)
+	{
+		community.rescheduleScriptBlock(s12, ticks = epoch_changing_generation);
+	}
+
+	// s11, massive sampling event, only executed at certain generations
+	if (n_massive_sample > 0)
+	{
+		community.rescheduleScriptBlock(s11, ticks = massive_sample_generation);
+	}
+
+	// s10, process this generation's new infections.
+	community.rescheduleScriptBlock(s10, ticks = all_gens_vector);
+
+	// s9, process recovered individuals
+	if (any(R_S_rate > 0))
+	{
+		RS_gens = c();
+		RS_epochs = which(R_S_rate!=0);
+		for (epoch_indx in RS_epochs)
+		{
+			if (epoch_indx == 0)
+			{
+				start_gen = 2;
+				if (n_epoch > 1)
+				{
+					end_gen = epoch_changing_generation[epoch_indx] - 1;
+				}
+				else
+				{
+					end_gen = n_generation;
+				}
+			}
+			else if (epoch_indx == n_epoch - 1)
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = n_generation;
+			}
+			else
+			{
+				start_gen = epoch_changing_generation[epoch_indx - 1];
+				end_gen = epoch_changing_generation[epoch_indx] - 1;
+			}
+			RS_gens = c(RS_gens, start_gen:end_gen);
+		}
+		community.rescheduleScriptBlock(s9, ticks = RS_gens);
+	}
+
+	// s4, logging this generation's compartment information. Run for all generations
+	community.rescheduleScriptBlock(s4, ticks = all_gens_vector);
+
+	// s5, end of simulation block
+	community.rescheduleScriptBlock(s5, ticks = n_generation);
+
+	// s8, process the exposed hosts
+	if (epi_model=="SEIR")
+	{
+		community.rescheduleScriptBlock(s8, ticks = all_gens_vector);
+	}
+}
+

@@ -13,7 +13,7 @@ Source code for the e3SIM framework. See `e3SIM-main/README.md` for installation
 Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. See `demo/README.md` for details. 
 
 - **tutorials.zip**: 
-Two example pipelines demonstrating end-to-end use of e3SIM. Each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it. Within each folder, there is also a compressed `Output_for_compare.zip` folder that contains example outputs that users can compare their results to.
+Two vignettes demonstrating end-to-end use of e3SIM, and the relevant data to run these vignettes. The `data` folder contains the data for two pathogen reference genomes. The `vignette` folder contains the two pipelines. Within `vignettes` folder, each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it.
     - `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
     - `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
 
@@ -25,7 +25,7 @@ Comprehensive manual for the e3SIM software.
     ```
     platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
     rootdir: e3SIM-main
-    plugins: cov-6.2.1
+    plugins: cov-7.0.0
     ```
 
 ---
@@ -53,54 +53,50 @@ Follow these steps to install and verify e3SIM on your system. These steps mirro
 This creates the `e3SIM-main/` directory.
     
 
-2. **Create the Conda environment** 
+2. **Create and activate the Conda environment** 
 
     - **macOS**
+        
+        Plan A:
+
         ```sh
+        # 0) If your system is not Rosetta, do:
+        softwareupdate --install-rosetta --agree-to-license
+
+        # 1) Create the environment entirely as x86_64:
+        CONDA_SUBDIR=osx-64 conda env create -n e3SIM -f e3SIM_mac.yml
+
+        # 2) Persist the subdirectory inside the environment so future installs also use osx-64:
+        conda activate e3SIM
+        conda env config vars set CONDA_SUBDIR=osx-64
+        conda deactivate && conda activate e3SIM
+
+        # 3) Install phylobase as x86_64:
+        conda install conda-forge::r-phylobase
+        conda install conda-forge::r-reshape2
+        ```
+        Plan B:
+
+        If your system does not support Rosetta so that the previous code block cannot be implemented, create the environment directly and install `phylobase` using `R`:
+
+        ```sh
+        # 1) Create and activate the environment
         conda env create --name e3SIM --file e3SIM_mac.yml
+        conda activate e3SIM
+
+        # 2) Install the R packages separately
+        Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", \
+            type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
         ```
     
     - **Linux**
         ```sh
         conda env create --name e3SIM --file e3SIM_linux.yml
+        conda activate e3SIM
         ```
 
-  
-3. **Activate the environment**
-
-    ```sh
-    conda activate e3SIM
-    ```
-  
-4. **Install required R packages** \
-Make sure `Rscript` is in your `PATH` (test with `Rscript --help`).  
-
-    - **macOS**
-        ```sh
-        R
-        
-        chooseCRANmirror(graphics = FALSE)
-        install.packages(c("phylobase", "ape", "ggplot2", "R.utils", "data.table"))
-
-        if (!requireNamespace("BiocManager", quietly = TRUE))
-            install.packages("BiocManager")
-        BiocManager::install(c("ggtree", "Biostrings"))
-
-        q()
-        ```
-
-    - **Linux**
-        ```sh
-        R
-        
-        chooseCRANmirror(graphics = FALSE)
-        install.packages("ade4")
-
-        q()
-        ```
-
-5. **Verify installation** \
-Run a small simulation to confirm everything is set up correctly:
+3. **Verify installation** \
+Run a small simulation to confirm everything is set up correctly under the `e3SIM` environment:
 
     ```sh
     cd e3SIM_codes
