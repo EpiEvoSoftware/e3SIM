@@ -8,7 +8,7 @@ import matplotlib.colors as mcolors
 import matplotlib
 
 NUM_META_COLS = 1
-POS_COL = 0
+POS_COL = 1
 # TRANS_INDEX = 0
 # DRUG_RES_INDEX = 1
 
@@ -126,8 +126,8 @@ def trait_calc_tseq(wk_dir_, tseq_smp, n_trait, sigmoid=False):
 
         for mut_idx in range(muts_size):
             mut = tseq_smp.mutation(mut_idx)
-            pos_values.append(tseq_smp.site(mut.site).position + 1)
             #pos_values.append(tseq_smp.site(mut.site).position)
+            pos_values.append(tseq_smp.site(mut.site).position + 1)
             node_ids.append(mut.node)
 
         pos_values= np.array(pos_values)
@@ -367,7 +367,7 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
     # Write VCF file
     with open(vcf_path, "w") as f:
         tables = sampled_ts.tables
-        original_mutations = tables.mutations
+        original_mutations = tables.mutations.copy()
         tables.mutations.clear()
         for m_id, mutation in enumerate(original_mutations):
             if mutation.metadata != {'mutation_list': []}:
@@ -427,7 +427,7 @@ def get_full_fasta(ref_path, wk_dir_):
 
 def output_fasta(ref_path, wk_dir_):
     rscript_path = os.path.join(os.path.dirname(__file__), "generate_fas.r")
-    subprocess.run(["Rscript", rscript_path, wk_dir_])
+    subprocess.run(["Rscript", "--vanilla", rscript_path, wk_dir_])
     get_full_fasta(ref_path, wk_dir_)
 
 
@@ -477,6 +477,24 @@ def run_per_data_processing(ref_path, wk_dir_, gen_model, runid, n_trait, seed_h
 		# 	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
 		# else:
 		# 	trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+    else:
+        traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, {})
+        trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+        color_trait = 0
+    mtdata = metadata_generate(sample_size, trvs_order, sampled_ts, sim_gen, traits_num_values, trait_color)
+    write_metadata(mtdata, each_wk_dir, n_trait, color_trait)
+
+    # CHECK W/ PERRY
+    if gen_model:
+        traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, n_trait)
+        if color_trait > 0:
+            trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+        else:
+            trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
+        # if color_trait > 0:
+        # 	trait_color = color_by_trait_normalized(traits_num_values[color_trait - 1], trvs_order)
+        # else:
+        # 	trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
     else:
         traits_num_values, trvs_order = trait_calc_tseq(wk_dir_, sampled_ts, {})
         trait_color = color_by_seed(sampled_ts, trvs_order, seed_host_match_path)
