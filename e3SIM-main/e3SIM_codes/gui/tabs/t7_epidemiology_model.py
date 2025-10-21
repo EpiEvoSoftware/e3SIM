@@ -106,7 +106,7 @@ class EpidemiologyModel(TabBase):
         self.render_survival_prob(hide, 0, 1, frow())
         self.render_sample_prob(hide, 0, 1, frow())
         self.render_sampling_recovery_prob(hide, 0, 1, frow())
-        self.render_image(hide, os.path.join(self.config_path, "../../../e3SIM_codes/gui/assets/t7.png"), 500, 300, 1, 1, 17)
+        self.render_image(hide, os.path.dirname(os.path.abspath(__file__)), "../assets/t7.png"), 500, 300, 1, 1, 17)
 
         self.render_title("Massive Sampling Events", hide, 0, 1, frow(),)
         self.render_massive_sampling(hide, 0, 1, frow(by=1))

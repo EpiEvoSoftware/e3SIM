@@ -133,7 +133,7 @@ class SeedsConfiguration(TabBase):
 
         epi_grpctrls.add(
             self.render_image(
-                os.path.join(self.config_path, "../../../e3SIM_codes/gui/assets/t4.png"), 550, 255, hide, self.control_frame,
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "../assets/t4.png"), 550, 255, hide, self.control_frame,
                 frow=18, column=1, columnspan=2, rowspan=10))
         return epi_grpctrls
 
