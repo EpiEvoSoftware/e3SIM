@@ -374,7 +374,7 @@ def output_tseq_vcf(wk_dir_, real_label, sampled_ts):
                 tables.mutations.add_row(
                 site=mutation.site,
                 node=mutation.node,
-                parent=mutation.parent,
+                parent=tskit.NULL,
                 time=mutation.time,
                 derived_state=mutation.derived_state,
                 metadata=mutation.metadata
