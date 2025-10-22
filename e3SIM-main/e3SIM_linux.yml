@@ -1,4 +1,4 @@
-name: e3SIM_dev
+name: e3SIM_linux
 channels:
   - conda-forge
   - bioconda
@@ -25,7 +25,7 @@ dependencies:
   - bwidget=1.10.1
   - bzip2=1.0.8
   - c-ares=1.34.5
-  - ca-certificates=2025.8.3
+  - ca-certificates=2025.10.5
   - cairo=1.18.4
   - curl=8.14.1
   - font-ttf-dejavu-sans-mono=2.37
@@ -142,6 +142,8 @@ dependencies:
   - r-lifecycle=1.0.4
   - r-magrittr=2.0.4
   - r-mass=7.3_65
+  - r-matrix=1.7_4
+  - r-mgcv=1.9_3
   - r-mime=0.13
   - r-munsell=0.5.1
   - r-nlme=3.1_168
@@ -155,6 +157,9 @@ dependencies:
   - r-prettyunits=1.2.0
   - r-progress=1.2.3
   - r-purrr=1.1.0
+  - r-r.methodss3=1.8.2
+  - r-r.oo=1.27.1
+  - r-r.utils=2.13.0
   - r-r6=2.6.1
   - r-rappdirs=0.3.3
   - r-rcolorbrewer=1.1_3
@@ -258,8 +263,8 @@ dependencies:
       - scipy==1.16.2
       - six==1.17.0
       - sniffio==1.3.1
+      - svgwrite==1.4.3
       - tqdm==4.67.1
-      # - tskit==0.6.4
       - tskit==0.5.6
       - tzdata==2025.2
       - urllib3==2.5.0
