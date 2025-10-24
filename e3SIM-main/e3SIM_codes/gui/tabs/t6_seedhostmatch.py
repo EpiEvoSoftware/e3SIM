@@ -284,11 +284,11 @@ class HostMatch(TabBase):
 
         for child in self.table.get_children():
             row = self.table.item(child)['values']
-            seedidgroup = row[0].split("_")
-            if len(seedidgroup) > 1:
-                seed_id = int(seedidgroup[1])
-            else:
-                seed_id = int(row[0])
+            # seedidgroup = row[0].split("_")
+            # if len(seedidgroup) > 1:
+            #     seed_id = int(seedidgroup[1])
+            # else:
+            seed_id = int(row[0])
             if seed_id in match_dict:
                 host_id = match_dict[seed_id]
                 updated_values = list(row)
@@ -311,11 +311,7 @@ class HostMatch(TabBase):
 
         for child in self.table.get_children():
             row = self.table.item(child)['values']
-            seedidgroup = row[0].split("_")
-            if len(seedidgroup) > 1:
-                seed_id = int(seedidgroup[1])
-            else:
-                seed_id = int(row[0])
+            seed_id = int(row[0])
             match_method_col = self.table["columns"].index("match_method")
             method_parameter_col = self.table["columns"].index("method_parameter")
             method_parameter_col2 = self.table["columns"].index("method_parameter_2")
