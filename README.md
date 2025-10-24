@@ -22,11 +22,12 @@ Comprehensive manual for the e3SIM software.
 
 - **coverage.xml**:
     - The coverage report generated using `pytest --cov=. --cov-report=xml` with the following session information:
-    ```
-    platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
-    rootdir: e3SIM-main
-    plugins: cov-7.0.0
-    ```
+
+        ```
+        platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+        rootdir: e3SIM-main
+        plugins: cov-7.0.0
+        ```
 
 ---
 
@@ -50,7 +51,7 @@ Follow these steps to install and verify e3SIM on your system. These steps mirro
     unzip e3SIM-main.zip
     cd e3SIM-main
     ```
-This creates the `e3SIM-main/` directory.
+    This creates the `e3SIM-main/` directory.
     
 
 2. **Create and activate the Conda environment** 
@@ -60,24 +61,26 @@ This creates the `e3SIM-main/` directory.
         Plan A:
 
         ```sh
-        # 0) If your system is not Rosetta, do:
-        softwareupdate --install-rosetta --agree-to-license
+        # 1) If you are on a M-chip machine (a.k.a., NOT Intel chip), run the following to install the emulator for x86_64 conda environment
+        softwareupdate --install-rosetta --agree-to-license # Ignore the 'Installing Rosetta 2 on this system is not supported.' output if it occurs
+        # Run the following to start a temporary Rosetta shell session inside your existing terminal
+        arch -x86_64 zsh
 
-        # 1) Create the environment entirely as x86_64:
+        # 2) Create the environment
         CONDA_SUBDIR=osx-64 conda env create -n e3SIM -f e3SIM_mac.yml
 
-        # 2) Persist the subdirectory inside the environment so future installs also use osx-64:
+        # 3) Save the subdirectory setting in the environment so future installs use osx-64
         conda activate e3SIM
         conda env config vars set CONDA_SUBDIR=osx-64
         conda deactivate && conda activate e3SIM
 
-        # 3) Install phylobase as x86_64:
+        # 4) Install phylobase and its dependencies
         conda install conda-forge::r-phylobase
         conda install conda-forge::r-reshape2
         ```
         Plan B:
 
-        If your system does not support Rosetta so that the previous code block cannot be implemented, create the environment directly and install `phylobase` using `R`:
+        If your are unable to install as in plan A on your system, follow the steps below to create the environment:
 
         ```sh
         # 1) Create and activate the environment
@@ -87,13 +90,7 @@ This creates the `e3SIM-main/` directory.
         # 2) Install the R packages separately
         Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", \
             type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
-        ```
-    
-    - **Linux**
-        ```sh
-        conda env create --name e3SIM --file e3SIM_linux.yml
-        conda activate e3SIM
-        ```
+        ```       ```
 
 3. **Verify installation** \
 Run a small simulation to confirm everything is set up correctly under the `e3SIM` environment:
@@ -111,7 +108,7 @@ Run a small simulation to confirm everything is set up correctly under the `e3SI
     ```
         
     - You should see progress messages in the console.
-    - Upon completion, check for output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
+    - Upon completion, check for the existence output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
 
 
 ---
@@ -182,7 +179,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 
 
 ## Liscence
-e3SIM is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+e3SIM is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ## Disclaimer
 This program is distributed WITHOUT ANY WARRANTY.  See the

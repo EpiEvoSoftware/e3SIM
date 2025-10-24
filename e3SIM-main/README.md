@@ -12,7 +12,7 @@ The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is compos
     unzip e3SIM-main.zip
     cd e3SIM-main
     ```
-This creates the e3SIM-main/ directory.
+    This creates the e3SIM-main/ directory.
     
 
 2. **Create and activate the Conda environment** 
@@ -22,24 +22,26 @@ This creates the e3SIM-main/ directory.
         Plan A:
 
         ```sh
-        # 0) If your system is not Rosetta, do:
-        softwareupdate --install-rosetta --agree-to-license
+        # 1) If you are on a M-chip machine (a.k.a., NOT Intel chip), run the following to install the emulator for x86_64 conda environment
+        softwareupdate --install-rosetta --agree-to-license # Ignore the 'Installing Rosetta 2 on this system is not supported.' output if it occurs
+        # Run the following to start a temporary Rosetta shell session inside your existing terminal
+        arch -x86_64 zsh
 
-        # 1) Create the environment entirely as x86_64:
+        # 2) Create the environment
         CONDA_SUBDIR=osx-64 conda env create -n e3SIM -f e3SIM_mac.yml
 
-        # 2) Persist the subdirectory inside the environment so future installs also use osx-64:
+        # 3) Save the subdirectory setting in the environment so future installs use osx-64
         conda activate e3SIM
         conda env config vars set CONDA_SUBDIR=osx-64
         conda deactivate && conda activate e3SIM
 
-        # 3) Install phylobase as x86_64:
+        # 4) Install phylobase and its dependencies
         conda install conda-forge::r-phylobase
         conda install conda-forge::r-reshape2
         ```
         Plan B:
 
-        If your system does not support Rosetta so that the previous code block cannot be implemented, create the environment directly and install `phylobase` using `R`:
+        If your are unable to install as in plan A on your system, follow the steps below to create the environment:
 
         ```sh
         # 1) Create and activate the environment
@@ -50,6 +52,13 @@ This creates the e3SIM-main/ directory.
         Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", \
             type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
         ```
+    
+    - **Linux**
+        ```sh
+        conda env create --name e3SIM --file e3SIM_linux.yml
+        conda activate e3SIM
+        ```
+
     
     - **Linux**
         ```sh
@@ -73,7 +82,7 @@ Run a small simulation to confirm everything is set up correctly:
     ```
         
     - You should see progress messages in the console.
-    - Upon completion, check for output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
+    - Upon completion, check for the existence output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
 
 
 
