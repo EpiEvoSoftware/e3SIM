@@ -109,7 +109,7 @@ class GeneticEffectConfig:
                     self.params["Rs"] = np.concatenate([np.full(self.trait_num["transmissibility"], DEFAULT_R_OHR), 
                         np.full(self.trait_num["drug_resistance"], DEFAULT_R_CLR)])
             elif len(self.params.get("Rs")) != sum(self.trait_num.values()):
-                raise CustomizedError("If you wish to provide a odds ratio / hazard ratio per SD for calibration"
+                raise CustomizedError("If you wish to provide a odds ratio / hazard ratio per SD for calibration, "
                     f"Please provide a list with the same length as your trait quantities({sum(self.trait_num.values())})")
             elif any(x <= 0 for x in self.params["Rs"]):
                 raise CustomizedError("If you wish to provide a odds ratio / hazard ratio per SD for calibration"
@@ -444,7 +444,7 @@ class EffectGenerator:
             print("WARNING: seed_generator.py hasn't been run. "
                     "If you want to use seed sequence different from the reference genome, "
                     "you must run seed_generator first - NOW you are regarding reference genome as seeding sequences", flush = True)
-            empty_data = {"Seed_ID": [f"seed_{i}" for i in range(self.cfg.num_init_seq)],
+            empty_data = {"Seed_ID": list(range(self.cfg.num_init_seq)),
             **{trait: [0] * self.cfg.num_init_seq for trait in trait_cols}} # seed X trait
 
             return pd.DataFrame(empty_data), df_AF
