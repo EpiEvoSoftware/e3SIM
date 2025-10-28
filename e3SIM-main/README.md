@@ -49,7 +49,7 @@ The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is compos
         conda activate e3SIM
 
         # 2) Install the R packages separately
-        Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", \
+        Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", 
             type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
         ```
     
@@ -59,12 +59,7 @@ The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is compos
         conda activate e3SIM
         ```
 
-    
-    - **Linux**
-        ```sh
-        conda env create --name e3SIM --file e3SIM_linux.yml
-        conda activate e3SIM
-        ```
+
 
 3. **Verify installation** \
 Run a small simulation to confirm everything is set up correctly:
