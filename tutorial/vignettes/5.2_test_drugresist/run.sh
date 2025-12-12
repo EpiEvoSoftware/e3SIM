@@ -7,9 +7,10 @@
 # Before executing the code, make sure to define your ${e3SIM} as environmental variable
 # (`e3SIM-main/e3SIM_codes`)
 # and set your working directory ${WKDIR} to where this `run.sh` resides.
-# (`tutorials/5.2_test_drugresist`)
+# (`tutorial/vignettes/5.2_test_drugresist`)
 # and make sure the configuration file (test_config_drugresist.json) 
 # and the provided genetic architecture (causal_gene_info.csv) are in your working directory.
+# It is recommended to do `chmod -R +x run.sh` first to get execution access of this file.
 
 e3SIM=YOURPATH_TO_E3SIM
 WKDIR=YOUR_WORKING_DIRECTORY # WKDIR=${PWD}

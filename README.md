@@ -13,7 +13,7 @@ Source code for the e3SIM framework. See `e3SIM-main/README.md` for installation
 Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. See `demo/README.md` for details. 
 
 - **tutorials.zip**: 
-Two vignettes demonstrating end-to-end use of e3SIM, and the relevant data to run these vignettes. The `data` folder contains the data for two pathogen reference genomes. The `vignette` folder contains the two pipelines. Within `vignettes` folder, each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it.
+Two vignettes demonstrating end-to-end use of e3SIM, and the relevant data to run these vignettes. The `data` folder contains the data for two pathogen reference genomes. The `vignette` folder contains the two pipelines. Within `vignettes` folder, each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it. It is recommended to do `chmod -R +x run.sh` first to get execution access.
     - `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
     - `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
 
@@ -170,7 +170,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
         - Guide you through each tab *in order* to generate prerequisite files.
         - Create a `config_file.json` in your working directory based on your inputs.
 
-        For more details on the GUI, see ***Chapter 7*** of the manual. 
+        For more details on the GUI, see ***Chapter 7*** of the manual. If the `Next` button doesn't show up in some of the tabs, please enter full screen mode to click on `Next`.
     
 
 3. **Run the simulation** \
