@@ -160,7 +160,7 @@
         "fraction_dispersion": 100
       },
       "effsize_params": {
-        "effsize_function":"",
+        "effsize_function": "",
         "normal": {
           "taus": []
         },

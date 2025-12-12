@@ -240,8 +240,7 @@ class EpidemiologyConfig:
 
     def _check_effect_size(self, param: str, max_value: int):
         values = getattr(self, param)
-
-        if any(i > max_value for i in values):
+        if max_value > 0 and any(i > max_value for i in values):
             raise CustomizedError(
             f"({param}) must be chosen from {list(range(max_value + 1))}")
 
@@ -496,12 +495,23 @@ class ConfigParser:
         # Parse epidemiology configuration
         epidemiology_config = self._parse_epidemiology_config(config.get("EpidemiologyModel", {}), 
         evolution_config.n_generation, evolution_config.cap_withinhost, genome_element.traits_num)
+        if not genome_element.use_genetic_model:
+            if any(effsize > 0 for effsize in epidemiology_config.transmissibility_effsize):
+                epidemiology_config.transmissibility_effsize = [0 for effsize in epidemiology_config.transmissibility_effsize]
+                print("WARNING: You decalred to use transmissibility genetic architecture in the simulation, but set use_genetic_model to be False. Therefore, no transmissibility architecture will be used.")
+            if any(effsize > 0 for effsize in epidemiology_config.drug_resistance_effsize):
+                epidemiology_config.drug_resistance_effsize = [0 for effsize in epidemiology_config.drug_resistance_effsize]
+                print("WARNING: You decalred to use drug-resistance genetic architecture in the simulation, but set use_genetic_model to be False. Therefore, no drug-resistance architecture will be used.")
 
         # Parse seeding information configuration
         seed_info = self._parse_seed_info(config.get("SeedsConfiguration", {}), basic_config.get("cwdir", "."))
         
         # Parse postprocessing
         postprocessing = self._parse_postprocess_config(config.get("Postprocessing_options", {}), genome_element.traits_num)
+        if not genome_element.use_genetic_model:
+            postprocessing.branch_color_trait = 0
+            postprocessing.heatmap_trait = "none"
+            print("WARNING: The tree will be colored by seed identity since use_genetic_model is specified as false.")
         
         return SimulationConfig(
             working_dir = basic_config.get("cwdir", "."),

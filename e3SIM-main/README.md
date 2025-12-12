@@ -50,7 +50,7 @@ The test coverage is 0.4808 according to Codecov. Since $\text{e3SIM}$ is compos
 
         # 2) Install the R packages separately
         Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org", 
-            type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
+            type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))'
         ```
     
     - **Linux**
@@ -90,7 +90,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 
 
 1. **Set up your working directory** \
-    Create a new empty directory outside `e3SIM-main` directory. This directory will be your working directory for a single simulation; all generated input files and simulation results will be saved here. 
+    Create a new empty directory outside `e3SIM-main` directory. This directory will be your working directory for a single simulation; all generated input files and simulation results will be saved here. Templates for the pre-simulation files can be found under the `e3SIM-main/e3SIM_codes/config_template` directory, or one can go to our provided vignettes. Formats for all files used in e3SIM are also described in the corresponding chapters of the manual.
 
     Set the path to this directory in the `WKDIR` by replacing `/path/to/working_dir` with your actual path:
 
@@ -132,7 +132,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
         - Guide you through each tab *in order* to generate prerequisite files.
         - Create a `config_file.json` in your working directory based on your inputs.
 
-        For more details on the GUI, see ***Chapter 7*** of the manual. 
+        For more details on the GUI, see ***Chapter 7*** of the manual. If the `Next` button doesn't show up in some of the tabs, please enter full screen mode to click on `Next`.
     
 
 3. **Run the simulation** \
@@ -146,7 +146,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 ---
 
 
-## Liscence
+## License
 $\text{e3SIM}$ is a free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

@@ -571,7 +571,7 @@ class GenomeElement(TabBase):
             self.effsize_group_control.add(nv)
 
         keys_path = ["GenomeElement", "effect_size", "effsize_params", "effsize_function"]
-        text = "Distribution to generate effezt sizes for each trait given selected sites"
+        text = "Distribution to generate effect sizes for each trait given selected sites"
         to_ui_mapping = {
             "n": "Normal distribution",
             "l": "Laplace distribution",
@@ -743,12 +743,12 @@ class GenomeElement(TabBase):
             keys_path = ["GenomeElement", "trait_prob_link", "logit", "alpha_trans"]
         elif self.initial_genome_config["trait_prob_link"]["link"] == "cloglog":
             keys_path = ["GenomeElement", "trait_prob_link", "cloglog", "alpha_trans"]
-        text = "Link scale slope for transmissibiility trait"
+        text = "Link scale slope for transmissibility trait"
         component = EasyEntry(
             keys_path,
             self.config_path,
             text,
-            "alpha values for transmissibiility",
+            "alpha values for transmissibility",
             self.control_frame,
             column,
             frow,

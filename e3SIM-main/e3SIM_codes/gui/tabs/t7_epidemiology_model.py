@@ -5,7 +5,7 @@ from utils import (no_validate_update, TabBase, EasyPathSelector, EasyTitle,
                    EasyCombobox, EasyRadioButton, EasyEntry, EasyImage, CreateToolTip)
 
 class EpidemiologyModel(TabBase):
-    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False):
+    def __init__(self, parent, tab_parent, config_path, tab_title, tab_index, hide=False, render_nb=True):
         super().__init__(parent, tab_parent, config_path, tab_title, tab_index, hide)
 
     def init_val(self, config_path):
