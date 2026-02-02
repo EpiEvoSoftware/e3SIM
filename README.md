@@ -1,27 +1,24 @@
 ## e3SIM Zenodo Package  
-*Supporting materials for the manuscript “e3SIM: epidemiological-ecological-evolutionary simulation framework for genomic epidemiology”*
-
-This Zenodo record contains the source code, demo scripts, and example data used in the manuscript. Each archive includes its own `README.md` with detailed, step-by-step instructions.
+*Supporting materials for the manuscript "e3SIM: epidemiological-ecological-evolutionary simulation framework for genomic epidemiology"*.
+This Zenodo record contains the source code, demo scripts, and example data used in the manuscript. 
 
 ---
 
 ### Contents
 - **e3SIM-main.zip**: 
-Source code for the e3SIM framework. See `e3SIM-main/README.md` for installation, dependencies, and usage examples. 
+Source code for the e3SIM software. 
 
 - **manuscript_data.zip**: 
-Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. See `demo/README.md` for details. 
+Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. 
 
-- **tutorials.zip**: 
-Two vignettes demonstrating end-to-end use of e3SIM, and the relevant data to run these vignettes. The `data` folder contains the data for two pathogen reference genomes. The `vignettes` folder contains the two pipelines. Within `vignettes` folder, each folder includes a `run.sh` bash script with all commands needed to execute the tutorial. Before executing `run.sh`, please inspect the script `run.sh` and manually change the absolute path as instructed in it. It is recommended to do `chmod -R +x run.sh` first to get execution access.
-    - `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
-    - `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
+- **tutorial.zip**: 
+Two vignettes demonstrating end-to-end use of e3SIM and the data needed to run them. See "Tutorials" section below.
 
 - **e3SIM_manual.pdf**:
 Comprehensive manual for the e3SIM software.
 
 - **coverage.xml**:
-    - The coverage report generated using `pytest --cov=. --cov-report=xml` with the following session information:
+    - The coverage report generated with `pytest --cov=. --cov-report=xml` and the following session information:
 
         ```
         platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
@@ -39,11 +36,11 @@ Comprehensive manual for the e3SIM software.
     - [Conda](https://docs.conda.io/) (Miniconda or Anaconda)  
     - [R ≥ 4.0](https://cran.r-project.org/) with command-line access (`Rscript`)  
 - **Build tools & libraries:**  
-    Listed in each archive’s `README.md` and in the provided Conda environment file (`.yml`). 
+    Listed in the provided Conda environment file (`.yml`). 
 
 
 ### Installation 
-Follow these steps to install and verify e3SIM on your system. These steps mirror the installation section in `e3SIM-main/README.md`.
+Follow these steps to install and verify e3SIM on your system. 
 
 1. **Extract the source archive** 
     
@@ -58,7 +55,7 @@ Follow these steps to install and verify e3SIM on your system. These steps mirro
 
     - **macOS**
         
-        Plan A:
+        **Option A**:
 
         ```sh
         # 1) If you are on a M-chip machine (a.k.a., NOT Intel chip), run the following to install the emulator for x86_64 conda environment
@@ -78,9 +75,9 @@ Follow these steps to install and verify e3SIM on your system. These steps mirro
         conda install conda-forge::r-phylobase
         conda install conda-forge::r-reshape2
         ```
-        Plan B:
-
-        If your are unable to install as in plan A on your system, follow the steps below to create the environment:
+        
+        **Option B**:\
+        If you are unable to install using Plan A on your system, follow the steps below to create the environment:
 
         ```sh
         # 1) Create and activate the environment
@@ -89,10 +86,11 @@ Follow these steps to install and verify e3SIM on your system. These steps mirro
 
         # 2) Install the R packages separately
         Rscript -e 'install.packages("phylobase", repos="https://cloud.r-project.org",
-         type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))
+         type = "source", INSTALL_opts = c("--no-test-load", "--no-staged-install", "--no-byte-compile"))'
         ```
 
      - **Linux**
+     
         ```sh
         conda env create --name e3SIM --file e3SIM_linux.yml
         conda activate e3SIM
@@ -114,7 +112,7 @@ Run a small simulation to confirm everything is set up correctly under the `e3SI
     ```
         
     - You should see progress messages in the console.
-    - Upon completion, check for the existence output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
+    - Upon completion, check for the existence of output files (e.g., `all_SEIR_trajectory.png`) in `e3SIM-main/test_installation/run/output_trajectories/`.
 
 
 ---
@@ -128,7 +126,9 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 
 
 1. **Set up your working directory** \
-    Create a new empty directory outside `e3SIM-main` directory. This directory will be your working directory for a single simulation; all generated input files and simulation results will be saved here. 
+    Create a new empty directory outside the `e3SIM-main` directory. This directory will be your working directory for a single simulation; all generated input files and simulation results will be saved here. 
+    
+    Templates for the pre-simulation files can be found under the `e3SIM-main/e3SIM_codes/presim_template` directory. JSON configuration templates can be found under `e3SIM-main/e3SIM_codes/config_template`. Formats for all files used in e3SIM are also described in the corresponding chapters of the manual.
 
     Set the path to this directory in the `WKDIR` by replacing `/path/to/working_dir` with your actual path:
 
@@ -145,7 +145,7 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
         - `NetworkGenerator`
         - `SeedGenerator`
         - `GeneticEffectGenerator`
-        - `SeedHostMatcher`
+        - `HostSeedMatcher`
     
         These must be run sequentially to generate all prerequisite files required for the simulation. For detailed instructions, see ***Chapter 2*** of the manual.
 
@@ -169,8 +169,11 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
         - Prompt you to select your working directory on the first tab (default: current directory).
         - Guide you through each tab *in order* to generate prerequisite files.
         - Create a `config_file.json` in your working directory based on your inputs.
+        - Note: If the `Next` button doesn't show up in some of the tabs, please enter ***full-screen mode*** to click on `Next`.
 
-        For more details on the GUI, see ***Chapter 7*** of the manual. If the `Next` button doesn't show up in some of the tabs, please enter full screen mode to click on `Next`.
+        
+        For more details on the GUI, see ***Chapter 7*** of the manual. 
+        The *Chapter 7* GUI screenshots are based on the *Chapter 5.2* tutorial vignette (`tutorial/vignettes/5.2_test_drugresist`).
     
 
 3. **Run the simulation** \
@@ -183,9 +186,56 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 
 ---
 
+### Tutorials
+e3SIM includes two end-to-end tutorial vignettes that correspond to the worked examples in the manual:
 
-## Liscence
-e3SIM is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+- `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
+- `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
+
+The `data` folder contains data for two pathogen reference genomes. The `vignette` folder contains the two pipelines. Each vignette directory includes a `run.sh` script containing the full command sequence for that tutorial (to avoid copy/paste issues from the PDF manual).
+
+1. **Extract the tutorials** \
+Unzip `tutorial.zip`, then locate the `vignettes/` directory containing the two tutorial folders.
+
+2. **Choose a vignette working directory**\
+Each tutorial runs in its vignette folder `5.1_test_minimal_model` and `5.2_test_drugresist` (this is `WKDIR`).
+
+3. **Inspect and edit `run.sh` (required)**\
+Open the vignette’s `run.sh` and follow the comments to update absolute paths.
+
+    ```sh
+    e3SIM=YOURPATH_TO_E3SIM
+    WKDIR=YOUR_WORKING_DIRECTORY # WKDIR=${PWD}
+    ```
+
+4. **Run the tutorial**
+
+    ```sh
+    # Example: Chapter 5.1 tutorial
+    cd path/to/vignettes/5.1_test_minimal_model
+    
+    # Option A: run with bash (works even if run.sh is not marked executable)
+    bash run.sh
+    
+    # Option B: make it executable, then run
+    chmod +x run.sh
+    ./run.sh
+    ```
+    
+#### Where to find outputs
+The tutorial directory acts as the working directory for that run. Outputs are written under the working directory, including:
+
+- Per-replicate outputs are written into subfolders named `1/`, `2/`, ... (one folder per replicate).
+- Aggregated plots across replicates are written into `output_trajectories/` (e.g., all_SEIR_trajectory.png).
+
+For a detailed description of output files and how to interpret them, see Manual ***Chapter 6***.
+
+Note: e3SIM is a stochastic simulator; results can vary unless the random seed is fixed.
+
+---
+
+## License
+e3SIM is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 ## Disclaimer
 This program is distributed WITHOUT ANY WARRANTY.  See the
