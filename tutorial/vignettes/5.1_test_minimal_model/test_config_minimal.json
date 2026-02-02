@@ -91,7 +91,7 @@
     "do_postprocess": true,
     "tree_plotting": {
       "branch_color_trait": 1,
-      "heatmap": "drug_resistance"
+      "heatmap": "transmissibility"
     },
     "sequence_output": {
       "vcf": true,

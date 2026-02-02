@@ -48,7 +48,7 @@ python ${e3SIM}/genetic_effect_generator.py \
         -wkdir ${WKDIR} \
         -method randomly_generate \
         -num_init_seq 5 \
-        -trait '{"transmissibility": 1, "drug_resistance": 0}' \
+        -trait_n '{"transmissibility": 1, "drug_resistance": 0}' \
         -csv ${WKDIR}/candidate_regions.csv \
         -func n \
         -taus 1.5 \
