@@ -189,23 +189,31 @@ export e3SIM="/path/to/e3SIM-main/e3SIM_codes"
 ### Tutorials
 e3SIM includes two end-to-end tutorial vignettes that correspond to the worked examples in the manual:
 
-- `5.1_test_minimal_model`: Tutorial described in Chapter 5.1 of the manual 
-- `5.2_test_drugresist`: Tutorial described in Chapter 5.2 of the manual 
+- `5.1_test_minimal_model`: Tutorial described in ***Chapter 5.1*** of the manual 
+- `5.2_test_drugresist`: Tutorial described in ***Chapter 5.2*** of the manual 
 
-The `data` folder contains data for two pathogen reference genomes. The `vignette` folder contains the two pipelines. Each vignette directory includes a `run.sh` script containing the full command sequence for that tutorial (to avoid copy/paste issues from the PDF manual).
+The `data` folder contains data for two pathogen reference genomes. The `vignettes` folder contains the two tutorial pipelines. 
+Each vignette directory includes a `run.sh` script containing the full command sequence for that tutorial (to avoid copy/paste issues from the PDF manual).
 
 1. **Extract the tutorials** \
-Unzip `tutorial.zip`, then locate the `vignettes/` directory containing the two tutorial folders.
+Unzip `tutorial.zip`, then locate the `vignettes` directory containing the two tutorial folders (`5.1_test_minimal_model` or `5.2_test_drugresist`).
 
 2. **Choose a vignette working directory**\
-Each tutorial runs in its vignette folder `5.1_test_minimal_model` and `5.2_test_drugresist` (this is `WKDIR`).
+Each tutorial runs in its own vignette folder (`5.1_test_minimal_model` or `5.2_test_drugresist`), which also serves as the working directory `WKDIR`.
 
 3. **Inspect and edit `run.sh` (required)**\
-Open the vignette’s `run.sh` and follow the comments to update absolute paths.
+Open the vignette's `run.sh` and update both `e3SIM` and `WKDIR` to **absolute paths**. 
+Do not use relative paths (e.g., `./` or `../`), as these will fail if the script is called from a different location.
 
     ```sh
-    e3SIM=YOURPATH_TO_E3SIM
-    WKDIR=YOUR_WORKING_DIRECTORY # WKDIR=${PWD}
+    # Set to the ABSOLUTE path where your e3SIM source code is located
+    e3SIM="/absolute/path/to/e3SIM-main/e3SIM_codes" 
+
+    # Set to the ABSOLUTE path of the current vignette folder
+    # TIP: Run `pwd` in your terminal and paste the output here.
+    WKDIR="/absolute/path/to/tutorial/vignettes/5.1_test_minimal_model" 
+    # or "/absolute/path/to/tutorial/vignettes/5.2_test_drugresist"
+    # If you are already in the vignette folder: WKDIR="$(pwd)"
     ```
 
 4. **Run the tutorial**
