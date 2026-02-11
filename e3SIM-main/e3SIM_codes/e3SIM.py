@@ -54,7 +54,7 @@ def main():
     _exit(error)
 
     ## Simulation
-    error = all_slim_simulation_by_config(param_dict)
+    error = all_slim_simulation_by_config(config_path) # the refactored function takes in a path instead of the dictionary
     _exit(error)
 
 
