@@ -1,34 +1,8 @@
-## e3SIM Zenodo Package  
-*Supporting materials for the manuscript "e3SIM: epidemiological-ecological-evolutionary simulation framework for genomic epidemiology"*.
-This Zenodo record contains the source code, demo scripts, and example data used in the manuscript. 
+## e3SIM 
+Xu, et al. (2026). e3SIM: Epidemiological-ecological-evolutionary simulation framework for genomic epidemiology. *Methods in Ecology and Evolution*, 00, 1–9. 
+<a href="https://doi.org/10.1111/2041-210x.70278" target="_blank" rel="noopener noreferrer">doi:10.1111/2041-210x.70278</a>
 
 ---
-
-### Contents
-- **e3SIM-main.zip**: 
-Source code for the e3SIM software. 
-
-- **manuscript_data.zip**: 
-Parameter files, input data, and scripts for reproducing the simulation examples and runtime profiling reported in the manuscript. 
-
-- **tutorial.zip**: 
-Two vignettes demonstrating end-to-end use of e3SIM and the data needed to run them. See "Tutorials" section below.
-
-- **e3SIM_manual.pdf**:
-Comprehensive manual for the e3SIM software.
-
-- **coverage.xml**:
-    - The coverage report generated with `pytest --cov=. --cov-report=xml` and the following session information:
-
-        ```
-        platform darwin -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
-        rootdir: e3SIM-main
-        plugins: cov-7.0.0
-        ```
-
----
-
-
 ### System requirements
 - **Operating systems**: macOS or Linux
 - **Prerequisites:**  
