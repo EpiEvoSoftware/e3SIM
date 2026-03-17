@@ -1,6 +1,6 @@
 ## e3SIM 
-Xu, et al. (2026). e3SIM: Epidemiological-ecological-evolutionary simulation framework for genomic epidemiology. *Methods in Ecology and Evolution*, 00, 1–9. 
-<a href="https://doi.org/10.1111/2041-210x.70278" target="_blank" rel="noopener noreferrer">doi:10.1111/2041-210x.70278</a>
+Xu, et al. (2026). <ins>e3SIM: Epidemiological-ecological-evolutionary simulation framework for genomic epidemiology</ins>. *Methods in Ecology and Evolution*, 00:1–9. 
+[doi:10.1111/2041-210x.70278](https://doi.org/10.1111/2041-210x.70278)
 
 ---
 ### System requirements
