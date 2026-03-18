@@ -808,9 +808,10 @@ class SimulationRunner:
             return False
    
         # Check for output
-        sample_path = output_dir / "sample.csv.gz"
+        sample_path1 = output_dir / "sample.csv.gz"
+        sample_path2 = output_dir / "concerted.sample.csv.gz"
 
-        return sample_path.exists()
+        return sample_path1.exists() or sample_path2.exists()
     
     def _get_seed_for_run(self, run_id: int) -> Optional[int]:
         """Get random seed for specific run."""
@@ -875,7 +876,7 @@ class PostProcessor:
         """Process results from a single run."""
         run_dir = self.config.working_dir / str(run_id)
         
-        if (run_dir / "sample.csv.gz").exists():
+        if (run_dir / "sample.csv.gz").exists() or (run_dir / "concerted.sample.csv.gz").exists():
             # Process tree sequences
             self._process_sequences(run_dir, run_id)
             # Generate plots
