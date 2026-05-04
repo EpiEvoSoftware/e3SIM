@@ -118,7 +118,7 @@ class TestConfigValidator:
             temp_path = f.name
         
         try:
-            result = ConfigValidator.validate_and_write_mutation_matrix(df0, temp_path)
+            result = ConfigValidator.validate_and_write_mutation_matrix(df0.values, temp_path)
             assert result is True
             df = pd.read_csv(temp_path)
             assert df.shape == (4, 4)
@@ -134,7 +134,7 @@ class TestConfigValidator:
             [0.3, 0.4, 0.5, 0]
         ])
         df0 = pd.DataFrame(matrix, index=bases, columns=bases)
-        result = ConfigValidator.validate_and_write_mutation_matrix(df0, "dummy.csv")
+        result = ConfigValidator.validate_and_write_mutation_matrix(df0.values, "dummy.csv")
         assert result is False
     
     def test_validate_mutation_matrix_negative_values(self):
@@ -146,7 +146,7 @@ class TestConfigValidator:
             [0.3, 0.4, 0.5, 0]
         ])
         df0 = pd.DataFrame(matrix, index=bases, columns=bases)
-        result = ConfigValidator.validate_and_write_mutation_matrix(df0, "dummy.csv")
+        result = ConfigValidator.validate_and_write_mutation_matrix(df0.values, "dummy.csv")
         assert result is False
 
 
@@ -209,7 +209,7 @@ class TestEvolutionConfig:
         
         config = EvolutionConfig(
             n_generation=100,
-            subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX,
+            subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX.value,
             transition_matrix_path=tmp_path / "matrix.csv",
             mut_rate_matrix=df0,
             cap_withinhost=1
@@ -230,7 +230,7 @@ class TestEvolutionConfig:
         with pytest.raises(CustomizedError, match="does NOT meet the requirement"):
             EvolutionConfig(
                 n_generation=100,
-                subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX,
+                subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX.value,
                 transition_matrix_path=tmp_path / "matrix.csv",
                 mut_rate_matrix=df0,
                 cap_withinhost=1
