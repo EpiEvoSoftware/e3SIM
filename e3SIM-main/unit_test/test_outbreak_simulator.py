@@ -106,17 +106,19 @@ class TestConfigValidator:
         ConfigValidator.validate_probability(0.5, "test param", strict=True)
     
     def test_validate_mutation_matrix_valid(self):
+        bases = ["A", "C", "G", "T"]
         matrix = np.array([
             [0, 0.1, 0.2, 0.3],
             [0.1, 0, 0.3, 0.4],
             [0.2, 0.3, 0, 0.5],
             [0.3, 0.4, 0.5, 0]
         ])
+        df0 = pd.DataFrame(matrix, index=bases, columns=bases)
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             temp_path = f.name
         
         try:
-            result = ConfigValidator.validate_and_write_mutation_matrix(matrix, temp_path)
+            result = ConfigValidator.validate_and_write_mutation_matrix(df0, temp_path)
             assert result is True
             df = pd.read_csv(temp_path, index_col=0)
             assert df.shape == (4, 4)
@@ -124,23 +126,27 @@ class TestConfigValidator:
             Path(temp_path).unlink(missing_ok=True)
     
     def test_validate_mutation_matrix_invalid_diagonal(self):
+        bases = ["A", "C", "G", "T"]
         matrix = np.array([
             [0.1, 0.1, 0.2, 0.3],
             [0.1, 0, 0.3, 0.4],
             [0.2, 0.3, 0, 0.5],
             [0.3, 0.4, 0.5, 0]
         ])
-        result = ConfigValidator.validate_and_write_mutation_matrix(matrix, "dummy.csv")
+        df0 = pd.DataFrame(matrix, index=bases, columns=bases)
+        result = ConfigValidator.validate_and_write_mutation_matrix(df0, "dummy.csv")
         assert result is False
     
     def test_validate_mutation_matrix_negative_values(self):
+        bases = ["A", "C", "G", "T"]
         matrix = np.array([
             [0, -0.1, 0.2, 0.3],
             [0.1, 0, 0.3, 0.4],
             [0.2, 0.3, 0, 0.5],
             [0.3, 0.4, 0.5, 0]
         ])
-        result = ConfigValidator.validate_and_write_mutation_matrix(matrix, "dummy.csv")
+        df0 = pd.DataFrame(matrix, index=bases, columns=bases)
+        result = ConfigValidator.validate_and_write_mutation_matrix(df0, "dummy.csv")
         assert result is False
 
 
