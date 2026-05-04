@@ -91,7 +91,7 @@ class EvolutionConfig:
             if self.within_host_reproduction_rate == 0.0:
                 print("Warning: Within-host reproduction rate is 0, within-host reproduction will have no effect.")
 
-        if self.subst_model_parameterization == SubstitutionModel.MUT_RATE_MATRIX:
+        if self.subst_model_parameterization == SubstitutionModel.MUT_RATE_MATRIX.value:
             if not ConfigValidator.validate_and_write_mutation_matrix(np.array(self.mut_rate_matrix), self.transition_matrix_path):
                 raise CustomizedError(f"The given mutation rate matrix {self.mut_rate_matrix} \
                                  does NOT meet the requirement 1) zeros on diagonals \
@@ -450,7 +450,7 @@ class ConfigValidator:
         
         col_names = ["A", "C", "G", "T"]
         df = pd.DataFrame(matrix, columns = col_names)
-        df.to_csv(path_to_write)
+        df.to_csv(path_to_write, index=False)
             
         return True
 
@@ -536,6 +536,7 @@ class ConfigParser:
     def _parse_evolution_config(self, config: Dict, cwdir: Path) -> EvolutionConfig:
         """Parse evolution configuration."""
         subst_model = config.get("subst_model_parameterization", "mut_rate")
+        print(cwdir / "muts_transition_matrix.csv")
         
         return EvolutionConfig(
             n_generation = config.get("n_generation", 100),
@@ -1018,7 +1019,10 @@ class SimulationOrchestrator:
             f.write(f"n_replicates:{self.config.n_replicates}\n")
             f.write(f"n_generation:{self.config.evolution.n_generation}\n")
             # f.write(f"transition_matrix:{self.config.evolution.mut_rate_matrix}\n")
-            f.write(f"transition_matrix:{self._writebinary(self.config.evolution.subst_model_parameterization == SubstitutionModel.MUT_RATE_MATRIX)}\n")
+            
+            f.write(f"transition_matrix:{self._writebinary(self.config.evolution.subst_model_parameterization == SubstitutionModel.MUT_RATE_MATRIX.value)}\n")
+            if self.config.evolution.subst_model_parameterization == SubstitutionModel.MUT_RATE_MATRIX.value:
+                f.write(f"transition_matrix_path:{self.config.evolution.transition_matrix_path}\n")
             f.write(f"mut_rate:{self.config.evolution.mut_rate}\n")
             f.write(f"within_host_reproduction:{self._writebinary(self.config.evolution.within_host_reproduction)}\n")
             f.write(f"within_host_reproduction_rate:{self.config.evolution.within_host_reproduction_rate}\n")
