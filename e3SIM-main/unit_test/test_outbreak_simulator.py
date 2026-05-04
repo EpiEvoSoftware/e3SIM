@@ -120,7 +120,7 @@ class TestConfigValidator:
         try:
             result = ConfigValidator.validate_and_write_mutation_matrix(df0, temp_path)
             assert result is True
-            df = pd.read_csv(temp_path, index_col=0)
+            df = pd.read_csv(temp_path)
             assert df.shape == (4, 4)
         finally:
             Path(temp_path).unlink(missing_ok=True)
@@ -198,37 +198,41 @@ class TestEvolutionConfig:
         assert config.mut_rate == 0.001
     
     def test_valid_evolution_config_mut_matrix(self, tmp_path):
+        bases = ["A", "C", "G", "T"]
         matrix = np.array([
             [0, 0.1, 0.2, 0.3],
             [0.1, 0, 0.3, 0.4],
             [0.2, 0.3, 0, 0.5],
             [0.3, 0.4, 0.5, 0]
         ])
+        df0 = pd.DataFrame(matrix, index=bases, columns=bases)
         
         config = EvolutionConfig(
             n_generation=100,
             subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX,
             transition_matrix_path=tmp_path / "matrix.csv",
-            mut_rate_matrix=matrix,
+            mut_rate_matrix=df0,
             cap_withinhost=1
         )
         assert config.n_generation == 100
         assert (tmp_path / "matrix.csv").exists()
     
     def test_evolution_config_invalid_mut_matrix(self, tmp_path):
+        bases = ["A", "C", "G", "T"]
         bad_matrix = np.array([
             [0.1, 0.1, 0.2, 0.3],
             [0.1, 0, 0.3, 0.4],
             [0.2, 0.3, 0, 0.5],
             [0.3, 0.4, 0.5, 0]
         ])
+        df0 = pd.DataFrame(bad_matrix, index=bases, columns=bases)
         
         with pytest.raises(CustomizedError, match="does NOT meet the requirement"):
             EvolutionConfig(
                 n_generation=100,
                 subst_model_parameterization=SubstitutionModel.MUT_RATE_MATRIX,
                 transition_matrix_path=tmp_path / "matrix.csv",
-                mut_rate_matrix=bad_matrix,
+                mut_rate_matrix=df0,
                 cap_withinhost=1
             )
     
